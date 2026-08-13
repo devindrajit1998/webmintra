@@ -1,0 +1,174 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { getCoupons, createCoupon } from "@/lib/admin-api";
+import { Loader2, Plus, Tag, Calendar, Users, X } from "lucide-react";
+
+export const Route = createFileRoute("/admin/coupons")({
+  component: CouponsPage,
+});
+
+function CouponsPage() {
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [form, setForm] = useState({ 
+    code: "", 
+    discountType: "percent",
+    discountValue: 0,
+    intervalType: "all",
+    maxUses: 100, 
+    expiresAt: "" 
+  });
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["adminCoupons", { page }],
+    queryFn: () => getCoupons({ page, limit: 10 }),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: createCoupon,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminCoupons"] });
+      setIsCreateOpen(false);
+      setForm({ code: "", discountType: "percent", discountValue: 0, intervalType: "all", maxUses: 100, expiresAt: "" });
+    },
+  });
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    
+    let applicableIntervals: string[] = [];
+    if (form.intervalType === "monthly") applicableIntervals = ["monthly"];
+    if (form.intervalType === "yearly") applicableIntervals = ["yearly"];
+
+    createMutation.mutate({
+      ...form,
+      discountType: form.discountType,
+      discountValue: Number(form.discountValue),
+      maxUses: Number(form.maxUses),
+      applicableIntervals
+    });
+  }
+
+  return (
+    <div className="w-full">
+      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight">Coupons & Discounts</h1>
+          <p className="mt-1 text-xs text-slate-500">Manage promotional codes for tenant subscriptions.</p>
+        </div>
+        <button 
+          onClick={() => setIsCreateOpen(!isCreateOpen)}
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400"
+        >
+          <Plus className="h-4 w-4" /> Create Coupon
+        </button>
+      </div>
+
+      {isCreateOpen && (
+        <form onSubmit={handleSubmit} className="mb-6 rounded-xl border border-slate-800 bg-[#0b1826] p-5 relative">
+          <button type="button" onClick={() => setIsCreateOpen(false)} className="absolute right-4 top-4 text-slate-500 hover:text-slate-300">
+            <X className="h-5 w-5" />
+          </button>
+          <h2 className="font-display text-lg font-bold mb-4">Create New Coupon</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <label className="text-xs font-medium text-slate-300">Code
+              <input required value={form.code} onChange={e => setForm({...form, code: e.target.value.toUpperCase()})} className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm font-mono uppercase placeholder-slate-600" placeholder="e.g. SUMMER20" />
+            </label>
+            <label className="text-xs font-medium text-slate-300">Type
+              <select value={form.discountType} onChange={e => setForm({...form, discountType: e.target.value})} className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm">
+                <option value="percent">Percentage</option>
+                <option value="flat">Flat Amount</option>
+              </select>
+            </label>
+            <label className="text-xs font-medium text-slate-300">Discount Value
+              <input required type="number" min="1" max={form.discountType === 'percent' ? 100 : undefined} value={form.discountValue || ""} onChange={e => setForm({...form, discountValue: Number(e.target.value)})} className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" placeholder="20" />
+            </label>
+            <label className="text-xs font-medium text-slate-300">Billing Cycle
+              <select value={form.intervalType} onChange={e => setForm({...form, intervalType: e.target.value})} className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm">
+                <option value="all">All Plans</option>
+                <option value="monthly">Monthly Only</option>
+                <option value="yearly">Yearly Only</option>
+              </select>
+            </label>
+            <label className="text-xs font-medium text-slate-300">Max Uses
+              <input required type="number" min="1" value={form.maxUses || ""} onChange={e => setForm({...form, maxUses: Number(e.target.value)})} className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" placeholder="100" />
+            </label>
+            <label className="text-xs font-medium text-slate-300">Expires At
+              <input type="datetime-local" value={form.expiresAt} onChange={e => setForm({...form, expiresAt: e.target.value})} className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm [color-scheme:dark]" />
+            </label>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button type="submit" disabled={createMutation.isPending} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2">
+              {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {createMutation.isPending ? "Creating..." : "Create Coupon"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {isLoading ? (
+          <div className="col-span-full py-10 text-center text-slate-500"><div className="flex flex-col items-center justify-center gap-3 py-8"><Loader2 className="h-8 w-8 animate-spin text-cyan-500" /><p className="text-sm text-slate-500">Loading coupons...</p></div></div>
+        ) : data?.coupons?.length ? (
+          data.coupons.map((coupon: any) => {
+            const isExpired = new Date(coupon.expiresAt) < new Date();
+            const isExhausted = coupon.usedCount >= coupon.maxUses;
+            const status = coupon.status === 'active' && !isExpired && !isExhausted ? 'active' : 'inactive';
+            
+            return (
+              <div key={coupon.id || coupon._id} className="relative flex flex-col rounded-xl border border-slate-800 bg-[#0b1826] p-6 transition-colors hover:border-slate-700">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-900 border border-slate-700">
+                      <Tag className="h-4 w-4 text-cyan-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-slate-200 font-mono text-lg">{coupon.code}</h3>
+                    </div>
+                  </div>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
+                    status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'
+                  }`}>
+                    {status}
+                  </span>
+                </div>
+                
+                <div className="mt-5 border-b border-slate-800/60 pb-5">
+                  <p className="font-display text-4xl font-black text-white">
+                    {coupon.discountType === 'percent' ? `${coupon.discountValue}%` : `₹${coupon.discountValue}`} <span className="text-sm font-normal text-slate-500">off</span>
+                  </p>
+                  {coupon.applicableIntervals && coupon.applicableIntervals.length > 0 && (
+                    <p className="mt-1 text-xs text-cyan-400 capitalize">{coupon.applicableIntervals.join(" & ")} plans only</p>
+                  )}
+                </div>
+
+                <div className="mt-4 flex-1 space-y-3 text-sm">
+                  <div className="flex items-center justify-between text-slate-400">
+                    <span className="flex items-center gap-2"><Users className="h-4 w-4 text-slate-500" /> Usage</span>
+                    <span className="font-medium text-slate-200">{coupon.usedCount} / {coupon.maxUses}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-400">
+                    <span className="flex items-center gap-2"><Calendar className="h-4 w-4 text-slate-500" /> Expires</span>
+                    <span className={`font-medium ${isExpired ? 'text-rose-400' : 'text-slate-200'}`}>
+                      {new Date(coupon.expiresAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div className="col-span-full rounded-xl border border-dashed border-slate-700 p-12 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-800/50 mb-4">
+              <Tag className="h-6 w-6 text-slate-400" />
+            </div>
+            <h3 className="font-display text-lg font-bold text-slate-300">No coupons found</h3>
+            <p className="mt-1 text-sm text-slate-500">Create discount codes to offer promotions to tenants.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
