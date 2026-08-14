@@ -59,6 +59,7 @@ import { Route as TenantWebsitesRouteImport } from './routes/tenant.websites'
 import { Route as AdminTenantsIndexRouteImport } from './routes/admin.tenants.index'
 import { Route as AdminTenantsIdRouteImport } from './routes/admin.tenants.$id'
 import { Route as TenantBuilderIdRouteImport } from './routes/tenant_.builder.$id'
+import { Route as AdminWebsitesIdBuilderRouteImport } from './routes/admin.websites_.$id.builder'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -310,6 +311,11 @@ const TenantBuilderIdRoute = TenantBuilderIdRouteImport.update({
   path: '/tenant/builder/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminWebsitesIdBuilderRoute = AdminWebsitesIdBuilderRouteImport.update({
+  id: '/websites_/$id/builder',
+  path: '/websites/$id/builder',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -362,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
   '/tenant/builder/$id': typeof TenantBuilderIdRoute
   '/admin/tenants/': typeof AdminTenantsIndexRoute
+  '/admin/websites/$id/builder': typeof AdminWebsitesIdBuilderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -413,6 +420,7 @@ export interface FileRoutesByTo {
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
   '/tenant/builder/$id': typeof TenantBuilderIdRoute
   '/admin/tenants': typeof AdminTenantsIndexRoute
+  '/admin/websites/$id/builder': typeof AdminWebsitesIdBuilderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -466,6 +474,7 @@ export interface FileRoutesById {
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
   '/tenant_/builder/$id': typeof TenantBuilderIdRoute
   '/admin/tenants/': typeof AdminTenantsIndexRoute
+  '/admin/websites_/$id/builder': typeof AdminWebsitesIdBuilderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -520,6 +529,7 @@ export interface FileRouteTypes {
     | '/admin/tenants/$id'
     | '/tenant/builder/$id'
     | '/admin/tenants/'
+    | '/admin/websites/$id/builder'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -571,6 +581,7 @@ export interface FileRouteTypes {
     | '/admin/tenants/$id'
     | '/tenant/builder/$id'
     | '/admin/tenants'
+    | '/admin/websites/$id/builder'
   id:
     | '__root__'
     | '/'
@@ -623,6 +634,7 @@ export interface FileRouteTypes {
     | '/admin/tenants/$id'
     | '/tenant_/builder/$id'
     | '/admin/tenants/'
+    | '/admin/websites_/$id/builder'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -991,6 +1003,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TenantBuilderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/websites_/$id/builder': {
+      id: '/admin/websites_/$id/builder'
+      path: '/websites/$id/builder'
+      fullPath: '/admin/websites/$id/builder'
+      preLoaderRoute: typeof AdminWebsitesIdBuilderRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -1018,6 +1037,7 @@ interface AdminRouteChildren {
   AdminWebsitesRoute: typeof AdminWebsitesRoute
   AdminTenantsIdRoute: typeof AdminTenantsIdRoute
   AdminTenantsIndexRoute: typeof AdminTenantsIndexRoute
+  AdminWebsitesIdBuilderRoute: typeof AdminWebsitesIdBuilderRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -1044,6 +1064,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminWebsitesRoute: AdminWebsitesRoute,
   AdminTenantsIdRoute: AdminTenantsIdRoute,
   AdminTenantsIndexRoute: AdminTenantsIndexRoute,
+  AdminWebsitesIdBuilderRoute: AdminWebsitesIdBuilderRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

@@ -13,6 +13,10 @@ export const ACTIVITY_ACTIONS = [
   "tenant_activated",
   "tenant_archived",
   "tenant_deleted",
+  "account_deletion_requested",
+  "account_deletion_cancelled",
+  "account_deletion_approved",
+  "account_deletion_rejected",
   // Subscription
   "subscription_created",
   "subscription_updated",

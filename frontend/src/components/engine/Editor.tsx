@@ -37,6 +37,7 @@ import {
 import { toast } from "sonner";
 import { renderPage, defaultRepeaterItems } from "@/lib/template-engine/render";
 import type { EditableField, EditorState, ElementEdit, TemplateAnalysis, ThemeTokens } from "@/lib/template-engine/types";
+import { FONTAWESOME_CATEGORIES } from "@/lib/template-engine/fontawesome-icons";
 import { Btn, Chip, ColorInput, ConfidenceChip, EmptyState, Panel, SectionTitle, Slider, TextInput, Toggle } from "./ui";
 import { cn } from "@/lib/utils";
 
@@ -548,6 +549,155 @@ function TreeView({
   );
 }
 
+function FontAwesomeIconPicker({
+  selectedClass,
+  onChange,
+}: {
+  selectedClass: string;
+  onChange: (className: string) => void;
+}) {
+  const [category, setCategory] = useState("All");
+  const [search, setSearch] = useState("");
+  const [customInput, setCustomInput] = useState(selectedClass);
+
+  useEffect(() => {
+    setCustomInput(selectedClass);
+  }, [selectedClass]);
+
+  const allIcons = useMemo(() => {
+    return Object.entries(FONTAWESOME_CATEGORIES).flatMap(([cat, icons]) =>
+      icons.map((icon) => ({ ...icon, category: cat })),
+    );
+  }, []);
+
+  const filteredIcons = useMemo(() => {
+    return allIcons.filter((icon) => {
+      const matchesCategory = category === "All" || icon.category === category;
+      const matchesSearch =
+        !search ||
+        icon.name.toLowerCase().includes(search.toLowerCase()) ||
+        icon.class.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [allIcons, category, search]);
+
+  // Extract core fa class for clean icon rendering in the picker UI
+  const getCleanFaClass = (rawClass: string) => {
+    const parts = rawClass.split(/\s+/).filter(Boolean);
+    const faPrefix = parts.find((p) => /^(fa-solid|fa-regular|fa-brands|fa-light|fa-thin|fa-duotone|fa|fas|far|fab)$/i.test(p)) || "fa-solid";
+    const faIcon = parts.find((p) => /^fa-[a-z0-9-]+$/i.test(p) && !/^(fa-solid|fa-regular|fa-brands|fa-light|fa-thin|fa-duotone|fa-2x|fa-3x|fa-4x|fa-5x|fa-lg|fa-sm|fa-xs|fa-fw|fa-spin)$/i.test(p)) || "fa-star";
+    return `${faPrefix} ${faIcon}`;
+  };
+
+  const previewClass = getCleanFaClass(selectedClass);
+
+  return (
+    <div className="space-y-3">
+      <SectionTitle hint="FontAwesome">Icon Selection</SectionTitle>
+
+      {/* Live Preview Box */}
+      <div className="flex items-center gap-3 rounded-xl border border-border bg-elevated/60 p-3">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-primary/30 bg-primary/10 text-primary text-2xl">
+          <i className={previewClass} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-semibold text-foreground">Current Icon</p>
+          <p className="font-mono text-[11px] text-muted-foreground truncate">{selectedClass}</p>
+        </div>
+      </div>
+
+      {/* Category Dropdown */}
+      <div className="space-y-1">
+        <label className="block text-[11px] font-semibold text-muted-foreground">Category</label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="h-8 w-full rounded-lg border border-border bg-background px-2 text-xs text-foreground outline-none focus:border-primary"
+        >
+          <option value="All">All Categories ({allIcons.length} icons)</option>
+          {Object.keys(FONTAWESOME_CATEGORIES).map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Search Input */}
+      <div className="space-y-1">
+        <label className="block text-[11px] font-semibold text-muted-foreground">Search Icons</label>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="e.g., star, phone, twitter, cart..."
+          className="h-8 w-full rounded-lg border border-border bg-background px-2 text-xs text-foreground outline-none focus:border-primary placeholder:text-muted-foreground/60"
+        />
+      </div>
+
+      {/* Icon Grid */}
+      <div className="space-y-1">
+        <label className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+          <span>Choose Icon ({filteredIcons.length})</span>
+        </label>
+        <div className="grid max-h-48 grid-cols-5 gap-1.5 overflow-y-auto rounded-lg border border-border bg-card/50 p-2">
+          {filteredIcons.map((icon) => {
+            const isSelected = selectedClass.includes(icon.class) || selectedClass === icon.class;
+            return (
+              <button
+                key={icon.class + icon.name}
+                type="button"
+                title={`${icon.name} (${icon.class})`}
+                onClick={() => {
+                  // Preserve existing non-FA utility classes like text-brand-400, size classes, etc.
+                  const extraClasses = selectedClass
+                    .split(/\s+/)
+                    .filter((c) => !/^(fa[srbldt]?|fa-[a-z0-9-]+)$/i.test(c))
+                    .join(" ");
+                  const combined = extraClasses ? `${icon.class} ${extraClasses}` : icon.class;
+                  onChange(combined);
+                  setCustomInput(combined);
+                }}
+                className={cn(
+                  "flex h-10 flex-col items-center justify-center rounded-md border border-border/60 text-base text-foreground transition hover:border-primary hover:bg-primary/10 hover:text-primary",
+                  isSelected && "border-primary bg-primary/20 text-primary ring-1 ring-primary",
+                )}
+              >
+                <i className={icon.class} />
+              </button>
+            );
+          })}
+          {filteredIcons.length === 0 && (
+            <div className="col-span-5 py-6 text-center text-xs text-muted-foreground">
+              No matching icons found.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Custom Icon Class override */}
+      <div className="space-y-1">
+        <label className="block text-[11px] font-semibold text-muted-foreground">Custom Class Name</label>
+        <div className="flex gap-2">
+          <input
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            placeholder="fa-solid fa-heart"
+            className="h-8 flex-1 rounded-lg border border-border bg-background px-2 font-mono text-xs text-foreground outline-none focus:border-primary"
+          />
+          <Btn
+            size="sm"
+            onClick={() => {
+              if (customInput.trim()) onChange(customInput.trim());
+            }}
+          >
+            Apply
+          </Btn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StyleControls({ edit, patch, id }: { edit: ElementEdit; patch: (id: string, p: ElementEdit) => void; id: string }) {
   const s = edit.style ?? {};
   const num = (key: string, fallback: number) => parseFloat(String(s[key] ?? fallback));
@@ -700,6 +850,13 @@ function ElementPanel({
           <Toggle label="Muted" checked={edit.muted ?? true} onChange={(v) => patch(selected, { muted: v })} />
           <Toggle label="Loop" checked={!!edit.loop} onChange={(v) => patch(selected, { loop: v })} />
         </div>
+      ) : null}
+
+      {kind === "icon" ? (
+        <FontAwesomeIconPicker
+          selectedClass={edit.className ?? field?.attrs?.["className"] ?? field?.value ?? "fa-solid fa-star"}
+          onChange={(newClass) => patch(selected, { className: newClass })}
+        />
       ) : null}
 
       {kind === "svg" ? (

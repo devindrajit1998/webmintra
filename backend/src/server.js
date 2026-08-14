@@ -48,7 +48,9 @@ import adminSearchRouter from "./routes/admin/search.js";
 import adminStorageRouter from "./routes/admin/storage.js";
 import adminCouponsRouter from "./routes/admin/coupons.js";
 import adminTemplatesRouter from "./routes/admin/templates.js";
+import adminTemplateCategoriesRouter from "./routes/admin/templateCategories.js";
 import adminUploadRouter from "./routes/admin/upload.js";
+import { initCronJobs } from "./services/cron.js";
 
 // ── Environment Validation ──────────────────────────────────────
 const required = ["MONGODB_URI", "JWT_SECRET", "OTP_SECRET"];
@@ -140,6 +142,7 @@ app.use("/api/admin/search", adminSearchRouter);
 app.use("/api/admin/storage", adminStorageRouter);
 app.use("/api/admin/coupons", adminCouponsRouter);
 app.use("/api/admin/templates", adminTemplatesRouter);
+app.use("/api/admin/template-categories", adminTemplateCategoriesRouter);
 app.use("/api/admin/upload", adminUploadRouter);
 
 // ── Public APIs ──────────────────────────────────────────────────
@@ -164,7 +167,10 @@ app.use((error, _request, response, _next) => {
 const port = Number(process.env.PORT ?? 3001);
 mongoose
   .connect(process.env.MONGODB_URI)
-  .then(() => app.listen(port, () => console.log(`API listening on ${port}`)))
+  .then(() => {
+    app.listen(port, () => console.log(`API listening on ${port}`));
+    initCronJobs();
+  })
   .catch((error) => {
     console.error("Database connection failed.", error);
     process.exit(1);

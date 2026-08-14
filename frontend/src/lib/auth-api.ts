@@ -61,6 +61,16 @@ export type TemplatePage = {
   htmlContent: string;
 };
 
+export type FormSubmission = {
+  _id: string;
+  websiteId: string;
+  tenantId: string;
+  data: Record<string, unknown>;
+  source: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type ApiResponse = {
   message: string;
   needsVerification?: boolean;
@@ -162,7 +172,14 @@ export async function getWebsite(websiteId: string) {
   }>(`/${websiteId}`);
 }
 
-export type CatalogTemplate = { id: string; name: string; category: string; description: string };
+export type CatalogTemplate = {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  pageCount: number;
+  thumbnailUrl: string | null;
+};
 
 export async function getTemplates() {
   const response = await fetch(`${API_URL}/templates`);
@@ -197,7 +214,13 @@ export async function archiveWebsite(websiteId: string) {
 }
 
 export async function getWebsiteForms(websiteId: string) {
-  return websiteRequest<{ forms: any[] }>(`/${websiteId}/forms`, { method: "GET" });
+  return websiteRequest<{ forms: FormSubmission[] }>(`/${websiteId}/forms`, { method: "GET" });
+}
+
+export async function deleteWebsiteForm(websiteId: string, submissionId: string) {
+  return websiteRequest<{ message: string }>(`/${websiteId}/forms/${submissionId}`, {
+    method: "DELETE",
+  });
 }
 
 // ── DOMAINS ──────────────────────────────────────────────────
@@ -340,28 +363,55 @@ export type BusinessInfo = {
   description: string;
 };
 
-async function businessRequest<T>(options?: RequestInit): Promise<T> {
-  const response = await apiFetch(`${API_URL}/tenants/business`, {
+async function tenantRequest<T>(path: string, options?: RequestInit): Promise<T> {
+  const response = await apiFetch(`${API_URL}/tenants${path}`, {
     credentials: "include",
     ...options,
     headers: { "content-type": "application/json", ...options?.headers },
   });
   const payload = (await response.json().catch(() => ({
-    message: "Unable to manage business information.",
+    message: "Unable to manage tenant settings.",
   }))) as T & { message?: string };
-  if (!response.ok) throw new Error(payload.message ?? "Unable to manage business information.");
+  if (!response.ok) throw new Error(payload.message ?? "Unable to manage tenant settings.");
   return payload;
 }
 
 export function getBusinessInfo() {
-  return businessRequest<{ business: BusinessInfo }>();
+  return tenantRequest<{ business: BusinessInfo }>("/business");
 }
 
 export function updateBusinessInfo(business: BusinessInfo) {
-  return businessRequest<{ message: string; business: BusinessInfo }>({
+  return tenantRequest<{ message: string; business: BusinessInfo }>("/business", {
     method: "PUT",
     body: JSON.stringify({ business }),
   });
+}
+
+export type AccountDeletionRequest = {
+  id: string;
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  reason: string;
+  requestedAt: string;
+  reviewedAt?: string;
+  adminNote: string;
+};
+
+export function getAccountDeletionRequest() {
+  return tenantRequest<{ deletionRequest: AccountDeletionRequest | null }>("/deletion-request");
+}
+
+export function createAccountDeletionRequest(reason: string, confirmation: string) {
+  return tenantRequest<{ message: string; deletionRequest: AccountDeletionRequest }>(
+    "/deletion-request",
+    {
+      method: "POST",
+      body: JSON.stringify({ reason, confirmation }),
+    },
+  );
+}
+
+export function cancelAccountDeletionRequest() {
+  return tenantRequest<{ message: string }>("/deletion-request", { method: "DELETE" });
 }
 
 export async function uploadBusinessBranding(file: File, assetType: "logo" | "favicon") {
@@ -719,6 +769,34 @@ async function workspaceRequest<T>(path: string, options: RequestInit = {}): Pro
     .catch(() => ({ message: "Unable to load workspace data." }));
   if (!response.ok) throw new Error(payload.message ?? "Unable to load workspace data.");
   return payload as T;
+}
+
+export type UserNotification = {
+  id: string;
+  _id: string;
+  type: string;
+  title: string;
+  message: string;
+  link: string;
+  isRead: boolean;
+  readAt?: string;
+  createdAt: string;
+};
+
+export function getTenantNotifications(limit = 8) {
+  return workspaceRequest<{ notifications: UserNotification[]; unreadCount: number }>(
+    `/notifications?limit=${limit}`,
+  );
+}
+
+export function markTenantNotificationRead(notificationId: string) {
+  return workspaceRequest<{ message: string }>(`/notifications/${notificationId}/read`, {
+    method: "PATCH",
+  });
+}
+
+export function markAllTenantNotificationsRead() {
+  return workspaceRequest<{ message: string }>("/notifications/read-all", { method: "PATCH" });
 }
 
 export type TenantAnalytics = {

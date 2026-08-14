@@ -112,6 +112,7 @@ const kindLabels: Record<FieldKind, string> = {
   image: "Image",
   video: "Video",
   svg: "SVG",
+  icon: "Icon",
   table: "Table",
 };
 
@@ -492,6 +493,14 @@ function detectFields(doc: Document, repeaters: Repeater[]): EditableField[] {
     }
     if (tag === "SVG" || tag === "svg") {
       push(el, "svg", "", "Medium", "graphic", {});
+      return;
+    }
+    const classList = el.getAttribute("class") ?? "";
+    const isFontAwesome = /\bfa[srbldt]?\b|\bfa-[a-z0-9-]+\b/i.test(classList);
+    if ((tag === "I" || tag === "SPAN" || tag === "EM") && isFontAwesome) {
+      push(el, "icon", classList, "High", "FontAwesome Icon", {
+        className: classList,
+      });
       return;
     }
     if (tag === "TABLE") {

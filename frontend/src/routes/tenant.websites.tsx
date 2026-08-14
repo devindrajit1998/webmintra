@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTenantContext } from "@/components/TenantDashboard";
 import { useMutation } from "@tanstack/react-query";
@@ -97,10 +97,11 @@ function WebsitesPage() {
 
 function WebsiteCard({ website }: { website: Website }) {
   const isPublished = website.status === 'published';
+  const BASE_DOMAIN = window.location.hostname.includes("localhost") ? window.location.host : "webmintra.cloud";
   const url = isPublished 
     ? website.customDomain
       ? `https://${website.customDomain}`
-      : `https://${website.id}.webmintra.cloud`
+      : `http${BASE_DOMAIN.includes("localhost") ? "" : "s"}://${website.id}.${BASE_DOMAIN}`
     : null;
 
   return (
@@ -144,7 +145,7 @@ function WebsiteCard({ website }: { website: Website }) {
 
           {url ? (
             <a href={url} target="_blank" rel="noreferrer" className="mt-3 flex items-center gap-1 text-[11px] text-slate-400 hover:text-cyan-400 transition-colors w-fit">
-              {`${website.id}.webmintra.cloud`}
+              {`${website.id}.${BASE_DOMAIN}`}
               <ExternalLink className="h-3 w-3" />
             </a>
           ) : (

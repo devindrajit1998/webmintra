@@ -129,10 +129,16 @@ function WebsitesPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex flex-col items-end gap-2">
-
+                      <div className="flex items-center justify-end gap-2">
+                        <a
+                          href={`/admin/websites_/${website.id}/builder`}
+                          className="inline-flex items-center gap-1 rounded-lg border border-cyan-500/20 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-400 transition hover:bg-cyan-500 hover:text-slate-950"
+                          title="Open inline builder for testing"
+                        >
+                          <Pencil className="h-3 w-3" /> Edit Inline
+                        </a>
                         {website.status !== 'archived' && (
-                          <button className="text-xs font-medium text-rose-400 hover:text-rose-300 flex items-center justify-end gap-1">
+                          <button className="text-xs font-medium text-rose-400 hover:text-rose-300 flex items-center justify-end gap-1 ml-2">
                             <Archive className="h-3 w-3" /> Suspend
                           </button>
                         )}

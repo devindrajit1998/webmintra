@@ -13,10 +13,60 @@ import { Subscription } from "../../models/Subscription.js";
 import { Payment } from "../../models/Payment.js";
 import { Domain } from "../../models/Domain.js";
 import { ActivityLog } from "../../models/ActivityLog.js";
+import { AccountDeletionRequest } from "../../models/AccountDeletionRequest.js";
+import { Notification } from "../../models/Notification.js";
+import { FormSubmission } from "../../models/FormSubmission.js";
+import { AnalyticsEvent } from "../../models/AnalyticsEvent.js";
+import { StorageItem } from "../../models/StorageItem.js";
+import { SupportTicket } from "../../models/SupportTicket.js";
+import { TenantBlogPost } from "../../models/TenantBlogPost.js";
 import { logActivity, buildLogContext } from "../../services/activityLog.js";
 import { parsePagination, parseSort, isMongoId, isEnum } from "../../lib/validate.js";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import { imagekit } from "../../lib/imagekit.js";
+
+async function cascadeDeleteTenantData(tenantId, reqUserId) {
+    const storageItems = await StorageItem.find({ tenant: tenantId }).select("metadata").lean();
+    
+    // Chunk array to avoid overwhelming the Node event loop or SDK if there are many files
+    const chunkSize = 10;
+    for (let i = 0; i < storageItems.length; i += chunkSize) {
+        const chunk = storageItems.slice(i, i + chunkSize);
+        await Promise.allSettled(chunk.map(item => {
+            if (item.metadata?.providerFileId) {
+                return imagekit.deleteFile(item.metadata.providerFileId);
+            }
+            return Promise.resolve();
+        }));
+    }
+    
+    // Attempt to delete the tenant's base folder (handles logos/favicons not in StorageItem)
+    try {
+        await imagekit.deleteFolder(`/webmintra/tenants/${tenantId}`);
+    } catch (e) {
+        // Ignored if folder doesn't exist or is not empty (though we just deleted the files)
+    }
+
+    await Promise.all([
+        Website.deleteMany({ owner: tenantId }),
+        Domain.deleteMany({ tenant: tenantId }),
+        Subscription.deleteMany({ tenant: tenantId }),
+        Payment.deleteMany({ tenant: tenantId }),
+        FormSubmission.deleteMany({ tenantId: tenantId }),
+        AnalyticsEvent.deleteMany({ tenant: tenantId }),
+        StorageItem.deleteMany({ tenant: tenantId }),
+        SupportTicket.deleteMany({ tenant: tenantId }),
+        TenantBlogPost.deleteMany({ author: tenantId }),
+        Notification.deleteMany({ recipient: tenantId }),
+        ActivityLog.deleteMany({ actor: tenantId }),
+        ActivityLog.deleteMany({ "resource.id": String(tenantId) }),
+        reqUserId ? AccountDeletionRequest.updateMany(
+            { tenant: tenantId, status: "pending" },
+            { $set: { status: "approved", reviewedAt: new Date(), reviewedBy: reqUserId } }
+        ) : Promise.resolve(),
+    ]);
+}
 
 const router = Router();
 router.use(requireAuthenticatedUser, requireRole("admin"));
@@ -84,7 +134,7 @@ router.get("/:tenantId", async (req, res, next) => {
 
     if (!tenant) return res.status(404).json({ message: "Tenant not found." });
 
-    const [websites, subscription, payments, domains, recentActivity, invitation] = await Promise.all([
+    const [websites, subscription, payments, domains, recentActivity, invitation, deletionRequest] = await Promise.all([
       Website.find({ owner: tenant._id }).select("name status templateName createdAt updatedAt").lean(),
       Subscription.findOne({ tenant: tenant._id }).sort({ createdAt: -1 }).populate("plan", "name interval price").lean(),
       Payment.find({ tenant: tenant._id }).sort({ createdAt: -1 }).limit(10).lean(),
@@ -94,6 +144,7 @@ router.get("/:tenantId", async (req, res, next) => {
         .limit(10)
         .lean(),
       Invitation.findById(tenant.invitationId).lean(),
+      AccountDeletionRequest.findOne({ tenant: tenant._id, status: "pending" }).lean(),
     ]);
 
     // Build onboarding stages
@@ -114,6 +165,7 @@ router.get("/:tenantId", async (req, res, next) => {
       recentPayments: payments.map(formatPayment),
       domains: domains.map((d) => ({ id: d._id, domain: d.domain, status: d.status, sslStatus: d.sslStatus, isPrimary: d.isPrimary })),
       recentActivity: recentActivity.map((a) => ({ id: a._id, action: a.action, description: a.description, createdAt: a.createdAt })),
+      deletionRequest: deletionRequest ? formatDeletionRequest(deletionRequest) : null,
     });
   } catch (error) {
     return next(error);
@@ -266,6 +318,74 @@ router.patch("/:tenantId/limits", async (req, res, next) => {
   }
 });
 
+// ── Review Account Deletion Request ───────────────────────────
+router.post("/:tenantId/deletion-request/review", async (req, res, next) => {
+  try {
+    if (!isMongoId(req.params.tenantId))
+      return res.status(400).json({ message: "Invalid tenant ID." });
+
+    const decision = req.body?.decision;
+    const adminNote = typeof req.body?.adminNote === "string" ? req.body.adminNote.trim() : "";
+    if (!["approve", "reject"].includes(decision)) {
+      return res.status(400).json({ message: "Decision must be approve or reject." });
+    }
+    if (adminNote.length > 1000) {
+      return res.status(400).json({ message: "Admin note must be 1000 characters or fewer." });
+    }
+
+    const tenant = await User.findOne({ _id: req.params.tenantId, role: "tenant" });
+    if (!tenant) return res.status(404).json({ message: "Tenant not found." });
+
+    const deletionRequest = await AccountDeletionRequest.findOne({
+      tenant: tenant._id,
+      status: "pending",
+    });
+    if (!deletionRequest) {
+      return res.status(404).json({ message: "No pending deletion request was found." });
+    }
+
+    deletionRequest.status = decision === "approve" ? "approved" : "rejected";
+    deletionRequest.reviewedAt = new Date();
+    deletionRequest.reviewedBy = req.user._id;
+    deletionRequest.adminNote = adminNote;
+    await deletionRequest.save();
+
+    if (decision === "reject") {
+      await Notification.create({
+        recipient: tenant._id,
+        type: "tenant",
+        title: "Account deletion request declined",
+        message: adminNote || "Your account deletion request was declined by an administrator.",
+        link: "/tenant/settings",
+        metadata: { deletionRequestId: String(deletionRequest._id) },
+      });
+      await logActivity({
+        ...buildLogContext(req),
+        action: "account_deletion_rejected",
+        description: `Account deletion request for ${tenant.name} (${tenant.email}) was rejected.`,
+        resource: { type: "tenant", id: String(tenant._id), name: tenant.name },
+        metadata: { deletionRequestId: String(deletionRequest._id), adminNote },
+      });
+      return res.json({ message: "Account deletion request rejected." });
+    }
+
+    await cascadeDeleteTenantData(tenant._id, req.user._id);
+    await User.deleteOne({ _id: tenant._id });
+
+    await logActivity({
+      ...buildLogContext(req),
+      action: "account_deletion_approved",
+      description: `Account deletion request for ${tenant.name} (${tenant.email}) was approved and the tenant was permanently deleted.`,
+      resource: { type: "tenant", id: String(tenant._id), name: tenant.name },
+      metadata: { deletionRequestId: String(deletionRequest._id), adminNote },
+    });
+
+    return res.json({ message: "Account deletion approved and tenant data deleted." });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 // ── Delete Tenant ─────────────────────────────────────────────
 router.delete("/:tenantId", async (req, res, next) => {
   try {
@@ -275,12 +395,8 @@ router.delete("/:tenantId", async (req, res, next) => {
     const tenant = await User.findOneAndDelete({ _id: req.params.tenantId, role: "tenant" });
     if (!tenant) return res.status(404).json({ message: "Tenant not found." });
 
-    // Cascade: delete related websites, domains
-    await Promise.all([
-      Website.deleteMany({ owner: tenant._id }),
-      Domain.deleteMany({ tenant: tenant._id }),
-      Subscription.deleteMany({ tenant: tenant._id }),
-    ]);
+    // Cascade: delete tenant-owned workspace, operational records, and ImageKit files
+    await cascadeDeleteTenantData(tenant._id, req.user._id);
 
     await logActivity({
       ...buildLogContext(req),
@@ -362,6 +478,16 @@ router.post("/bulk", async (req, res, next) => {
 });
 
 // ── Helpers ───────────────────────────────────────────────────
+
+function formatDeletionRequest(request) {
+  return {
+    id: String(request._id),
+    status: request.status,
+    reason: request.reason || "",
+    requestedAt: request.requestedAt,
+    adminNote: request.adminNote || "",
+  };
+}
 
 function formatTenant(t) {
   return {

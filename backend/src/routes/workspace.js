@@ -10,12 +10,66 @@ import { buildLogContext, logActivity } from "../services/activityLog.js";
 import { isMongoId, isString, parsePagination, stripUndefined } from "../lib/validate.js";
 import { Website } from "../models/Website.js";
 import { AnalyticsEvent } from "../models/AnalyticsEvent.js";
-import { TenantBlogPost, TENANT_POST_STATUSES } from "../models/TenantBlogPost.js";
+import { resolveTenantSeoEntitlements } from "../lib/tenant-seo-entitlements.js";
+import { checkStorageLimit } from "../services/limits.js";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } }); // 2MB limit
 
 router.use(requireAuthenticatedUser, requireRole("tenant"), establishTenantContext);
+
+router.get("/notifications", async (req, res, next) => {
+    try {
+        const { limit } = parsePagination({ page: 1, limit: req.query.limit ?? 8 });
+        const [notifications, unreadCount] = await Promise.all([
+            Notification.find({ recipient: req.tenantId })
+                .sort({ createdAt: -1 })
+                .limit(limit)
+                .select("type title message link isRead readAt createdAt")
+                .lean(),
+            Notification.countDocuments({ recipient: req.tenantId, isRead: false }),
+        ]);
+
+        return res.json({
+            notifications: notifications.map((notification) => ({
+                ...notification,
+                id: notification._id,
+            })),
+            unreadCount,
+        });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+router.patch("/notifications/read-all", async (req, res, next) => {
+    try {
+        await Notification.updateMany(
+            { recipient: req.tenantId, isRead: false },
+            { isRead: true, readAt: new Date() },
+        );
+        return res.json({ message: "All notifications marked as read." });
+    } catch (error) {
+        return next(error);
+    }
+});
+
+router.patch("/notifications/:notificationId/read", async (req, res, next) => {
+    try {
+        if (!isMongoId(req.params.notificationId)) {
+            return res.status(400).json({ message: "Invalid notification ID." });
+        }
+        const notification = await Notification.findOneAndUpdate(
+            { _id: req.params.notificationId, recipient: req.tenantId },
+            { isRead: true, readAt: new Date() },
+            { new: true },
+        );
+        if (!notification) return res.status(404).json({ message: "Notification not found." });
+        return res.json({ message: "Notification marked as read." });
+    } catch (error) {
+        return next(error);
+    }
+});
 
 router.get("/activity", async (req, res, next) => {
     try {
@@ -114,6 +168,12 @@ router.post("/support", async (req, res, next) => {
 router.post("/support/upload", upload.single("file"), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+        const entitlements = await resolveTenantSeoEntitlements(req.user);
+        const isAllowed = await checkStorageLimit(req.tenantId, req.file.size, entitlements.limits);
+        if (!isAllowed) {
+            return res.status(403).json({ message: `You have exceeded your plan's storage limit of ${entitlements.limits.storageMb}MB. Please upgrade your plan or delete some files.` });
+        }
 
         const response = await imagekit.upload({
             file: req.file.buffer.toString("base64"),

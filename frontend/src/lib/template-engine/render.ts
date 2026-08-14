@@ -12,6 +12,7 @@ export function defaultRepeaterItems(itemIds: string[]) {
 }
 
 function applyEdit(el: Element, edit: ElementEdit) {
+  if (edit.className !== undefined) el.setAttribute("class", edit.className);
   if (edit.text !== undefined && el.children.length === 0) el.textContent = edit.text;
   else if (edit.text !== undefined) {
     const target = el.querySelector("span,strong,em") ?? el;
@@ -287,7 +288,8 @@ export function renderPage(
     html = html.replace(re, (m) => pairs.find(([from]) => from.toLowerCase() === m.toLowerCase())?.[1] ?? m);
   }
 
-  html = html.replace("</head>", `<style id="te-theme">${themeCss(state.theme)}</style></head>`);
+  const faLink = `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />`;
+  html = html.replace("</head>", `${faLink}<style id="te-theme">${themeCss(state.theme)}</style></head>`);
   if (opts.interactive) html = html.replace("</body>", `${BRIDGE}</body>`);
   return html;
 }

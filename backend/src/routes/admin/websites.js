@@ -88,6 +88,119 @@ router.get("/:websiteId", async (req, res, next) => {
   }
 });
 
+// ── Get Website Editor Data (Admin Testing) ───────────────────
+router.get("/:websiteId/editor", async (req, res, next) => {
+  try {
+    if (!isMongoId(req.params.websiteId))
+      return res.status(400).json({ message: "Invalid website ID." });
+
+    const website = await Website.findById(req.params.websiteId)
+      .populate("templateId", "htmlContent pages")
+      .populate("owner", "name email plan");
+
+    if (!website) return res.status(404).json({ message: "Website not found." });
+
+    const htmlContent = website.templateId?.htmlContent || "";
+    const pages = website.templateId?.pages || [];
+
+    return res.json({
+      website: {
+        id: website.id || website._id?.toString(),
+        name: website.name,
+        templateName: website.templateName,
+        templateId: website.templateId,
+        status: website.status,
+        lastOpenedAt: website.lastOpenedAt,
+        createdAt: website.createdAt,
+        updatedAt: website.updatedAt,
+        draftState: website.draftState,
+        publishedState: website.publishedState,
+        owner: website.owner,
+      },
+      htmlContent,
+      pages,
+      seoEntitlements: {
+        limits: { websites: 999, pagesPerWebsite: 999, storageMb: 9999 },
+        seoFeatures: {
+          metaTitleDescription: true,
+          socialSharePreviews: true,
+          sitemapGeneration: true,
+          searchConsoleVerification: true,
+          googleAnalyticsIntegration: true,
+          custom301Redirects: true,
+          custom404Page: true,
+          imageAltText: "enabled",
+        },
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// ── Save Website Draft (Admin Testing) ─────────────────────────
+router.put("/:websiteId/draft", async (req, res, next) => {
+  try {
+    if (!isMongoId(req.params.websiteId))
+      return res.status(400).json({ message: "Invalid website ID." });
+
+    const { draftState } = req.body;
+    if (!draftState) return res.status(400).json({ message: "Draft state is required." });
+
+    const website = await Website.findByIdAndUpdate(
+      req.params.websiteId,
+      { $set: { draftState } },
+      { new: true },
+    );
+    if (!website) return res.status(404).json({ message: "Website not found." });
+
+    await logActivity({
+      ...buildLogContext(req),
+      action: "website_updated",
+      description: `Admin edited website draft for "${website.name}".`,
+      resource: { type: "website", id: String(website._id), name: website.name },
+    });
+
+    return res.json({
+      website: formatWebsite(website.toObject()),
+      message: "Draft saved successfully.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// ── Publish Website (Admin Testing) ───────────────────────────
+router.post("/:websiteId/publish", async (req, res, next) => {
+  try {
+    if (!isMongoId(req.params.websiteId))
+      return res.status(400).json({ message: "Invalid website ID." });
+
+    const website = await Website.findById(req.params.websiteId);
+    if (!website) return res.status(404).json({ message: "Website not found." });
+
+    website.publishedState = website.draftState;
+    website.status = "published";
+    website.markModified("draftState");
+    website.markModified("publishedState");
+    await website.save();
+
+    await logActivity({
+      ...buildLogContext(req),
+      action: "website_published",
+      description: `Admin published website "${website.name}".`,
+      resource: { type: "website", id: String(website._id), name: website.name },
+    });
+
+    return res.json({
+      website: formatWebsite(website.toObject()),
+      message: "Website published successfully.",
+    });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 // ── Update Website Status ─────────────────────────────────────
 router.patch("/:websiteId/status", async (req, res, next) => {
   try {
