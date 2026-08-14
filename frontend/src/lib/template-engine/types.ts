@@ -42,6 +42,7 @@ export interface Repeater {
   containerId: string;
   label: string;
   type: string;
+  sectionName?: string | undefined;
   itemIds: string[];
   itemLabels: string[];
   fieldsPerItem: number;
@@ -180,7 +181,8 @@ export interface ElementEdit {
   muted?: boolean;
   loop?: boolean;
   poster?: string;
-  placeholder?: string;
+  iconClass?: string;
+  className?: string;
   style?: Record<string, string>;
 }
 

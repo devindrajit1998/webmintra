@@ -1,4 +1,4 @@
-﻿import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { getWebsite, saveDraft, publishWebsite, uploadWebsiteImage } from "@/lib/auth-api";
@@ -74,6 +74,7 @@ function BuilderPage() {
     <div className="flex h-screen flex-col bg-background overflow-hidden">
       <Editor
         analysis={analysis}
+        websiteId={id}
         initialState={data.website.draftState}
         entitlements={data.seoEntitlements.seoFeatures}
         onExit={() => navigate({ to: "/tenant" })}

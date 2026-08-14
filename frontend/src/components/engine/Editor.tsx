@@ -12,6 +12,7 @@ import {
   Download,
   Eye,
   EyeOff,
+  FileCode2,
   History,
   Image as ImageIcon,
   Laptop,
@@ -20,6 +21,7 @@ import {
   ListTree,
   Monitor,
   Palette,
+  Pencil,
   Plus,
   Redo2,
   RotateCcw,
@@ -32,8 +34,12 @@ import {
   Trash2,
   Type,
   Undo2,
+  Upload,
   Video as VideoIcon,
+  X,
+  Loader2,
 } from "lucide-react";
+import { getWebsiteAssets, type MediaAsset } from "@/lib/auth-api";
 import { toast } from "sonner";
 import { renderPage, defaultRepeaterItems } from "@/lib/template-engine/render";
 import type { EditableField, EditorState, ElementEdit, TemplateAnalysis, ThemeTokens } from "@/lib/template-engine/types";
@@ -55,16 +61,20 @@ const itemKeyOf = (id: string) => (id.includes("::") ? (id.split("::")[0] ?? "")
 
 export function Editor({
   analysis,
+  websiteId,
   initialState,
   entitlements,
+  isAdmin = false,
   onExit,
   onSaveDraft,
   onPublish,
   onUploadImage,
 }: {
   analysis: TemplateAnalysis;
+  websiteId?: string;
   initialState?: Partial<EditorState> | undefined;
   entitlements?: Record<string, boolean | string> | undefined;
+  isAdmin?: boolean;
   onExit: () => void;
   onSaveDraft?: (state: EditorState) => void;
   onPublish?: (state: EditorState) => void;
@@ -97,6 +107,7 @@ export function Editor({
   const [pageId, setPageId] = useState(analysis.pages[0]?.id ?? "");
   const page = analysis.pages.find((p) => p.id === pageId) ?? analysis.pages[0]!;
   const [selected, setSelected] = useState<string | null>(null);
+  const [interactMode, setInteractMode] = useState(false);
   const [device, setDevice] = useState<string>("desktop");
   const [customWidth, setCustomWidth] = useState(1440);
   const [landscape, setLandscape] = useState(false);
@@ -109,6 +120,13 @@ export function Editor({
   const [toast, setToast] = useState("");
   const frameRef = useRef<HTMLIFrameElement>(null);
   const previewScrollRef = useRef<{ x: number; y: number } | null>(null);
+
+  const toggleInteractMode = () => {
+    const next = !interactMode;
+    setInteractMode(next);
+    frameRef.current?.contentWindow?.postMessage({ source: "te-host", type: "set-interact-mode", interact: next }, "*");
+    flash(next ? "Interactive Mode: Click buttons/modals to test" : "Edit Mode: Click any element to edit");
+  };
 
   const preservePreviewScroll = () => {
     const previewWindow = frameRef.current?.contentWindow;
@@ -177,9 +195,27 @@ export function Editor({
         setSelected(d.id);
         setTab("element");
       }
+      if (d.type === "open-tab" && typeof d.tab === "string") {
+        if (d.id) setSelected(d.id);
+        setTab(d.tab as RightTab);
+      }
+      if (d.type === "delete-element" && typeof d.id === "string") {
+        patch(d.id, { hidden: true });
+        flash("Element hidden from page");
+      }
+      if (d.type === "style-patch" && typeof d.id === "string" && d.style) {
+        patch(d.id, { style: d.style });
+      }
       if (d.type === "text") patch(d.id, { text: String(d.value ?? "") });
-      if (d.type === "repeater-add" && typeof d.repeaterId === "string") {
-        addRepeaterItem(d.repeaterId, Number(d.sourceIndex));
+      if (d.type === "navigate" && typeof d.href === "string") {
+        const cleanHref = d.href.replace(/^\//, "").split("#")[0]?.split("?")[0] || "";
+        const targetPage = analysis.pages.find((p) => p.name === cleanHref || p.name === `${cleanHref}.html` || (cleanHref === "" && p.name === "index.html"));
+        if (targetPage) {
+          setPageId(targetPage.id);
+          flash(`Switched to ${targetPage.name}`);
+        } else {
+          flash(`Link points to ${d.href} (Navigation restricted in editor)`);
+        }
       }
     };
     window.addEventListener("message", onMsg);
@@ -197,6 +233,116 @@ export function Editor({
     setSelected(id);
     frameRef.current?.contentWindow?.postMessage({ source: "te-host", type: "focus", id }, "*");
   };
+
+  // Keyboard shortcuts handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      const isInput =
+        activeEl instanceof HTMLInputElement ||
+        activeEl instanceof HTMLTextAreaElement ||
+        activeEl?.getAttribute("contenteditable") === "true";
+
+      // Save Draft (Ctrl+S / Cmd+S)
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        setRevisions((r) => [{ label: `Revision ${r.length + 1}`, at: new Date().toLocaleString(), state }, ...r]);
+        if (onSaveDraft) onSaveDraft(state);
+        flash("Version saved");
+        return;
+      }
+
+      // Undo (Ctrl+Z / Cmd+Z)
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z") {
+        if (!isInput && cursor > 0) {
+          e.preventDefault();
+          setCursor((c) => c - 1);
+          flash("Undo");
+        }
+        return;
+      }
+
+      // Redo (Ctrl+Y or Ctrl+Shift+Z)
+      if (
+        ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "z")
+      ) {
+        if (!isInput && cursor < history.length - 1) {
+          e.preventDefault();
+          setCursor((c) => c + 1);
+          flash("Redo");
+        }
+        return;
+      }
+
+      // Escape to deselect
+      if (e.key === "Escape") {
+        if (selected) {
+          setSelected(null);
+          frameRef.current?.contentWindow?.postMessage({ source: "te-host", type: "focus", id: "" }, "*");
+        }
+        return;
+      }
+
+      // Delete/Backspace to hide selected element
+      if ((e.key === "Delete" || e.key === "Backspace") && !isInput && selected) {
+        e.preventDefault();
+        patch(selected, { hidden: true });
+        flash("Element hidden from page");
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [cursor, history.length, onSaveDraft, patch, selected, state]);
+
+  // Compute breadcrumbs for currently selected element
+  const breadcrumbs = useMemo(() => {
+    if (!selected || !page) return [];
+    const crumbs: { id: string; label: string; tag: string }[] = [];
+    const bId = baseId(selected);
+
+    // Find in tree recursively
+    const findPath = (
+      nodes: { id: string; label: string; kind: string; children: unknown[] }[],
+      targetId: string,
+      path: { id: string; label: string; tag: string }[] = [],
+    ): { id: string; label: string; tag: string }[] | null => {
+      if (!Array.isArray(nodes)) return null;
+      for (const n of nodes) {
+        if (!n) continue;
+        const currentPath = [...path, { id: n.id, label: n.label, tag: n.kind }];
+        if (n.id === targetId || n.id === bId) {
+          return currentPath;
+        }
+        if (Array.isArray(n.children) && n.children.length) {
+          const res = findPath(
+            n.children as { id: string; label: string; kind: string; children: unknown[] }[],
+            targetId,
+            currentPath,
+          );
+          if (res) return res;
+        }
+      }
+      return null;
+    };
+
+    if (page.tree) {
+      const treePath = findPath(page.tree, selected);
+      if (treePath?.length) {
+        return treePath;
+      }
+    }
+
+    // Fallback: match field & repeater
+    const f = page.fields?.find((f) => f.id === bId);
+    if (f?.inRepeater && page.repeaters) {
+      const rep = page.repeaters.find((r) => r.id === f.inRepeater);
+      if (rep) crumbs.push({ id: rep.containerId, label: rep.label, tag: "repeater" });
+    }
+    if (f) crumbs.push({ id: selected, label: f.label || f.tag, tag: f.tag });
+    return crumbs;
+  }, [page, selected]);
 
   const flash = (msg: string) => {
     setToast(msg);
@@ -224,20 +370,27 @@ export function Editor({
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
       {/* top bar */}
-      <header className="z-20 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-2.5 sm:flex sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
-          <button onClick={onExit} className="flex min-w-0 items-center gap-2" title="Choose another website">
-            <span className="text-primary grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/12">
-              W
+      <header className="z-20 flex items-center justify-between border-b border-border bg-card/90 px-4 py-2 backdrop-blur-md">
+        <div className="flex min-w-0 items-center gap-4">
+          <button onClick={onExit} className="flex min-w-0 items-center gap-2.5 group" title="Exit to templates">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary font-bold transition group-hover:scale-105 group-hover:bg-primary/25 border border-primary/30 shadow-xs">
+              WM
             </span>
-            <span className="min-w-0">
-              <span className="block truncate font-display text-sm font-bold">WebMintra</span>
+            <span className="min-w-0 text-left">
+              <span className="flex items-center gap-1.5 font-display text-xs font-bold tracking-tight text-foreground">
+                {analysis.name}
+                {published && <span className="rounded-full bg-emerald-500/15 px-1.5 py-0.2 text-[9px] font-medium text-emerald-400 border border-emerald-500/30">Live</span>}
+              </span>
               <span className="block truncate text-[10px] text-muted-foreground">
-                {analysis.name} · {savedAt ? `Last saved at ${savedAt}` : "Changes saved automatically"} {published ? "· Live" : ""}
+                {savedAt ? `Saved at ${savedAt}` : "Autosaved"}
               </span>
             </span>
           </button>
-          <div className="hidden gap-1 lg:flex">
+
+          <div className="h-4 w-px bg-border hidden sm:block" />
+
+          {/* Page Tabs */}
+          <div className="flex items-center gap-1 overflow-x-auto">
             {analysis.pages.map((p) => (
               <button
                 key={p.id}
@@ -246,44 +399,57 @@ export function Editor({
                   setSelected(null);
                 }}
                 className={cn(
-                  "rounded-lg px-2.5 py-1.5 text-xs font-semibold transition",
-                  p.id === pageId ? "bg-primary/12 text-primary" : "text-muted-foreground hover:text-foreground",
+                  "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition",
+                  p.id === pageId
+                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                    : "text-muted-foreground hover:bg-elevated hover:text-foreground",
                 )}
               >
-                {p.name}
+                <FileCode2 className="h-3 w-3" />
+                <span>{p.name}</span>
               </button>
             ))}
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Btn size="icon" variant="ghost" title="Undo" disabled={cursor === 0} onClick={() => setCursor((c) => c - 1)}>
-            <Undo2 className="h-4 w-4" />
+
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="flex items-center gap-0.5 rounded-lg border border-border bg-elevated/40 p-0.5">
+            <Btn size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-foreground" title="Undo (Ctrl+Z)" disabled={cursor === 0} onClick={() => setCursor((c) => c - 1)}>
+              <Undo2 className="h-3.5 w-3.5" />
+            </Btn>
+            <Btn
+              size="icon"
+              variant="ghost"
+              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+              title="Redo (Ctrl+Y)"
+              disabled={cursor >= history.length - 1}
+              onClick={() => setCursor((c) => c + 1)}
+            >
+              <Redo2 className="h-3.5 w-3.5" />
+            </Btn>
+          </div>
+
+          <Btn size="sm" variant="ghost" className="text-xs text-muted-foreground hover:text-foreground gap-1.5" title="Export page HTML" onClick={download}>
+            <Download className="h-3.5 w-3.5" /> Export
           </Btn>
-          <Btn
-            size="icon"
-            variant="ghost"
-            title="Redo"
-            disabled={cursor >= history.length - 1}
-            onClick={() => setCursor((c) => c + 1)}
-          >
-            <Redo2 className="h-4 w-4" />
-          </Btn>
-          <Btn size="icon" variant="ghost" title="Export page HTML" onClick={download}>
-            <Download className="h-4 w-4" />
-          </Btn>
+
           <Btn
             size="sm"
+            variant="outline"
+            className="text-xs border-border/80 text-foreground gap-1.5 shadow-xs"
             onClick={() => {
               setRevisions((r) => [{ label: `Revision ${r.length + 1}`, at: new Date().toLocaleString(), state }, ...r]);
               if (onSaveDraft) onSaveDraft(state);
-              flash("Version saved");
+              flash("Draft saved");
             }}
           >
-            <Save className="h-3.5 w-3.5" /> Save a version
+            <Save className="h-3.5 w-3.5" /> Save Draft
           </Btn>
+
           <Btn
             size="sm"
             variant="primary"
+            className="text-xs font-semibold gap-1.5 shadow-sm"
             onClick={() => {
               const errs = analysis.issues.filter((i) => i.severity === "error").length;
               if (errs) {
@@ -296,7 +462,7 @@ export function Editor({
               flash("Your changes are live");
             }}
           >
-            Make changes live
+            <Sparkles className="h-3.5 w-3.5" /> Publish Live
           </Btn>
         </div>
       </header>
@@ -378,6 +544,31 @@ export function Editor({
             <Btn size="sm" variant={landscape ? "primary" : "default"} onClick={() => setLandscape(!landscape)}>
               <RotateCcw className="h-3.5 w-3.5" /> {landscape ? "Landscape" : "Portrait"}
             </Btn>
+
+            <div className="flex items-center gap-1 bg-background/80 rounded-lg p-0.5 border border-border">
+              <button
+                type="button"
+                onClick={() => interactMode && toggleInteractMode()}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition",
+                  !interactMode ? "bg-primary text-primary-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Click any element to select and edit its content or style"
+              >
+                <Pencil className="h-3 w-3" /> Edit Mode
+              </button>
+              <button
+                type="button"
+                onClick={() => !interactMode && toggleInteractMode()}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold transition",
+                  interactMode ? "bg-cyan-500 text-slate-950 font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
+                )}
+                title="Test modals, buttons, and popups by clicking them directly"
+              >
+                <Eye className="h-3 w-3" /> Interact &amp; Open Modals
+              </button>
+            </div>
             <div className="ml-auto flex items-center gap-2">
               <Chip>{frameWidth}px</Chip>
               <div className="w-28">
@@ -385,30 +576,81 @@ export function Editor({
               </div>
             </div>
           </div>
-          <div className="surface-grid min-h-0 flex-1 overflow-auto p-6">
-            <div className="mx-auto" style={{ width: frameWidth * zoom }}>
+          <div className="surface-grid min-h-0 flex-1 overflow-auto p-4 sm:p-8 flex flex-col items-center justify-between">
+            <div className="my-auto flex justify-center w-full" style={{ minHeight: "calc(100vh - 220px)" }}>
               <div
-                className="overflow-hidden rounded-xl border border-border bg-white shadow-panel"
-                style={{ width: frameWidth, height: 1000, transform: `scale(${zoom})`, transformOrigin: "top left" }}
+                style={{
+                  width: frameWidth * zoom,
+                  height: 960 * zoom,
+                  position: "relative",
+                }}
               >
-                <iframe
-                  ref={frameRef}
-                  title="Live preview"
-                  srcDoc={srcDoc}
-                  onLoad={() => {
-                    const scroll = previewScrollRef.current;
-                    if (!scroll) return;
-                    frameRef.current?.contentWindow?.scrollTo(scroll.x, scroll.y);
-                    previewScrollRef.current = null;
+                <div
+                  className="overflow-hidden rounded-2xl border border-border bg-white shadow-2xl transition-transform"
+                  style={{
+                    width: frameWidth,
+                    height: 960,
+                    transform: `scale(${zoom})`,
+                    transformOrigin: "top left",
                   }}
-                  className="h-full w-full border-0"
-                />
+                >
+                  <iframe
+                    ref={frameRef}
+                    title="Live preview"
+                    srcDoc={srcDoc}
+                    onLoad={() => {
+                      const scroll = previewScrollRef.current;
+                      if (!scroll) return;
+                      frameRef.current?.contentWindow?.scrollTo(scroll.x, scroll.y);
+                      previewScrollRef.current = null;
+                    }}
+                    className="h-full w-full border-0"
+                  />
+                </div>
               </div>
             </div>
-            <p className="mt-4 text-center text-[11px] text-muted-foreground">
-              Select something on the page to change it. Double-click text to type directly on the page.
-            </p>
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary border border-primary/20">
+                  <Sparkles className="h-3 w-3" /> Quick Tip: Double-click any text to type directly on canvas
+                </span>
+                <span className="hidden sm:inline">·</span>
+                <span className="hidden sm:inline">Click any card or button to customize its style &amp; links</span>
+              </div>
+              <p className="font-mono text-[10px] text-muted-foreground/80 hidden md:block">
+                <span className="text-primary/90 font-semibold">Ctrl+S</span> Save · <span className="text-primary/90 font-semibold">Ctrl+Z</span> Undo · <span className="text-primary/90 font-semibold">Del</span> Delete
+              </p>
+            </div>
           </div>
+
+          {/* Canvas Bottom Breadcrumb Bar */}
+          {breadcrumbs.length > 0 && (
+            <div className="flex items-center gap-1.5 border-t border-border bg-card/80 px-4 py-2 text-xs backdrop-blur">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mr-1">Hierarchy:</span>
+              <div className="flex flex-wrap items-center gap-1 overflow-x-auto">
+                {breadcrumbs.map((crumb, idx) => {
+                  const isLast = idx === breadcrumbs.length - 1;
+                  return (
+                    <div key={crumb.id + idx} className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => focusInPreview(crumb.id)}
+                        className={cn(
+                          "rounded-md px-2 py-0.5 text-[11px] font-medium transition",
+                          isLast
+                            ? "bg-primary/20 text-primary font-semibold border border-primary/30 shadow-xs"
+                            : "text-muted-foreground hover:bg-elevated hover:text-foreground"
+                        )}
+                      >
+                        {crumb.label.replace(/^div\s*>\s*/i, "").trim() || crumb.tag || "Element"}
+                      </button>
+                      {!isLast && <ChevronRight className="h-3 w-3 text-muted-foreground/60 shrink-0" />}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </main>
 
         {/* right: property panel */}
@@ -452,6 +694,11 @@ export function Editor({
                   entitlements["imageAltText"] === "enabled" ||
                   entitlements["imageAltText"] === true
                 }
+                page={page}
+                websiteId={websiteId}
+                isAdmin={isAdmin}
+                onAddRepeaterItem={addRepeaterItem}
+                onSwitchTab={setTab}
               />
             ) : null}
             {tab === "repeaters" ? (
@@ -503,6 +750,17 @@ export function Editor({
 
 /* --------------------------------- panels --------------------------------- */
 
+function getNodeIcon(kind: string, label: string) {
+  const l = label.toLowerCase();
+  if (kind === "repeater") return Rows3;
+  if (kind === "item") return Boxes;
+  if (l.includes("img") || l.includes("image") || l.includes("photo") || l.includes("banner")) return ImageIcon;
+  if (l.includes("btn") || l.includes("button") || l.includes("link")) return Link2;
+  if (l.includes("heading") || l.includes("title") || l.includes("text") || l.includes("p") || l.includes("quote")) return Type;
+  if (l.includes("nav") || l.includes("menu")) return ListTree;
+  return ChevronRight;
+}
+
 function TreeView({
   nodes,
   onSelect,
@@ -515,81 +773,448 @@ function TreeView({
   depth?: number;
 }) {
   return (
-    <ul className={cn(depth > 0 && "ml-2.5 border-l border-border/70 pl-2")}>
-      {nodes.map((n) => (
-        <li key={n.id + n.label}>
-          <button
-            onClick={() => onSelect(n.id)}
-            className={cn(
-              "flex w-full items-center gap-1.5 rounded-md px-1.5 py-1.5 text-left text-[11px] transition",
-              selected === n.id ? "bg-primary/12 text-primary" : "text-muted-foreground hover:bg-elevated hover:text-foreground",
-            )}
-          >
-            {n.kind === "repeater" ? (
-              <Rows3 className="h-3 w-3 shrink-0" />
-            ) : n.kind === "item" ? (
-              <Boxes className="h-3 w-3 shrink-0" />
-            ) : (
-              <ChevronRight className="h-3 w-3 shrink-0" />
-            )}
-            <span className="truncate">{n.label}</span>
-          </button>
-          {n.children.length ? (
-            <TreeView
-              nodes={n.children as { id: string; label: string; kind: string; children: unknown[] }[]}
-              onSelect={onSelect}
-              selected={selected}
-              depth={depth + 1}
-            />
-          ) : null}
-        </li>
-      ))}
+    <ul className={cn(depth > 0 && "ml-2 border-l border-border/60 pl-1.5")}>
+      {nodes.map((n) => {
+        const Icon = getNodeIcon(n.kind, n.label);
+        const isSelected = selected === n.id || (selected && selected.endsWith(`::${n.id}`));
+        return (
+          <li key={n.id + n.label}>
+            <button
+              onClick={() => onSelect(n.id)}
+              className={cn(
+                "flex w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-left text-[11px] transition",
+                isSelected
+                  ? "bg-primary/15 text-primary font-medium ring-1 ring-primary/40"
+                  : "text-muted-foreground hover:bg-elevated hover:text-foreground",
+              )}
+            >
+              <Icon className={cn("h-3 w-3 shrink-0", isSelected ? "text-primary" : "text-muted-foreground/70")} />
+              <span className="truncate">{n.label.replace(/^div\s*>\s*/i, "").trim() || "Container"}</span>
+            </button>
+            {n.children.length ? (
+              <TreeView
+                nodes={n.children as { id: string; label: string; kind: string; children: unknown[] }[]}
+                onSelect={onSelect}
+                selected={selected}
+                depth={depth + 1}
+              />
+            ) : null}
+          </li>
+        );
+      })}
     </ul>
   );
 }
 
-function StyleControls({ edit, patch, id }: { edit: ElementEdit; patch: (id: string, p: ElementEdit) => void; id: string }) {
-  const s = edit.style ?? {};
-  const num = (key: string, fallback: number) => parseFloat(String(s[key] ?? fallback));
-  const set = (key: string, value: string) => patch(id, { style: { [key]: value } });
+const FA_ICONS = [
+  // Common & UI
+  "fa-solid fa-check", "fa-solid fa-check-circle", "fa-solid fa-xmark", "fa-solid fa-circle-xmark",
+  "fa-solid fa-arrow-right", "fa-solid fa-arrow-left", "fa-solid fa-arrow-up", "fa-solid fa-arrow-down",
+  "fa-solid fa-chevron-right", "fa-solid fa-chevron-left", "fa-solid fa-chevron-up", "fa-solid fa-chevron-down",
+  "fa-solid fa-bars", "fa-solid fa-ellipsis", "fa-solid fa-magnifying-glass", "fa-solid fa-plus", "fa-solid fa-minus",
+  "fa-solid fa-gear", "fa-solid fa-sliders", "fa-solid fa-filter", "fa-solid fa-bell", "fa-solid fa-circle-info",
+  "fa-solid fa-triangle-exclamation", "fa-solid fa-circle-question", "fa-solid fa-shield-halved", "fa-solid fa-lock",
+  "fa-solid fa-unlock", "fa-solid fa-key", "fa-solid fa-eye", "fa-solid fa-eye-slash", "fa-solid fa-trash",
+  "fa-solid fa-pen", "fa-solid fa-pen-to-square", "fa-solid fa-floppy-disk", "fa-solid fa-share-nodes",
+
+  // Business & Finance
+  "fa-solid fa-briefcase", "fa-solid fa-building", "fa-solid fa-chart-line", "fa-solid fa-chart-pie",
+  "fa-solid fa-chart-column", "fa-solid fa-dollar-sign", "fa-solid fa-euro-sign", "fa-solid fa-sterling-sign",
+  "fa-solid fa-indian-rupee-sign", "fa-solid fa-credit-card", "fa-solid fa-wallet", "fa-solid fa-coins",
+  "fa-solid fa-receipt", "fa-solid fa-calculator", "fa-solid fa-handshake", "fa-solid fa-award",
+  "fa-solid fa-trophy", "fa-solid fa-medal", "fa-solid fa-crown", "fa-solid fa-gem", "fa-solid fa-scale-balanced",
+
+  // Communication & Contact
+  "fa-solid fa-phone", "fa-solid fa-envelope", "fa-solid fa-envelope-open", "fa-solid fa-message",
+  "fa-solid fa-comments", "fa-solid fa-paper-plane", "fa-solid fa-location-dot", "fa-solid fa-map-pin",
+  "fa-solid fa-map", "fa-solid fa-globe", "fa-solid fa-headset", "fa-solid fa-address-book",
+
+  // Media & Photography
+  "fa-solid fa-camera", "fa-solid fa-camera-retro", "fa-solid fa-image", "fa-solid fa-images",
+  "fa-solid fa-video", "fa-solid fa-film", "fa-solid fa-play", "fa-solid fa-pause", "fa-solid fa-volume-high",
+  "fa-solid fa-music", "fa-solid fa-microphone", "fa-solid fa-clapperboard", "fa-solid fa-palette",
+
+  // Tech & Devices
+  "fa-solid fa-laptop", "fa-solid fa-desktop", "fa-solid fa-mobile-screen", "fa-solid fa-tablet-screen-button",
+  "fa-solid fa-server", "fa-solid fa-database", "fa-solid fa-code", "fa-solid fa-terminal",
+  "fa-solid fa-wifi", "fa-solid fa-signal", "fa-solid fa-cloud", "fa-solid fa-cloud-arrow-up",
+  "fa-solid fa-cloud-arrow-down", "fa-solid fa-bolt", "fa-solid fa-plug", "fa-solid fa-battery-full",
+  "fa-solid fa-microchip", "fa-solid fa-robot", "fa-solid fa-network-wired",
+
+  // People & User
+  "fa-solid fa-user", "fa-solid fa-users", "fa-solid fa-user-group", "fa-solid fa-user-plus",
+  "fa-solid fa-user-tie", "fa-solid fa-user-shield", "fa-solid fa-circle-user", "fa-solid fa-heart",
+  "fa-solid fa-thumbs-up", "fa-solid fa-thumbs-down", "fa-solid fa-star", "fa-solid fa-face-smile",
+
+  // Shopping & Ecommerce
+  "fa-solid fa-cart-shopping", "fa-solid fa-bag-shopping", "fa-solid fa-basket-shopping", "fa-solid fa-tag",
+  "fa-solid fa-tags", "fa-solid fa-box", "fa-solid fa-boxes-stacked", "fa-solid fa-truck", "fa-solid fa-truck-fast",
+  "fa-solid fa-store", "fa-solid fa-barcode", "fa-solid fa-gift",
+
+  // Travel, Food & Lifestyle
+  "fa-solid fa-calendar", "fa-solid fa-calendar-days", "fa-solid fa-clock", "fa-solid fa-hourglass",
+  "fa-solid fa-car", "fa-solid fa-plane", "fa-solid fa-rocket", "fa-solid fa-bicycle", "fa-solid fa-hotel",
+  "fa-solid fa-utensils", "fa-solid fa-mug-hot", "fa-solid fa-wine-glass", "fa-solid fa-burger",
+  "fa-solid fa-dumbbell", "fa-solid fa-tree", "fa-solid fa-fire", "fa-solid fa-droplet", "fa-solid fa-sun",
+  "fa-solid fa-moon", "fa-solid fa-leaf", "fa-solid fa-compass", "fa-solid fa-lightbulb",
+
+  // Social & Brands
+  "fa-brands fa-facebook", "fa-brands fa-instagram", "fa-brands fa-x-twitter", "fa-brands fa-twitter",
+  "fa-brands fa-linkedin", "fa-brands fa-youtube", "fa-brands fa-tiktok", "fa-brands fa-pinterest",
+  "fa-brands fa-whatsapp", "fa-brands fa-telegram", "fa-brands fa-github", "fa-brands fa-google",
+  "fa-brands fa-apple", "fa-brands fa-windows", "fa-brands fa-android", "fa-brands fa-spotify",
+  "fa-brands fa-discord", "fa-brands fa-slack", "fa-brands fa-dribbble", "fa-brands fa-behance"
+];
+
+function FontAwesomeIconPicker({
+  currentClass,
+  onSelect,
+}: {
+  currentClass: string;
+  onSelect: (className: string) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState<string>("all");
+
+  const filtered = FA_ICONS.filter((cls) => {
+    const cleanName = cls.replace(/^fa-(solid|brands|regular)\s+fa-/, "");
+    const matchesSearch = cleanName.toLowerCase().includes(search.toLowerCase().trim());
+    if (!matchesSearch) return false;
+    if (category === "brands") return cls.startsWith("fa-brands");
+    if (category === "solid") return cls.startsWith("fa-solid");
+    return true;
+  });
+
   return (
-    <div className="space-y-3">
-      <SectionTitle>Layout &amp; style</SectionTitle>
-      <div className="grid grid-cols-3 gap-1">
+    <div className="rounded-xl border border-border bg-elevated/40 p-3 space-y-2.5">
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Search 400+ FontAwesome icons..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full rounded-lg border border-border bg-background py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
+        />
+      </div>
+
+      {/* Category Pills */}
+      <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
         {[
-          ["left", AlignLeft],
-          ["center", AlignCenter],
-          ["right", AlignRight],
-        ].map(([v, Icon]) => (
+          ["all", "All Icons"],
+          ["solid", "Solid / UI"],
+          ["brands", "Brands & Social"],
+        ].map(([cat, label]) => (
           <button
-            key={v as string}
-            onClick={() => set("text-align", v as string)}
+            key={cat}
+            type="button"
+            onClick={() => setCategory(cat)}
             className={cn(
-              "grid h-8 place-items-center rounded-lg border border-border transition hover:border-primary/40",
-              s["text-align"] === v && "border-primary bg-primary/12 text-primary",
+              "whitespace-nowrap rounded-md px-2 py-1 font-medium transition",
+              category === cat ? "bg-primary text-primary-foreground font-semibold" : "bg-card text-muted-foreground hover:text-foreground"
             )}
           >
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {(() => {
-              const I = Icon as typeof AlignLeft;
-              return <I className="h-3.5 w-3.5" />;
-            })()}
+            {label}
           </button>
         ))}
       </div>
-      <Slider label="Padding" min={0} max={80} value={num("padding", 0)} onChange={(v) => set("padding", `${v}px`)} />
-      <Slider label="Margin top" min={-40} max={80} value={num("margin-top", 0)} onChange={(v) => set("margin-top", `${v}px`)} />
-      <Slider label="Border radius" min={0} max={48} value={num("border-radius", 0)} onChange={(v) => set("border-radius", `${v}px`)} />
-      <Slider label="Opacity" min={10} max={100} value={num("opacity", 1) <= 1 ? num("opacity", 1) * 100 : num("opacity", 100)} unit="%" onChange={(v) => set("opacity", String(v / 100))} />
-      <Slider label="Font size" min={10} max={72} value={num("font-size", 16)} onChange={(v) => set("font-size", `${v}px`)} />
-      <Slider label="Letter spacing" min={-3} max={8} step={0.5} value={num("letter-spacing", 0)} onChange={(v) => set("letter-spacing", `${v}px`)} />
-      <Slider label="Width" min={10} max={100} unit="%" value={num("width", 100)} onChange={(v) => set("width", `${v}%`)} />
-      <ColorInput label="Text color" value={String(s["color"] ?? "#0f172a")} onChange={(v) => set("color", v)} />
-      <ColorInput label="Background" value={String(s["background-color"] ?? "#ffffff")} onChange={(v) => set("background-color", v)} />
-      <TextInput label="Gradient / overlay" value={String(s["background-image"] ?? "")} placeholder="linear-gradient(90deg,#0ea5a4,#f59e0b)" onChange={(v) => set("background-image", v)} />
-      <TextInput label="Box shadow" value={String(s["box-shadow"] ?? "")} placeholder="0 20px 40px -20px rgba(0,0,0,.4)" onChange={(v) => set("box-shadow", v)} />
-      <TextInput label="Animation" value={String(s["animation"] ?? "")} placeholder="te-fade 600ms ease both" onChange={(v) => set("animation", v)} />
-      <Toggle label="Hidden on page" checked={!!edit.hidden} onChange={(v) => patch(id, { hidden: v })} />
+
+      {/* Icons Grid */}
+      <div className="grid grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-1 border border-border/60 rounded-lg bg-background/50">
+        {filtered.map((cls) => {
+          const isSelected = currentClass === cls || currentClass.includes(cls.split(" ")[1] || "___");
+          return (
+            <button
+              key={cls}
+              type="button"
+              onClick={() => onSelect(cls)}
+              title={cls}
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition hover:scale-110 hover:border-primary hover:bg-primary/10",
+                isSelected ? "border-cyan-500 bg-cyan-500/20 text-cyan-400 font-bold" : "border-border/80 text-foreground bg-card"
+              )}
+            >
+              <i className={cls} />
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-muted-foreground text-center">
+        Showing {filtered.length} icons · Click any icon to apply
+      </p>
+    </div>
+  );
+}
+
+function MediaLibraryModal({
+  websiteId,
+  currentSrc,
+  onSelect,
+  onUpload,
+  onClose,
+}: {
+  websiteId?: string;
+  currentSrc?: string;
+  onSelect: (url: string) => void;
+  onUpload?: (file: File) => Promise<string>;
+  onClose: () => void;
+}) {
+  const [search, setSearch] = useState("");
+  const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    if (!websiteId) {
+      setLoading(false);
+      return;
+    }
+    let isMounted = true;
+    getWebsiteAssets(websiteId)
+      .then((res) => {
+        if (isMounted) setAssets(res.assets || []);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => {
+        if (isMounted) setLoading(false);
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, [websiteId]);
+
+  const filteredAssets = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return assets;
+    return assets.filter((a) => (a.originalName || a.filename || "").toLowerCase().includes(q));
+  }, [assets, search]);
+
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !onUpload) return;
+    try {
+      setUploading(true);
+      const url = await onUpload(file);
+      onSelect(url);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to upload image");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm animate-in fade-in duration-150">
+      <div className="flex flex-col w-full max-w-2xl max-h-[85vh] rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
+              <ImageIcon className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="font-display text-sm font-bold text-foreground">Media Library</h3>
+              <p className="text-[11px] text-muted-foreground">Select an existing image or upload a new one</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground hover:bg-elevated hover:text-foreground transition"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 border-b border-border bg-elevated/20 p-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search uploaded images by name..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-lg border border-border bg-background py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
+            />
+          </div>
+
+          <label className="flex items-center gap-1.5 cursor-pointer rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:opacity-90 shadow-xs">
+            {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+            <span>Upload Image</span>
+            <input type="file" accept="image/*" className="hidden" onChange={handleUploadFile} disabled={uploading} />
+          </label>
+        </div>
+
+        {/* Assets Grid */}
+        <div className="flex-1 overflow-y-auto p-4 min-h-[260px]">
+          {loading ? (
+            <div className="flex h-48 flex-col items-center justify-center gap-2 text-muted-foreground">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <p className="text-xs">Loading media assets...</p>
+            </div>
+          ) : filteredAssets.length > 0 ? (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              {filteredAssets.map((asset) => {
+                const isSelected = currentSrc === asset.url;
+                return (
+                  <button
+                    key={asset._id || asset.url}
+                    type="button"
+                    onClick={() => onSelect(asset.url)}
+                    className={cn(
+                      "group relative aspect-square overflow-hidden rounded-xl border bg-background text-left transition hover:scale-[1.02] hover:shadow-md",
+                      isSelected ? "border-primary ring-2 ring-primary/50 shadow-glow" : "border-border/80 hover:border-primary/50"
+                    )}
+                  >
+                    <img src={asset.url} alt={asset.alt || asset.originalName} className="h-full w-full object-cover transition duration-200 group-hover:scale-105" />
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 text-[10px] text-white">
+                      <p className="truncate font-medium">{asset.originalName || asset.filename}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="flex h-48 flex-col items-center justify-center gap-2 text-center text-muted-foreground">
+              <ImageIcon className="h-8 w-8 opacity-40 text-muted-foreground" />
+              <p className="text-xs font-semibold text-foreground">No media assets found</p>
+              <p className="text-[11px] max-w-xs text-muted-foreground">
+                Upload your first image to store it in your library and reuse it anywhere across your site.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-border bg-elevated/20 px-4 py-2.5 text-xs text-muted-foreground">
+          <span>{filteredAssets.length} image{filteredAssets.length === 1 ? "" : "s"} available</span>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-border px-3 py-1 text-xs font-medium text-foreground hover:bg-elevated transition"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StyleControls({
+  edit,
+  patch,
+  id,
+  kind,
+}: {
+  edit: ElementEdit;
+  patch: (id: string, p: ElementEdit) => void;
+  id: string;
+  kind?: string;
+}) {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const s = edit.style ?? {};
+  const num = (key: string, fallback: number) => parseFloat(String(s[key] ?? fallback));
+  const set = (key: string, value: string) => patch(id, { style: { [key]: value } });
+
+  const isText = ["title", "subtitle", "description", "longtext", "richtext", "quote", "caption", "badge"].includes(kind ?? "");
+  const isImage = kind === "image";
+  const isButton = kind === "button" || kind === "link";
+
+  return (
+    <div className="space-y-3 pt-2">
+      <SectionTitle>Styling</SectionTitle>
+
+      {/* Alignment for Text & Buttons */}
+      {(isText || isButton || !kind) && (
+        <div className="grid grid-cols-3 gap-1">
+          {[
+            ["left", AlignLeft],
+            ["center", AlignCenter],
+            ["right", AlignRight],
+          ].map(([v, Icon]) => (
+            <button
+              key={v as string}
+              onClick={() => set("text-align", v as string)}
+              className={cn(
+                "grid h-8 place-items-center rounded-lg border border-border transition hover:border-primary/40",
+                s["text-align"] === v && "border-primary bg-primary/12 text-primary",
+              )}
+            >
+              {(() => {
+                const I = Icon as typeof AlignLeft;
+                return <I className="h-3.5 w-3.5" />;
+              })()}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Essential Controls based on element type */}
+      {isText && (
+        <>
+          <Slider label="Font size" min={10} max={72} value={num("font-size", 16)} onChange={(v) => set("font-size", `${v}px`)} />
+          <ColorInput label="Text color" value={String(s["color"] ?? "#0f172a")} onChange={(v) => set("color", v)} />
+        </>
+      )}
+
+      {isImage && (
+        <>
+          <Slider label="Corner roundness" min={0} max={48} value={num("border-radius", 8)} onChange={(v) => set("border-radius", `${v}px`)} />
+          <Slider label="Opacity" min={10} max={100} value={num("opacity", 1) <= 1 ? num("opacity", 1) * 100 : num("opacity", 100)} unit="%" onChange={(v) => set("opacity", String(v / 100))} />
+        </>
+      )}
+
+      {isButton && (
+        <>
+          <Slider label="Corner roundness" min={0} max={48} value={num("border-radius", 8)} onChange={(v) => set("border-radius", `${v}px`)} />
+          <ColorInput label="Text color" value={String(s["color"] ?? "#ffffff")} onChange={(v) => set("color", v)} />
+        </>
+      )}
+
+      {/* Advanced Layout Accordion */}
+      <div className="rounded-lg border border-border/80 bg-elevated/20 overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setShowAdvanced(!showAdvanced)}
+          className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition"
+        >
+          <span>More Style Options</span>
+          <span className="text-[10px] font-mono">{showAdvanced ? "▲ Hide" : "▼ Show"}</span>
+        </button>
+
+        {showAdvanced && (
+          <div className="space-y-3 p-3 border-t border-border/60">
+            <Slider label="Padding" min={0} max={80} value={num("padding", 0)} onChange={(v) => set("padding", `${v}px`)} />
+            <Slider label="Margin top" min={-40} max={80} value={num("margin-top", 0)} onChange={(v) => set("margin-top", `${v}px`)} />
+            <Slider label="Letter spacing" min={-3} max={8} step={0.5} value={num("letter-spacing", 0)} onChange={(v) => set("letter-spacing", `${v}px`)} />
+            <Slider label="Width" min={10} max={100} unit="%" value={num("width", 100)} onChange={(v) => set("width", `${v}%`)} />
+            <ColorInput label="Background color" value={String(s["background-color"] ?? "")} onChange={(v) => set("background-color", v)} />
+            <TextInput label="Gradient overlay" value={String(s["background-image"] ?? "")} placeholder="linear-gradient(90deg,#0ea5a4,#f59e0b)" onChange={(v) => set("background-image", v)} />
+            <TextInput label="Box shadow" value={String(s["box-shadow"] ?? "")} placeholder="0 20px 40px -20px rgba(0,0,0,.4)" onChange={(v) => set("box-shadow", v)} />
+          </div>
+        )}
+      </div>
+
+      <div className="pt-2 border-t border-border/80 space-y-2">
+        <Toggle label="Hidden on page" checked={!!edit.hidden} onChange={(v) => patch(id, { hidden: v })} />
+        <button
+          type="button"
+          onClick={() => patch(id, { hidden: !edit.hidden })}
+          className={cn(
+            "w-full flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition border",
+            edit.hidden
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+              : "border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20"
+          )}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          {edit.hidden ? "Restore Element to Page" : "Delete / Hide Element from Page"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -601,6 +1226,11 @@ function ElementPanel({
   patch,
   onUploadImage,
   canEditAltText,
+  page,
+  websiteId,
+  isAdmin = false,
+  onAddRepeaterItem,
+  onSwitchTab,
 }: {
   selected: string | null;
   field?: EditableField | undefined;
@@ -608,7 +1238,14 @@ function ElementPanel({
   patch: (id: string, p: ElementEdit) => void;
   onUploadImage: ((file: File) => Promise<string>) | undefined;
   canEditAltText: boolean;
+  page?: TemplateAnalysis["pages"][number];
+  websiteId?: string;
+  isAdmin?: boolean;
+  onAddRepeaterItem?: (repeaterId: string) => void;
+  onSwitchTab?: (tab: RightTab) => void;
 }) {
+  const [isMediaOpen, setIsMediaOpen] = useState(false);
+
   if (!selected) {
     return (
       <EmptyState
@@ -620,6 +1257,10 @@ function ElementPanel({
   }
   const kind = field?.kind ?? "description";
   const itemKey = itemKeyOf(selected);
+  const matchedRepeater = field?.inRepeater
+    ? page?.repeaters.find((r) => r.id === field.inRepeater)
+    : page?.repeaters.find((r) => r.containerId === selected || r.itemIds.includes(selected) || (selected && r.itemIds.some((id) => selected.endsWith(id))));
+
   return (
     <div className="fade-up space-y-4">
       <div>
@@ -632,6 +1273,81 @@ function ElementPanel({
           {itemKey ? ` · repeater item ${itemKey}` : ""}
         </p>
       </div>
+
+      {matchedRepeater && onAddRepeaterItem ? (
+        <div className="rounded-xl border border-primary/30 bg-primary/10 p-3 shadow-sm">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+              <Rows3 className="h-3.5 w-3.5" />
+              <span>{matchedRepeater.label}</span>
+            </div>
+            {onSwitchTab && (
+              <button
+                type="button"
+                onClick={() => onSwitchTab("repeaters")}
+                className="text-[10px] text-muted-foreground hover:text-foreground underline"
+              >
+                Manage list
+              </button>
+            )}
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-2.5">
+            This element is part of a repeatable list (cards, grid, or reviews).
+          </p>
+          <Btn
+            size="sm"
+            variant="primary"
+            className="w-full justify-center gap-1.5"
+            onClick={() => onAddRepeaterItem(matchedRepeater.id)}
+          >
+            <Plus className="h-3.5 w-3.5" /> Add New {matchedRepeater.label.replace(/s$/i, "") || "Item"}
+          </Btn>
+        </div>
+      ) : (
+        /* Manual Repeater Conversion strictly for Admins */
+        (isAdmin && selected) && (
+          <div className="rounded-xl border border-border/80 bg-elevated/40 p-3">
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                <Rows3 className="h-3.5 w-3.5 text-cyan-400" />
+                <span>Repeatable Section</span>
+              </div>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground">Admin</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground mb-2.5">
+              Want this element or card to be a repeatable list (duplicate, reorder, add cards)?
+            </p>
+            <Btn
+              size="sm"
+              variant="outline"
+              className="w-full justify-center gap-1.5 text-xs border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10"
+              onClick={() => {
+                const bId = baseId(selected);
+                // Create a dynamic repeater for this container
+                const newRepId = `rep-custom-${Date.now()}`;
+                const newRepeater: Repeater = {
+                  id: newRepId,
+                  containerId: bId,
+                  label: field?.label || "Custom Repeater List",
+                  type: "Cards",
+                  itemIds: [bId],
+                  itemLabels: [field?.label || "Card 1"],
+                  fieldsPerItem: 1,
+                  confidence: "High",
+                };
+                if (page) {
+                  page.repeaters = [...page.repeaters, newRepeater];
+                  if (field) field.inRepeater = newRepId;
+                }
+                if (onAddRepeaterItem) onAddRepeaterItem(newRepId);
+                toast.success("Repeater enabled for this element!");
+              }}
+            >
+              <Plus className="h-3.5 w-3.5" /> Enable Repeater on this Element
+            </Btn>
+          </div>
+        )
+      )}
 
       {["title", "subtitle", "description", "longtext", "richtext", "quote", "caption", "badge", "number", "currency", "date"].includes(
         kind,
@@ -652,37 +1368,61 @@ function ElementPanel({
           <SectionTitle hint={field?.role}>Image</SectionTitle>
           <ImagePreview src={edit.src ?? field?.value ?? ""} alt={edit.alt ?? field?.attrs["alt"] ?? field?.label ?? "Image preview"} />
           <TextInput label="Source URL" value={edit.src ?? field?.value ?? ""} onChange={(v) => patch(selected, { src: v })} />
-          <label className="block cursor-pointer rounded-lg border border-dashed border-border px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground transition hover:border-primary/50">
-            Replace with local image
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={async (e) => {
-                const f = e.target.files?.[0];
-                if (f) {
-                  // Show optimistic loading state or just wait
-                  if (onUploadImage) {
-                    try {
-                      toast.loading("Uploading image...", { id: "upload" });
-                      const url = await onUploadImage(f);
-                      patch(selected, { src: url });
-                      toast.success("Image uploaded", { id: "upload" });
-                    } catch (err) {
-                      toast.error("Failed to upload image", { id: "upload" });
+          
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setIsMediaOpen(true)}
+              className="flex items-center justify-center gap-1.5 rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/20 shadow-xs"
+            >
+              <ImageIcon className="h-3.5 w-3.5" /> Media Library
+            </button>
+            <label className="flex items-center justify-center gap-1.5 cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:border-primary/50 shadow-xs">
+              <Upload className="h-3.5 w-3.5 text-muted-foreground" /> Direct Upload
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    if (onUploadImage) {
+                      try {
+                        toast.loading("Uploading image...", { id: "upload" });
+                        const url = await onUploadImage(f);
+                        patch(selected, { src: url });
+                        toast.success("Image uploaded", { id: "upload" });
+                      } catch (err) {
+                        toast.error("Failed to upload image", { id: "upload" });
+                      }
+                    } else {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        patch(selected, { src: reader.result as string });
+                      };
+                      reader.readAsDataURL(f);
                     }
-                  } else {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      patch(selected, { src: reader.result as string });
-                    };
-                    reader.readAsDataURL(f);
                   }
-                }
-                e.target.value = "";
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+
+          {isMediaOpen && (
+            <MediaLibraryModal
+              websiteId={websiteId}
+              currentSrc={edit.src ?? field?.value ?? ""}
+              onSelect={(url) => {
+                patch(selected, { src: url });
+                setIsMediaOpen(false);
+                toast.success("Image selected from library");
               }}
+              onUpload={onUploadImage}
+              onClose={() => setIsMediaOpen(false)}
             />
-          </label>
+          )}
+
           {canEditAltText ? <TextInput label="Alt text" value={edit.alt ?? field?.attrs["alt"] ?? ""} onChange={(v) => patch(selected, { alt: v })} /> : null}
           <TextInput label="Title attribute" value={edit.title ?? ""} onChange={(v) => patch(selected, { title: v })} />
           <TextInput label="Focal point (object-position)" value={edit.style?.["object-position"] ?? ""} placeholder="50% 30%" onChange={(v) => patch(selected, { style: { "object-position": v, "object-fit": "cover" } })} />
@@ -702,11 +1442,18 @@ function ElementPanel({
         </div>
       ) : null}
 
-      {kind === "svg" ? (
+      {kind === "svg" || kind === "badge" || (field?.role === "icon") || (field?.tag === "i") ? (
         <div className="space-y-3">
-          <SectionTitle>SVG graphic</SectionTitle>
-          <ColorInput label="Fill" value={edit.fill ?? "#0ea5a4"} onChange={(v) => patch(selected, { fill: v })} />
-          <ColorInput label="Stroke" value={edit.stroke ?? "#0f172a"} onChange={(v) => patch(selected, { stroke: v })} />
+          <SectionTitle>FontAwesome Icon Library</SectionTitle>
+          <FontAwesomeIconPicker
+            currentClass={edit.iconClass || field?.value || ""}
+            onSelect={(cls) => {
+              patch(selected, { iconClass: cls, text: "" });
+              toast.success(`Icon set to ${cls}`);
+            }}
+          />
+          <ColorInput label="Icon Color" value={edit.fill ?? edit.style?.color ?? "#0ea5a4"} onChange={(v) => patch(selected, { fill: v, style: { color: v } })} />
+          <TextInput label="Icon Class name (e.g. fa-solid fa-camera)" value={edit.iconClass ?? ""} placeholder="fa-solid fa-check" onChange={(v) => patch(selected, { iconClass: v })} />
         </div>
       ) : null}
 
@@ -743,7 +1490,7 @@ function ElementPanel({
         </div>
       ) : null}
 
-      <StyleControls edit={edit} patch={patch} id={selected} />
+      <StyleControls edit={edit} patch={patch} id={selected} kind={kind} />
     </div>
   );
 }
@@ -772,127 +1519,184 @@ function RepeaterPanel({
     return <EmptyState icon={<Rows3 className="h-5 w-5" />} title="No repeaters on this page" body="Repeaters appear when three or more structurally identical siblings are detected." />;
   }
 
+  const groupedSections = useMemo(() => {
+    const map = new Map<string, typeof page.repeaters>();
+    page.repeaters.forEach((r) => {
+      const sec = r.sectionName || "General Content";
+      const list = map.get(sec) ?? [];
+      list.push(r);
+      map.set(sec, list);
+    });
+    return Array.from(map.entries());
+  }, [page.repeaters]);
+
   const setItems = (repId: string, items: { key: string; srcIndex: number }[]) =>
     commit({ ...state, repeaters: { ...state.repeaters, [repId]: items } });
 
   return (
-    <div className="fade-up space-y-3">
+    <div className="fade-up space-y-4">
       <SectionTitle hint={page.name}>Repeaters</SectionTitle>
-      {page.repeaters.map((r) => {
-        const items = state.repeaters[r.id] ?? defaultRepeaterItems(r.itemIds);
-        const expanded = open === r.id;
-        return (
-          <div key={r.id} className="rounded-lg border border-border bg-elevated/40">
-            <button
-              onClick={() => setOpen(expanded ? null : r.id)}
-              className="flex w-full items-center gap-2 px-3 py-2.5 text-left"
-            >
-              <Rows3 className="text-primary h-3.5 w-3.5 shrink-0" />
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-xs font-semibold">{r.label}</span>
-                <span className="block text-[10px] text-muted-foreground">{items.length} items</span>
-              </span>
-              <ConfidenceChip level={r.confidence} />
-            </button>
-            {expanded ? (
-              <div className="space-y-2 border-t border-border p-2.5">
-                {items.map((item, i) => {
-                  const srcId = r.itemIds[item.srcIndex] ?? r.itemIds[0]!;
-                  const isOpen = openItem === item.key + r.id;
-                  return (
-                    <div key={item.key} className="rounded-lg border border-border bg-card">
-                      <div className="flex items-center gap-1 px-2 py-1.5">
-                        <button
-                          onClick={() => {
-                            setOpenItem(isOpen ? null : item.key + r.id);
-                            focus(`${item.key}::${srcId}`);
-                          }}
-                          className="min-w-0 flex-1 truncate text-left text-[11px] font-semibold"
-                        >
-                          {r.itemLabels[item.srcIndex] ?? `${r.label} ${i + 1}`}
-                        </button>
-                        <Btn size="icon" variant="ghost" title="Move up" disabled={i === 0} onClick={() => {
-                          const next = [...items];
-                          const tmp = next[i - 1]!;
-                          next[i - 1] = next[i]!;
-                          next[i] = tmp;
-                          setItems(r.id, next);
-                        }}>
-                          <ArrowUp className="h-3 w-3" />
-                        </Btn>
-                        <Btn size="icon" variant="ghost" title="Move down" disabled={i === items.length - 1} onClick={() => {
-                          const next = [...items];
-                          const tmp = next[i + 1]!;
-                          next[i + 1] = next[i]!;
-                          next[i] = tmp;
-                          setItems(r.id, next);
-                        }}>
-                          <ArrowDown className="h-3 w-3" />
-                        </Btn>
-                        <Btn size="icon" variant="ghost" title="Duplicate" onClick={() => {
-                          const next = [...items];
-                          next.splice(i + 1, 0, { key: `c${Date.now()}`, srcIndex: item.srcIndex });
-                          setItems(r.id, next);
-                        }}>
-                          <Copy className="h-3 w-3" />
-                        </Btn>
-                        <Btn size="icon" variant="ghost" title="Delete" disabled={items.length <= 1} onClick={() => setItems(r.id, items.filter((_, j) => j !== i))}>
-                          <Trash2 className="text-destructive h-3 w-3" />
-                        </Btn>
-                      </div>
-                      {isOpen ? (
-                        <div className="space-y-2 border-t border-border p-2.5">
-                          {page.fields
-                            .filter((f) => f.inRepeater === r.id && f.id.startsWith("e"))
-                            .filter((f) => {
-                              const src = r.itemIds[item.srcIndex];
-                              return src ? true : false;
-                            })
-                            .slice(0, 40)
-                            .filter((f) => f.id !== srcId)
-                            .map((f) => {
-                              const targetId = `${item.key}::${f.id}`;
-                              const e = editOf(targetId);
-                              if (f.kind === "image") {
-                                return (
-                                  <TextInput key={f.id} label={`${f.label}`} value={e.src ?? f.value} onChange={(v) => patch(targetId, { src: v })} />
-                                );
-                              }
-                              if (f.kind === "link" || f.kind === "button") {
-                                return (
-                                  <div key={f.id} className="space-y-1.5">
-                                    <TextInput label={f.label} value={e.text ?? f.value} onChange={(v) => patch(targetId, { text: v })} />
-                                    <TextInput label="Destination" value={e.href ?? f.attrs["href"] ?? ""} onChange={(v) => patch(targetId, { href: v })} />
-                                  </div>
-                                );
-                              }
-                              return (
-                                <TextInput
-                                  key={f.id}
-                                  label={f.label}
-                                  multiline={f.kind === "longtext" || f.kind === "quote"}
-                                  value={e.text ?? f.value}
-                                  onChange={(v) => patch(targetId, { text: v })}
-                                />
-                              );
-                            })}
-                        </div>
-                      ) : null}
-                    </div>
-                  );
-                })}
-                <Btn
-                  size="sm"
-                  className="w-full justify-center"
-                  onClick={() => addItem(r.id)}
-                >
-                  <Plus className="h-3.5 w-3.5" /> Add item
-                </Btn>
-              </div>
-            ) : null}
+
+      {groupedSections.map(([sectionName, repeaters]) => (
+        <div key={sectionName} className="space-y-2">
+          {/* Section Divider & Header */}
+          <div className="flex items-center gap-2 pt-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400">
+              {sectionName}
+            </span>
+            <div className="h-[1px] flex-1 bg-border/80" />
           </div>
-        );
-      })}
+
+          <div className="space-y-2 pl-1">
+            {repeaters.map((r) => {
+              const items = state.repeaters[r.id] ?? defaultRepeaterItems(r.itemIds);
+              const expanded = open === r.id;
+              return (
+                <div key={r.id} className="rounded-lg border border-border bg-elevated/40">
+                  <div className="flex items-center justify-between gap-1 px-3 py-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setOpen(expanded ? null : r.id)}
+                      className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                    >
+                      <Rows3 className="text-primary h-3.5 w-3.5 shrink-0" />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-xs font-semibold">{r.label}</span>
+                        <span className="block text-[10px] text-muted-foreground">{items.length} items</span>
+                      </span>
+                      <ConfidenceChip level={r.confidence} />
+                    </button>
+                    <Btn
+                      size="sm"
+                      variant="ghost"
+                      className="shrink-0 text-primary hover:bg-primary/10 gap-1 text-[11px] h-7 px-2"
+                      title={`Add new ${r.label.replace(/s$/i, "") || "item"}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpen(r.id);
+                        addItem(r.id);
+                      }}
+                    >
+                      <Plus className="h-3 w-3" /> Add
+                    </Btn>
+                  </div>
+                  {expanded ? (
+                    <div className="space-y-2 border-t border-border p-2.5">
+                      {items.map((item, i) => {
+                        const srcId = r.itemIds[item.srcIndex] ?? r.itemIds[0]!;
+                        const isOpen = openItem === item.key + r.id;
+                        return (
+                          <div key={item.key} className="rounded-lg border border-border bg-card">
+                            <div className="flex items-center gap-1 px-2 py-1.5">
+                              <button
+                                onClick={() => {
+                                  setOpenItem(isOpen ? null : item.key + r.id);
+                                  focus(`${item.key}::${srcId}`);
+                                }}
+                                className="min-w-0 flex-1 truncate text-left text-[11px] font-semibold"
+                              >
+                                {r.itemLabels[item.srcIndex] ?? `Item ${i + 1}`}
+                              </button>
+                              <Btn
+                                size="icon"
+                                variant="ghost"
+                                title="Move up"
+                                disabled={i === 0}
+                                onClick={() => {
+                                  const next = [...items];
+                                  const [moved] = next.splice(i, 1);
+                                  if (moved) next.splice(i - 1, 0, moved);
+                                  setItems(r.id, next);
+                                }}
+                              >
+                                <ArrowUp className="h-3 w-3" />
+                              </Btn>
+                              <Btn
+                                size="icon"
+                                variant="ghost"
+                                title="Move down"
+                                disabled={i === items.length - 1}
+                                onClick={() => {
+                                  const next = [...items];
+                                  const [moved] = next.splice(i, 1);
+                                  if (moved) next.splice(i + 1, 0, moved);
+                                  setItems(r.id, next);
+                                }}
+                              >
+                                <ArrowDown className="h-3 w-3" />
+                              </Btn>
+                              <Btn
+                                size="icon"
+                                variant="ghost"
+                                title="Duplicate"
+                                onClick={() => {
+                                  const next = [...items];
+                                  next.splice(i + 1, 0, { key: `c${Date.now()}-${items.length}`, srcIndex: item.srcIndex });
+                                  setItems(r.id, next);
+                                }}
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Btn>
+                              <Btn size="icon" variant="ghost" title="Delete" disabled={items.length <= 1} onClick={() => setItems(r.id, items.filter((_, j) => j !== i))}>
+                                <Trash2 className="text-destructive h-3 w-3" />
+                              </Btn>
+                            </div>
+                            {isOpen ? (
+                              <div className="space-y-2 border-t border-border p-2.5">
+                                {page.fields
+                                  .filter((f) => f.inRepeater === r.id && f.id.startsWith("e"))
+                                  .filter((f) => {
+                                    const src = r.itemIds[item.srcIndex];
+                                    return src ? true : false;
+                                  })
+                                  .slice(0, 40)
+                                  .filter((f) => f.id !== srcId)
+                                  .map((f) => {
+                                    const targetId = `${item.key}::${f.id}`;
+                                    const e = editOf(targetId);
+                                    if (f.kind === "image") {
+                                      return (
+                                        <TextInput key={f.id} label={`${f.label}`} value={e.src ?? f.value} onChange={(v) => patch(targetId, { src: v })} />
+                                      );
+                                    }
+                                    if (f.kind === "link" || f.kind === "button") {
+                                      return (
+                                        <div key={f.id} className="space-y-1.5">
+                                          <TextInput label={f.label} value={e.text ?? f.value} onChange={(v) => patch(targetId, { text: v })} />
+                                          <TextInput label="Destination" value={e.href ?? f.attrs["href"] ?? ""} onChange={(v) => patch(targetId, { href: v })} />
+                                        </div>
+                                      );
+                                    }
+                                    return (
+                                      <TextInput
+                                        key={f.id}
+                                        label={f.label}
+                                        multiline={f.kind === "longtext" || f.kind === "quote"}
+                                        value={e.text ?? f.value}
+                                        onChange={(v) => patch(targetId, { text: v })}
+                                      />
+                                    );
+                                  })}
+                              </div>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                      <Btn
+                        size="sm"
+                        className="w-full justify-center"
+                        onClick={() => addItem(r.id)}
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Add item
+                      </Btn>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

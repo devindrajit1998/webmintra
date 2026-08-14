@@ -31,6 +31,12 @@ function applyEdit(el: Element, edit: ElementEdit) {
     if (v) el.setAttribute(a, "");
     else el.removeAttribute(a);
   });
+  if (edit.iconClass !== undefined) {
+    // Replace any fa-* classes or set full icon class
+    const currentClasses = (el.getAttribute("class") || "").split(/\s+/).filter((c) => !c.startsWith("fa-") && c !== "fa" && c !== "fas" && c !== "far" && c !== "fab" && c !== "fa-solid" && c !== "fa-regular" && c !== "fa-brands");
+    el.setAttribute("class", [...currentClasses, ...edit.iconClass.split(/\s+/)].filter(Boolean).join(" "));
+  }
+  if (edit.className !== undefined) el.setAttribute("class", edit.className);
   if (edit.fill) el.querySelectorAll("path,circle,rect,polygon").forEach((p) => p.setAttribute("fill", edit.fill!));
   if (edit.stroke) el.querySelectorAll("path,circle,rect,polygon").forEach((p) => p.setAttribute("stroke", edit.stroke!));
   if (edit.hidden) el.setAttribute("style", `${el.getAttribute("style") ?? ""};display:none !important`);
@@ -54,50 +60,295 @@ function themeCss(t: ThemeTokens) {
 }
 
 const BRIDGE = `
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" data-te-bridge-node />
 <style id="te-bridge-style" data-te-bridge-node>
-  [data-te-id]:hover { outline: 2px dashed rgba(14,165,164,.9) !important; outline-offset: 2px; cursor: pointer; }
-  [data-te-selected] { outline: 3px solid #0ea5a4 !important; outline-offset: 2px; }
-  [data-te-editing] { outline: 3px solid #f59e0b !important; background: rgba(245,158,11,.06) !important; }
-  #te-repeater-add { position: fixed; z-index: 2147483647; display: none; align-items: center; gap: 5px; border: 1px solid #0f766e; border-radius: 7px; padding: 6px 9px; background: #0f766e; color: #fff; font: 600 12px/1 system-ui, sans-serif; box-shadow: 0 6px 16px rgba(15,118,110,.25); cursor: pointer; }
-  #te-repeater-add:hover { background: #115e59; }
+  [data-te-id] { transition: outline 0.1s ease; }
+  [data-te-id]:hover { outline: 2px dashed rgba(6,182,212,.75) !important; outline-offset: 2px; cursor: pointer; }
+  [data-te-selected] { outline: 3px solid #06b6d4 !important; outline-offset: 2px; position: relative !important; }
+  [data-te-editing] { outline: 3px solid #f59e0b !important; background: rgba(245,158,11,.08) !important; }
+  
+  #te-canvas-pill {
+    position: fixed;
+    z-index: 2147483647;
+    display: none;
+    align-items: center;
+    gap: 3px;
+    background: #0b1826;
+    border: 1px solid #1e293b;
+    border-radius: 9999px;
+    padding: 3px 6px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.6), 0 0 16px rgba(6,182,212,0.35);
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #e2e8f0;
+    pointer-events: auto;
+    animation: te-pill-in 0.15s ease-out;
+  }
+  @keyframes te-pill-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .te-pill-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px 7px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    height: 24px;
+  }
+  .te-pill-btn:hover {
+    background: #1e293b;
+    color: #38bdf8;
+  }
+  .te-pill-btn.active {
+    background: rgba(6,182,212,0.25);
+    color: #38bdf8;
+  }
+  .te-pill-divider {
+    width: 1px;
+    height: 14px;
+    background: #334155;
+    margin: 0 2px;
+  }
+  .te-pill-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #38bdf8;
+    background: rgba(6,182,212,0.15);
+    padding: 2px 7px;
+    border-radius: 9999px;
+    margin-right: 2px;
+  }
 </style>
 <script data-te-bridge-node>
 (function(){
   var sel = null;
+  var hoverItem = null;
+
+  // 1. Floating Quick Action & Rich Formatting Pill
+  var pill = document.createElement('div');
+  pill.id = 'te-canvas-pill';
+  pill.setAttribute('data-te-bridge-node', '');
+  pill.innerHTML = 
+    '<span class="te-pill-tag" id="te-pill-label">Element</span>' +
+    '<button type="button" class="te-pill-btn" id="te-pill-bold" title="Toggle Bold"><b>B</b></button>' +
+    '<button type="button" class="te-pill-btn" id="te-pill-italic" title="Toggle Italic"><i>I</i></button>' +
+    '<button type="button" class="te-pill-btn" id="te-pill-align" title="Cycle Alignment">≡</button>' +
+    '<span class="te-pill-divider"></span>' +
+    '<button type="button" class="te-pill-btn" id="te-pill-edit" title="Edit in Panel">✏️ Style</button>' +
+    '<button type="button" class="te-pill-btn" id="te-pill-add" style="display:none" title="Add Card / Item">+ Add Next</button>' +
+    '<button type="button" class="te-pill-btn" id="te-pill-del" title="Delete / Hide from page" style="color:#f87171;">🗑️ Delete</button>';
+  document.body.appendChild(pill);
+
+  var pillLabel = pill.querySelector('#te-pill-label');
+  var pillBold = pill.querySelector('#te-pill-bold');
+  var pillItalic = pill.querySelector('#te-pill-italic');
+  var pillAlign = pill.querySelector('#te-pill-align');
+  var pillEdit = pill.querySelector('#te-pill-edit');
+  var pillAdd = pill.querySelector('#te-pill-add');
+  var pillDel = pill.querySelector('#te-pill-del');
+
+  pillBold.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(sel){
+      var id = idOf(sel);
+      var curWeight = sel.style.fontWeight || window.getComputedStyle(sel).fontWeight;
+      var isBold = curWeight === 'bold' || Number(curWeight) >= 700;
+      parent.postMessage({ source:'te', type:'style-patch', id: id, style: { 'font-weight': isBold ? 'normal' : 'bold' } }, '*');
+    }
+  });
+
+  pillItalic.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(sel){
+      var id = idOf(sel);
+      var curStyle = sel.style.fontStyle || window.getComputedStyle(sel).fontStyle;
+      var isItalic = curStyle === 'italic';
+      parent.postMessage({ source:'te', type:'style-patch', id: id, style: { 'font-style': isItalic ? 'normal' : 'italic' } }, '*');
+    }
+  });
+
+  pillAlign.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(sel){
+      var id = idOf(sel);
+      var curAlign = sel.style.textAlign || window.getComputedStyle(sel).textAlign || 'left';
+      var nextAlign = curAlign === 'left' ? 'center' : curAlign === 'center' ? 'right' : 'left';
+      parent.postMessage({ source:'te', type:'style-patch', id: id, style: { 'text-align': nextAlign } }, '*');
+    }
+  });
+
+  pillEdit.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(sel){
+      var id = idOf(sel);
+      parent.postMessage({ source:'te', type:'open-tab', tab:'element', id: id }, '*');
+    }
+  });
+
+  pillAdd.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    var repId = pillAdd.getAttribute('data-repeater-id');
+    var srcIdx = Number(pillAdd.getAttribute('data-source-index') || 0);
+    if(repId){
+      parent.postMessage({ source:'te', type:'repeater-add', repeaterId: repId, sourceIndex: srcIdx }, '*');
+    }
+  });
+
+  pillDel.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(sel){
+      var id = idOf(sel);
+      parent.postMessage({ source:'te', type:'delete-element', id: id }, '*');
+    }
+  });
+
+  // 2. Repeater Floating Add Button
   var addButton = document.createElement('button');
-  addButton.id = 'te-repeater-add';
+  addButton.id = 'te-repeater-float-add';
   addButton.setAttribute('data-te-bridge-node', '');
   addButton.type = 'button';
   addButton.setAttribute('aria-label', 'Add repeater item');
-  addButton.textContent = '+ Add item';
+  addButton.innerHTML = '<span style="font-size:14px;font-weight:bold;">+</span> Add Item';
   document.body.appendChild(addButton);
+
   function idOf(el){ while(el && el !== document.body){ if(el.getAttribute && el.getAttribute('data-te-id')) return el.getAttribute('data-te-id'); el = el.parentElement; } return null; }
   function repeaterItem(el){ return el && el.closest ? el.closest('[data-te-repeater-id][data-te-item]') : null; }
-  function placeAddButton(el){
-    var item = repeaterItem(el);
-    if(!item){ addButton.style.display = 'none'; return; }
+  
+  function getFriendlyTag(el){
+    if(!el) return 'Element';
+    var tag = el.tagName.toLowerCase();
+    if(tag === 'img') return 'Image';
+    if(tag === 'button' || tag === 'a') return 'Button / Link';
+    if(tag === 'i' || tag === 'svg') return 'Icon';
+    if(/^h[1-6]$/.test(tag)) return tag.toUpperCase();
+    if(tag === 'p') return 'Paragraph';
+    return tag;
+  }
+
+  function placeOverlays(el){
+    // Update Floating Pill for Selected Element
+    if(sel){
+      var sRect = sel.getBoundingClientRect();
+      pillLabel.textContent = getFriendlyTag(sel);
+      var repItem = repeaterItem(sel);
+      if(repItem){
+        pillAdd.style.display = 'inline-flex';
+        pillAdd.setAttribute('data-repeater-id', repItem.getAttribute('data-te-repeater-id') || '');
+        pillAdd.setAttribute('data-source-index', repItem.getAttribute('data-te-source-index') || '0');
+      } else {
+        pillAdd.style.display = 'none';
+      }
+
+      pill.style.display = 'flex';
+      var topPos = sRect.top - 36;
+      if(topPos < 10) topPos = sRect.bottom + 8;
+      pill.style.top = Math.max(10, Math.min(window.innerHeight - 44, topPos)) + 'px';
+      pill.style.left = Math.max(10, Math.min(window.innerWidth - pill.offsetWidth - 10, sRect.left)) + 'px';
+    } else {
+      pill.style.display = 'none';
+    }
+
+    // Update Floating Add button for Repeater hover
+    var item = repeaterItem(el) || hoverItem;
+    if(!item || sel){ addButton.style.display = 'none'; return; }
     var rect = item.getBoundingClientRect();
+    if(rect.width === 0 || rect.height === 0){ addButton.style.display = 'none'; return; }
     addButton.style.display = 'flex';
-    addButton.style.top = Math.max(8, rect.bottom + 8) + 'px';
+    addButton.style.top = Math.min(window.innerHeight - 40, Math.max(8, rect.bottom + 6)) + 'px';
     addButton.style.left = Math.max(8, Math.min(window.innerWidth - addButton.offsetWidth - 8, rect.right - addButton.offsetWidth)) + 'px';
     addButton.setAttribute('data-repeater-id', item.getAttribute('data-te-repeater-id') || '');
     addButton.setAttribute('data-source-index', item.getAttribute('data-te-source-index') || '0');
   }
+
   addButton.addEventListener('click', function(e){
     e.preventDefault(); e.stopPropagation();
-    parent.postMessage({ source:'te', type:'repeater-add', repeaterId:addButton.getAttribute('data-repeater-id'), sourceIndex:Number(addButton.getAttribute('data-source-index') || 0) }, '*');
+    parent.postMessage({
+      source: 'te',
+      type: 'repeater-add',
+      repeaterId: addButton.getAttribute('data-repeater-id'),
+      sourceIndex: Number(addButton.getAttribute('data-source-index') || 0)
+    }, '*');
   });
-  document.addEventListener('click', function(e){
-    var id = idOf(e.target);
-    e.preventDefault();
+
+  document.addEventListener('mouseover', function(e){
+    var item = repeaterItem(e.target);
+    if(item){
+      hoverItem = item;
+      placeOverlays(hoverItem);
+    }
+  }, true);
+
+  var isInteractMode = false;
+
+  // 0. Transparent Edit-Mode Click Shield
+  var shield = document.createElement('div');
+  shield.id = 'te-click-shield';
+  shield.setAttribute('data-te-bridge-node', '');
+  shield.style.cssText = 'position:fixed;inset:0;z-index:2147483640;cursor:pointer;background:transparent;';
+  document.body.appendChild(shield);
+
+  function updateShieldState(){
+    shield.style.display = isInteractMode ? 'none' : 'block';
+  }
+
+  // Handle all selection through the shield so template JS event listeners never receive the click
+  shield.addEventListener('mousemove', function(e){
+    shield.style.pointerEvents = 'none';
+    var under = document.elementFromPoint(e.clientX, e.clientY);
+    shield.style.pointerEvents = 'auto';
+    var item = repeaterItem(under);
+    if(item){
+      hoverItem = item;
+      placeOverlays(hoverItem);
+    }
+  });
+
+  shield.addEventListener('click', function(e){
+    shield.style.pointerEvents = 'none';
+    var target = document.elementFromPoint(e.clientX, e.clientY);
+    shield.style.pointerEvents = 'auto';
+
+    if(!target) return;
+    if(target === addButton || addButton.contains(target) || target === pill || pill.contains(target)) return;
+
+    var id = idOf(target);
     if(!id) return;
     if(sel) sel.removeAttribute('data-te-selected');
     sel = document.querySelector('[data-te-id="'+id+'"]');
     if(sel) sel.setAttribute('data-te-selected','');
-    placeAddButton(sel);
+    placeOverlays(sel);
     parent.postMessage({ source:'te', type:'select', id: id }, '*');
+  });
+
+  // Intercept all link clicks and form submissions in the iframe to prevent navigating away
+  document.addEventListener('click', function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if(a){
+      var href = a.getAttribute('href') || '';
+      e.preventDefault();
+      if(href && !href.startsWith('#') && !href.startsWith('javascript:')){
+        // Notify editor parent to switch page if it's a page in this template
+        parent.postMessage({ source:'te', type:'navigate', href: href }, '*');
+      }
+    }
   }, true);
+
+  document.addEventListener('submit', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+  }, true);
+
   document.addEventListener('dblclick', function(e){
+    e.preventDefault();
+    e.stopPropagation();
     var id = idOf(e.target);
     if(!id) return;
     var el = document.querySelector('[data-te-id="'+id+'"]');
@@ -176,7 +427,7 @@ const BRIDGE = `
     if(sel) sel.removeAttribute('data-te-selected');
     sel = selectedId ? document.querySelector('[data-te-id="'+selectedId+'"]') : null;
     if(sel) sel.setAttribute('data-te-selected', '');
-    placeAddButton(sel);
+    placeOverlays(sel);
     window.scrollTo(x, y);
   }
   window.addEventListener('message', function(e){
@@ -185,14 +436,36 @@ const BRIDGE = `
       applySnapshot(e.data.html, e.data.selected || null);
       return;
     }
+    if(e.data.type === 'set-interact-mode'){
+      isInteractMode = !!e.data.interact;
+      updateShieldState();
+      if(isInteractMode && sel){
+        sel.removeAttribute('data-te-selected');
+        sel = null;
+        placeOverlays(null);
+      }
+      return;
+    }
     if(e.data.type === 'focus'){
       if(sel) sel.removeAttribute('data-te-selected');
       sel = document.querySelector('[data-te-id="'+e.data.id+'"]');
-      if(sel){ sel.setAttribute('data-te-selected',''); sel.scrollIntoView({behavior:'smooth', block:'center'}); placeAddButton(sel); }
+      if(sel){
+        // If element is inside a hidden modal or drawer, temporarily force-reveal the modal in editor
+        var hiddenAncestor = sel.closest('[style*="display:none"], [style*="display: none"], .hidden, [hidden], [aria-hidden="true"], dialog:not([open])');
+        if(hiddenAncestor){
+          hiddenAncestor.style.setProperty('display', 'block', 'important');
+          hiddenAncestor.removeAttribute('hidden');
+          hiddenAncestor.setAttribute('aria-hidden', 'false');
+          if(hiddenAncestor.tagName === 'DIALOG') hiddenAncestor.setAttribute('open', '');
+        }
+        sel.setAttribute('data-te-selected','');
+        sel.scrollIntoView({behavior:'smooth', block:'center'});
+        placeOverlays(sel);
+      }
     }
   });
-  window.addEventListener('resize', function(){ placeAddButton(sel); });
-  window.addEventListener('scroll', function(){ placeAddButton(sel); }, true);
+  window.addEventListener('resize', function(){ placeOverlays(sel); });
+  window.addEventListener('scroll', function(){ placeOverlays(sel); }, true);
 })();
 </script>`;
 

@@ -118,17 +118,21 @@ const kindLabels: Record<FieldKind, string> = {
 /* -------------------------------- repeaters ------------------------------- */
 
 function repeaterType(sampleText: string, container: Element, item: Element): string {
-  const t = `${sampleText} ${cls(container)} ${cls(item)} ${container.closest("section")?.getAttribute("id") ?? ""}`.toLowerCase();
-  if (/\$|price|month|\/mo|plan/.test(t)) return "Pricing";
-  if (/testimonial|“|"|says|quote/.test(t)) return "Testimonials";
-  if (/faq|question|answer|\?/.test(t)) return "FAQ";
-  if (/team|founder|director|lead|principal/.test(t)) return "Team";
-  if (/blog|article|read more|post/.test(t)) return "Blog posts";
-  if (/product|buy|add to cart|sku/.test(t)) return "Products";
-  if (/service/.test(t)) return "Services";
-  if (/feature|benefit/.test(t)) return "Features";
-  if (/gallery|work|portfolio/.test(t)) return "Gallery";
-  if (/logo|trusted by/.test(t)) return "Logo wall";
+  const section = container.closest("section,main,article,div[id],div[class]");
+  const heading = section?.querySelector(":scope > h1,:scope > h2,:scope > h3,header h1,header h2,header h3");
+  const headingText = heading ? text(heading).toLowerCase() : "";
+  const t = `${headingText} ${sampleText} ${cls(container)} ${cls(item)} ${section?.getAttribute("id") ?? ""}`.toLowerCase();
+
+  if (/faq|frequently asked|questions|q&a|\?/.test(t)) return "FAQ";
+  if (/testimonial|review|“|"|says|rating|feedback/.test(t)) return "Testimonials";
+  if (/pricing|plan|tier|\/mo|\/yr|billed|month/.test(t) || (/\$|usd|eur|gbp|inr/.test(sampleText) && /\/|per|month|year/.test(sampleText))) return "Pricing";
+  if (/team|founder|director|lead|principal|staff|member/.test(t)) return "Team";
+  if (/blog|article|read more|post|news/.test(t)) return "Blog posts";
+  if (/product|buy|add to cart|sku|shop/.test(t)) return "Products";
+  if (/service|what we do|offering/.test(t)) return "Services";
+  if (/feature|benefit|why choose/.test(t)) return "Features";
+  if (/gallery|work|portfolio|shots/.test(t)) return "Gallery";
+  if (/logo|trusted by|clients|partners/.test(t)) return "Logo wall";
   return "Cards";
 }
 
@@ -138,7 +142,7 @@ function truncateLabel(value: string, limit = 48) {
 }
 
 function meaningfulItemLabel(item: Element, index: number, type: string) {
-  const heading = item.querySelector("h1,h2,h3,h4,h5,h6");
+  const heading = item.querySelector("h1,h2,h3,h4,h5,h6,summary,button,strong");
   const labelled = item.getAttribute("aria-label") ?? item.getAttribute("title") ?? item.querySelector("[aria-label],[title]")?.getAttribute("aria-label") ?? item.querySelector("[aria-label],[title]")?.getAttribute("title");
   const imageAlt = item.querySelector("img[alt]")?.getAttribute("alt");
   const value = text(heading ?? item) || labelled || imageAlt;
@@ -148,20 +152,69 @@ function meaningfulItemLabel(item: Element, index: number, type: string) {
 }
 
 function meaningfulRepeaterLabel(type: string, container: Element, firstItem: Element) {
-  if (type !== "Cards") return type;
-  const section = container.closest("section,main,article");
+  const section = container.closest("section,main,article,div[id],div[class]");
   const heading = section?.querySelector(":scope > h1,:scope > h2,:scope > h3,header h1,header h2,header h3");
-  if (heading && !firstItem.contains(heading)) return truncateLabel(text(heading));
+  if (heading && !firstItem.contains(heading)) {
+    const headingVal = truncateLabel(text(heading));
+    if (headingVal.length > 2) return headingVal;
+  }
+  if (type !== "Cards") return type;
   if (firstItem.querySelector("img[alt]")) return "Image collection";
   const firstLabel = meaningfulItemLabel(firstItem, 0, "Content item");
   return `${firstLabel} collection`;
 }
 
+function meaningfulSectionName(container: Element): string {
+  // 1. Check direct tags
+  const headerEl = container.closest("header, nav, [id*='header'], [class*='header'], [id*='nav'], [class*='nav']");
+  if (headerEl) return "Header";
+
+  const footerEl = container.closest("footer, [id*='footer'], [class*='footer']");
+  if (footerEl) return "Footer";
+
+  // 2. Search upwards for enclosing section or block
+  let curr: Element | null = container;
+  while (curr && curr !== document.body) {
+    // Check heading inside this container or previous sibling
+    const heading = curr.querySelector(":scope > h1, :scope > h2, :scope > h3, :scope > div > h1, :scope > div > h2, :scope > div > h3, :scope > header > h1, :scope > header > h2, :scope > header > h3");
+    if (heading && text(heading).length > 2) {
+      const hText = text(heading);
+      const hLower = hText.toLowerCase();
+      if (/faq|frequently asked|questions/.test(hLower)) return "FAQ";
+      if (/pricing|plans|packages|investment/.test(hLower)) return "Pricing";
+      if (/review|testimonial|client stories|praise/.test(hLower)) return "Testimonials";
+      if (/service|what we do|offering/.test(hLower)) return "Services";
+      if (/gallery|portfolio|featured work|celebration/.test(hLower)) return "Portfolio & Gallery";
+      if (/about|story|team|meet/.test(hLower)) return "About & Story";
+      if (/feature|why choose|highlights/.test(hLower)) return "Features";
+      if (/contact|booking|get in touch/.test(hLower)) return "Contact & Booking";
+      return truncateLabel(hText, 30);
+    }
+
+    const t = `${cls(curr)} ${curr.getAttribute("id") ?? ""}`.toLowerCase();
+    if (/hero|banner|intro|welcome/.test(t)) return "Hero";
+    if (/faq|questions/.test(t)) return "FAQ";
+    if (/pricing|packages|price/.test(t)) return "Pricing";
+    if (/testimonial|reviews/.test(t)) return "Testimonials";
+    if (/service/.test(t)) return "Services";
+    if (/gallery|portfolio|work/.test(t)) return "Portfolio & Gallery";
+    if (/about|team/.test(t)) return "About & Story";
+    if (/feature/.test(t)) return "Features";
+    if (/contact|booking/.test(t)) return "Contact & Booking";
+
+    curr = curr.parentElement;
+  }
+
+  return "Page Section";
+}
+
 function detectRepeaters(doc: Document): Repeater[] {
   const out: Repeater[] = [];
-  doc.querySelectorAll("*").forEach((container) => {
+  // Traverse DOM in document order
+  const allContainers = Array.from(doc.querySelectorAll("*"));
+  allContainers.forEach((container) => {
     const kids = Array.from(container.children).filter((k) => !SKIP_TAGS.has(k.tagName));
-    if (kids.length < 3) return;
+    if (kids.length < 2) return;
     const groups = new Map<string, Element[]>();
     kids.forEach((k) => {
       const sig = classSignature(k);
@@ -169,18 +222,20 @@ function detectRepeaters(doc: Document): Repeater[] {
     });
     for (const [, items] of groups) {
       const first = items[0];
-      if (items.length < 3 || items.length !== kids.length || !first) continue;
+      if (items.length < 2 || items.length !== kids.length || !first) continue;
       const depth = first.querySelectorAll("*").length;
       const sample = text(first);
       const fieldsPerItem = Math.max(1, first.querySelectorAll("h1,h2,h3,h4,p,span,img,a,blockquote,li,td").length);
       const type = repeaterType(sample, container, first);
       const label = meaningfulRepeaterLabel(type, container, first);
+      const sectionName = meaningfulSectionName(container);
       const confidence: Confidence = depth >= 2 && sample.length > 4 ? "High" : depth >= 1 ? "Medium" : "Low";
       out.push({
         id: nid("rep"),
         containerId: teid(container),
         label,
         type,
+        sectionName,
         itemIds: items.map((i) => teid(i)),
         itemLabels: items.map((item, index) => meaningfulItemLabel(item, index, type)),
         fieldsPerItem,
@@ -188,8 +243,14 @@ function detectRepeaters(doc: Document): Repeater[] {
       });
     }
   });
-  // drop nested duplicates (keep outermost)
-  return out.filter((r) => !out.some((o) => o !== r && o.itemIds.some((id) => r.containerId === id)));
+  // drop nested and overlapping duplicates (keep top-level distinct repeaters)
+  const seenContainers = new Set<string>();
+  const filtered = out.filter((r) => {
+    if (seenContainers.has(r.containerId)) return false;
+    seenContainers.add(r.containerId);
+    return !out.some((o) => o !== r && o.itemIds.some((id) => r.containerId === id));
+  });
+  return filtered;
 }
 
 /* ------------------------------- navigation ------------------------------- */
@@ -492,6 +553,10 @@ function detectFields(doc: Document, repeaters: Repeater[]): EditableField[] {
     }
     if (tag === "SVG" || tag === "svg") {
       push(el, "svg", "", "Medium", "graphic", {});
+      return;
+    }
+    if (tag === "I" || (tag === "SPAN" && /icon|fa-|lucide|svg|emoji/i.test(el.className + " " + (el.getAttribute("aria-label") || "")))) {
+      push(el, "svg", text(el) || el.className || "Icon", "High", "icon", {});
       return;
     }
     if (tag === "TABLE") {
