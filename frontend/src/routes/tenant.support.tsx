@@ -56,7 +56,9 @@ function SupportPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [reply, setReply] = useState("");
-  const [attachments, setAttachments] = useState<{ url: string; filename: string; size: number }[]>([]);
+  const [attachments, setAttachments] = useState<{ url: string; filename: string; size: number }[]>(
+    [],
+  );
   const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -139,7 +141,9 @@ function SupportPage() {
             <LifeBuoy className="h-4 w-4" /> Customer support
           </div>
           <h1 className="font-display text-3xl font-bold text-white">Support tickets</h1>
-          <p className="mt-2 text-sm text-slate-400">Contact the WebMintra team and track every response.</p>
+          <p className="mt-2 text-sm text-slate-400">
+            Contact the WebMintra team and track every response.
+          </p>
         </div>
         <button
           type="button"
@@ -154,14 +158,24 @@ function SupportPage() {
       <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-slate-800 bg-slate-800 sm:grid-cols-4">
         <SummaryCard label="Total" value={pagination.total} icon={Inbox} />
         <SummaryCard label="Open" value={summary.open ?? 0} icon={AlertCircle} />
-        <SummaryCard label="In Progress" value={(summary.in_progress ?? 0) + (summary.waiting_reply ?? 0)} icon={Clock3} />
-        <SummaryCard label="Resolved" value={(summary.resolved ?? 0) + (summary.closed ?? 0)} icon={CheckCircle2} />
+        <SummaryCard
+          label="In Progress"
+          value={(summary.in_progress ?? 0) + (summary.waiting_reply ?? 0)}
+          icon={Clock3}
+        />
+        <SummaryCard
+          label="Resolved"
+          value={(summary.resolved ?? 0) + (summary.closed ?? 0)}
+          icon={CheckCircle2}
+        />
       </div>
 
       {/* Main split panel */}
       <section className="grid min-h-[640px] overflow-hidden border-y border-slate-800 bg-[#0b1826] lg:grid-cols-[minmax(300px,400px)_1fr] lg:rounded-xl lg:border">
         {/* Ticket list (left) */}
-        <div className={`${selectedId ? "hidden lg:flex" : "flex"} min-h-0 flex-col border-slate-800 lg:border-r`}>
+        <div
+          className={`${selectedId ? "hidden lg:flex" : "flex"} min-h-0 flex-col border-slate-800 lg:border-r`}
+        >
           {/* Filters */}
           <div className="space-y-3 border-b border-slate-800 p-4">
             <div className="relative">
@@ -195,18 +209,29 @@ function SupportPage() {
           {/* List body */}
           <div className="flex-1 overflow-y-auto">
             {listQuery.isLoading ? (
-              <Centered icon={<Loader2 className="h-7 w-7 animate-spin text-emerald-400" />} title="Loading tickets" />
+              <Centered
+                icon={<Loader2 className="h-7 w-7 animate-spin text-emerald-400" />}
+                title="Loading tickets"
+              />
             ) : listQuery.isError ? (
               <Centered
                 icon={<AlertCircle className="h-7 w-7 text-rose-400" />}
                 title="Could not load tickets"
-                action={<button onClick={() => listQuery.refetch()} className="text-sm text-emerald-400">Try again</button>}
+                action={
+                  <button onClick={() => listQuery.refetch()} className="text-sm text-emerald-400">
+                    Try again
+                  </button>
+                }
               />
             ) : tickets.length === 0 ? (
               <Centered
                 icon={<Inbox className="h-8 w-8 text-slate-600" />}
                 title="No tickets"
-                description={search || status ? "Change filters to see other tickets." : "Create a ticket when you need help."}
+                description={
+                  search || status
+                    ? "Change filters to see other tickets."
+                    : "Create a ticket when you need help."
+                }
               />
             ) : (
               tickets.map((item) => (
@@ -218,14 +243,22 @@ function SupportPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-200">{item.subject}</p>
-                      <p className="mt-0.5 text-[11px] font-medium text-slate-500">{item.ticketNumber}</p>
+                      <p className="truncate text-sm font-semibold text-slate-200">
+                        {item.subject}
+                      </p>
+                      <p className="mt-0.5 text-[11px] font-medium text-slate-500">
+                        {item.ticketNumber}
+                      </p>
                     </div>
                     <StatusBadge status={item.status} />
                   </div>
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">{item.description}</p>
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">
+                    {item.description}
+                  </p>
                   <div className="mt-2.5 flex items-center justify-between gap-2">
-                    <span className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${PRIORITY_COLORS[item.priority] ?? ""}`}>
+                    <span
+                      className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${PRIORITY_COLORS[item.priority] ?? ""}`}
+                    >
                       {item.priority}
                     </span>
                     <span className="text-[10px] text-slate-600">
@@ -247,12 +280,19 @@ function SupportPage() {
               description="Choose a conversation to read messages and reply."
             />
           ) : detailQuery.isLoading ? (
-            <Centered icon={<Loader2 className="h-7 w-7 animate-spin text-emerald-400" />} title="Loading conversation" />
+            <Centered
+              icon={<Loader2 className="h-7 w-7 animate-spin text-emerald-400" />}
+              title="Loading conversation"
+            />
           ) : !ticket ? (
             <Centered
               icon={<AlertCircle className="h-7 w-7 text-rose-400" />}
               title="Could not load ticket"
-              action={<button onClick={() => detailQuery.refetch()} className="text-sm text-emerald-400">Try again</button>}
+              action={
+                <button onClick={() => detailQuery.refetch()} className="text-sm text-emerald-400">
+                  Try again
+                </button>
+              }
             />
           ) : (
             <>
@@ -274,7 +314,9 @@ function SupportPage() {
                     <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-500">
                       <span>{ticket.ticketNumber}</span>
                       {ticket.category && <span className="capitalize">{ticket.category}</span>}
-                      <span className={`rounded border px-1.5 py-0.5 font-semibold uppercase ${PRIORITY_COLORS[ticket.priority] ?? ""}`}>
+                      <span
+                        className={`rounded border px-1.5 py-0.5 font-semibold uppercase ${PRIORITY_COLORS[ticket.priority] ?? ""}`}
+                      >
                         {ticket.priority}
                       </span>
                       <span>Opened {format(new Date(ticket.createdAt), "PPp")}</span>
@@ -298,7 +340,9 @@ function SupportPage() {
                 {(ticket.replies ?? []).map((r: any) => (
                   <Message
                     key={r.id}
-                    author={r.author?.role === "admin" ? (r.author.name || "WebMintra Support") : "You"}
+                    author={
+                      r.author?.role === "admin" ? r.author.name || "WebMintra Support" : "You"
+                    }
                     content={r.content}
                     date={r.createdAt}
                     isTenant={r.author?.role !== "admin"}
@@ -338,11 +382,20 @@ function SupportPage() {
                     {attachments.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {attachments.map((file, i) => (
-                          <div key={i} className="group relative rounded border border-slate-700 bg-slate-900 p-1">
-                            <img src={file.url} alt={file.filename} className="h-10 w-10 object-cover opacity-80" />
+                          <div
+                            key={i}
+                            className="group relative rounded border border-slate-700 bg-slate-900 p-1"
+                          >
+                            <img
+                              src={file.url}
+                              alt={file.filename}
+                              className="h-10 w-10 object-cover opacity-80"
+                            />
                             <button
                               type="button"
-                              onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
+                              onClick={() =>
+                                setAttachments((prev) => prev.filter((_, idx) => idx !== i))
+                              }
                               className="absolute -right-1.5 -top-1.5 rounded-full bg-slate-800 p-0.5 text-slate-400 opacity-0 hover:text-rose-400 group-hover:opacity-100 transition"
                             >
                               <X className="h-3 w-3" />
@@ -366,19 +419,29 @@ function SupportPage() {
                           disabled={uploading || attachments.length >= 3}
                           className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-emerald-400 disabled:opacity-50"
                         >
-                          {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Paperclip className="h-3.5 w-3.5" />}
+                          {uploading ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Paperclip className="h-3.5 w-3.5" />
+                          )}
                           {uploading ? "Uploading..." : "Attach"}
                         </button>
                         <span className="text-[11px] text-slate-600">{reply.length}/5000</span>
                       </div>
                       <button
                         type="submit"
-                        disabled={(!reply.trim() && attachments.length === 0) || replyMutation.isPending || uploading}
+                        disabled={
+                          (!reply.trim() && attachments.length === 0) ||
+                          replyMutation.isPending ||
+                          uploading
+                        }
                         className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-40"
                       >
-                        {replyMutation.isPending
-                          ? <Loader2 className="h-4 w-4 animate-spin" />
-                          : <Send className="h-4 w-4" />}
+                        {replyMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="h-4 w-4" />
+                        )}
                         {replyMutation.isPending ? "Sending..." : "Send reply"}
                       </button>
                     </div>
@@ -441,7 +504,11 @@ function StatusBadge({ status }: { status: SupportTicket["status"] }) {
 }
 
 function Message({
-  author, content, date, isTenant, attachments,
+  author,
+  content,
+  date,
+  isTenant,
+  attachments,
 }: {
   author: string;
   content: string;
@@ -456,15 +523,18 @@ function Message({
         <span>{format(new Date(date), "MMM d, h:mm a")}</span>
       </div>
       <div
-        className={`max-w-[88%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6 ${isTenant
+        className={`max-w-[88%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6 ${
+          isTenant
             ? "bg-emerald-500/12 text-emerald-50 border border-emerald-500/20"
             : "border border-slate-700/50 bg-slate-800 text-slate-200"
-          }`}
+        }`}
       >
         {content}
       </div>
       {attachments && attachments.length > 0 && (
-        <div className={`mt-2 flex flex-wrap gap-2 max-w-[88%] ${isTenant ? "justify-end" : "justify-start"}`}>
+        <div
+          className={`mt-2 flex flex-wrap gap-2 max-w-[88%] ${isTenant ? "justify-end" : "justify-start"}`}
+        >
           {attachments.map((file, i) => (
             <a
               key={i}
@@ -473,7 +543,11 @@ function Message({
               rel="noreferrer"
               className="group relative block overflow-hidden rounded-lg border border-slate-700 bg-slate-900"
             >
-              <img src={file.url} alt={file.filename} className="h-20 w-auto object-cover opacity-90 transition group-hover:opacity-100" />
+              <img
+                src={file.url}
+                alt={file.filename}
+                className="h-20 w-auto object-cover opacity-90 transition group-hover:opacity-100"
+              />
             </a>
           ))}
         </div>
@@ -484,7 +558,10 @@ function Message({
 
 // ── Centered State ────────────────────────────────────────────
 function Centered({
-  icon, title, description, action,
+  icon,
+  title,
+  description,
+  action,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -495,7 +572,9 @@ function Centered({
     <div className="flex min-h-64 flex-1 flex-col items-center justify-center p-8 text-center">
       {icon}
       <h3 className="mt-3 text-sm font-semibold text-slate-300">{title}</h3>
-      {description && <p className="mt-1 max-w-xs text-xs leading-5 text-slate-500">{description}</p>}
+      {description && (
+        <p className="mt-1 max-w-xs text-xs leading-5 text-slate-500">{description}</p>
+      )}
       {action && <div className="mt-3">{action}</div>}
     </div>
   );
@@ -503,7 +582,11 @@ function Centered({
 
 // ── Create Ticket Modal ───────────────────────────────────────
 function CreateTicketModal({
-  form, setForm, pending, onClose, onSubmit,
+  form,
+  setForm,
+  pending,
+  onClose,
+  onSubmit,
 }: {
   form: typeof emptyForm;
   setForm: React.Dispatch<React.SetStateAction<typeof emptyForm>>;
@@ -517,13 +600,18 @@ function CreateTicketModal({
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form
-        onSubmit={(e) => { e.preventDefault(); onSubmit(); }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit();
+        }}
         className="w-full max-w-xl rounded-xl border border-slate-700 bg-[#0b1826] shadow-2xl"
       >
         <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
           <div>
             <h2 className="font-semibold text-white">Create support ticket</h2>
-            <p className="mt-1 text-xs text-slate-500">Include enough detail for the team to investigate quickly.</p>
+            <p className="mt-1 text-xs text-slate-500">
+              Include enough detail for the team to investigate quickly.
+            </p>
           </div>
           <button
             type="button"
@@ -568,7 +656,9 @@ function CreateTicketModal({
             Priority
             <select
               value={form.priority}
-              onChange={(e) => setForm({ ...form, priority: e.target.value as SupportTicket["priority"] })}
+              onChange={(e) =>
+                setForm({ ...form, priority: e.target.value as SupportTicket["priority"] })
+              }
               className="mt-1.5 h-10 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100"
             >
               <option value="low">Low</option>
@@ -589,7 +679,9 @@ function CreateTicketModal({
               placeholder="Describe the issue: what happened, what you expected, and any error messages."
               className="mt-1.5 h-40 w-full resize-none rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-100 outline-none transition focus:border-emerald-500"
             />
-            <span className="mt-1 block text-right text-[10px] text-slate-600">{form.description.length}/5000</span>
+            <span className="mt-1 block text-right text-[10px] text-slate-600">
+              {form.description.length}/5000
+            </span>
           </label>
         </div>
 

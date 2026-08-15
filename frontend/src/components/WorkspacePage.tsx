@@ -69,9 +69,12 @@ export function WorkspacePage({ requiredRole }: { requiredRole: SessionUser["rol
 
   async function signOut() {
     try {
-      await apiFetch(`${import.meta.env["VITE_API_URL"] ?? "http://localhost:3001/api"}/auth/logout`, {
-        method: "POST",
-      });
+      await apiFetch(
+        `${import.meta.env["VITE_API_URL"] ?? "http://localhost:3001/api"}/auth/logout`,
+        {
+          method: "POST",
+        },
+      );
     } finally {
       clearCsrfToken();
       clearSessionUser();
@@ -92,17 +95,35 @@ export function WorkspacePage({ requiredRole }: { requiredRole: SessionUser["rol
   if (!user) return <div className="min-h-screen bg-background" aria-busy="true" />;
 
   if (user.role === "admin")
-    return <AdminDashboardView user={user} dashboard={dashboard as AdminDashboard | null} error={dashboardError} onSignOut={() => void signOut()} />;
+    return (
+      <AdminDashboardView
+        user={user}
+        dashboard={dashboard as AdminDashboard | null}
+        error={dashboardError}
+        onSignOut={() => void signOut()}
+      />
+    );
 
   if (!user.onboardingCompleted) return <TenantOnboarding />;
 
-  return <TenantLayout user={user} dashboard={dashboard as TenantDashboardData | null} websites={websites} error={dashboardError} websiteError={websiteError} onOpenWebsite={async (websiteId) => {
-    try {
-      await openWebsite(websiteId);
-      navigate({ to: "/tenant/builder/$id", params: { id: websiteId } });
-    } catch (err: any) {
-      toast.error("Failed to open: " + err?.message);
-      console.error(err);
-    }
-  }} onArchiveWebsite={(websiteId) => void archiveWebsiteRecord(websiteId)} onSignOut={() => void signOut()} />;
+  return (
+    <TenantLayout
+      user={user}
+      dashboard={dashboard as TenantDashboardData | null}
+      websites={websites}
+      error={dashboardError}
+      websiteError={websiteError}
+      onOpenWebsite={async (websiteId) => {
+        try {
+          await openWebsite(websiteId);
+          navigate({ to: "/tenant/builder/$id", params: { id: websiteId } });
+        } catch (err: any) {
+          toast.error("Failed to open: " + err?.message);
+          console.error(err);
+        }
+      }}
+      onArchiveWebsite={(websiteId) => void archiveWebsiteRecord(websiteId)}
+      onSignOut={() => void signOut()}
+    />
+  );
 }

@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { JSDOM } from "jsdom";
 import { Website } from "../models/Website.js";
+import { Template } from "../models/Template.js";
+import { Plan } from "../models/Plan.js";
 import { User } from "../models/User.js";
 import { FormSubmission } from "../models/FormSubmission.js";
 import { AnalyticsEvent, ANALYTICS_EVENT_TYPES } from "../models/AnalyticsEvent.js";
@@ -19,14 +21,257 @@ import {
 const router = Router();
 const WEBSITE_ID_PATTERN = /^[0-9a-fA-F]{24}$/;
 
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function sanitizeFormData(data) {
+  if (typeof data !== "object" || data === null) return {};
+  return Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      String(key).slice(0, 100),
+      typeof value === "string" ? value.slice(0, 5000) : value,
+    ])
+  );
+}
+
+// ── Public Templates Showcase ──────────────────────────────────
+router.get("/templates", async (req, res) => {
+  try {
+    const { category, limit } = req.query;
+    const filter = { isActive: true };
+    if (category && typeof category === "string" && category.trim() && category.toLowerCase() !== "all") {
+      filter.category = { $regex: new RegExp(`^${escapeRegex(category.trim())}$`, "i") };
+    }
+    const query = Template.find(filter)
+      .sort({ createdAt: -1 })
+      .select("title description category thumbnailUrl pageCount assets pages");
+    
+    if (limit) {
+      query.limit(Math.min(100, Number(limit) || 10));
+    }
+    const templates = await query.lean();
+    return res.json({ templates });
+  } catch (error) {
+    console.error("Error fetching public templates:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Single Template Preview ────────────────────────────
+router.get("/templates/:id", async (req, res) => {
+  try {
+    const template = await Template.findOne({ _id: req.params.id, isActive: true }).lean();
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+    return res.json({ template });
+  } catch (error) {
+    console.error("Error fetching template preview:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Template Categories ─────────────────────────────────
+router.get("/template-categories", async (req, res) => {
+  try {
+    const categories = await Template.distinct("category", { isActive: true });
+    return res.json({ categories: categories.filter(Boolean) });
+  } catch (error) {
+    console.error("Error fetching template categories:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Pricing Plans ───────────────────────────────────────
+router.get("/plans", async (req, res) => {
+  try {
+    const plans = await Plan.find({ status: "active", isPublic: true })
+      .sort({ sortOrder: 1, createdAt: 1 })
+      .select("name slug description pricing currency trialDays limits features highlights isPopular sortOrder")
+      .lean();
+    return res.json({ plans });
+  } catch (error) {
+    console.error("Error fetching public plans:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Blog ────────────────────────────────────────────────
+router.get("/blog", async (req, res) => {
+  try {
+    const { BlogPost, BlogCategory } = await import("../models/Blog.js");
+    const { category, search, limit = 20 } = req.query;
+    const filter = { status: "published" };
+
+    if (category && category !== "all") {
+      const catDoc = await BlogCategory.findOne({ slug: category });
+      if (catDoc) filter.category = catDoc._id;
+    }
+
+    if (search && typeof search === "string" && search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
+      filter.$or = [
+        { title: { $regex: safeSearch, $options: "i" } },
+        { excerpt: { $regex: safeSearch, $options: "i" } },
+      ];
+    }
+
+    const posts = await BlogPost.find(filter)
+      .populate("category", "name slug")
+      .populate("author", "name email")
+      .sort({ publishedAt: -1, createdAt: -1 })
+      .limit(Number(limit) || 20)
+      .lean();
+
+    const categories = await BlogCategory.find({ isActive: true }).sort({ sortOrder: 1 }).lean();
+    return res.json({ posts, categories });
+  } catch (error) {
+    console.error("Error fetching public blog:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/blog/:slug", async (req, res) => {
+  try {
+    const { BlogPost } = await import("../models/Blog.js");
+    const post = await BlogPost.findOne({ slug: req.params.slug, status: "published" })
+      .populate("category", "name slug")
+      .populate("author", "name email")
+      .lean();
+
+    if (!post) return res.status(404).json({ message: "Article not found" });
+
+    // increment view count
+    await BlogPost.updateOne({ _id: post._id }, { $inc: { viewCount: 1 } });
+    return res.json({ post });
+  } catch (error) {
+    console.error("Error fetching article:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Knowledge Base ──────────────────────────────────────
+router.get("/kb", async (req, res) => {
+  try {
+    const { KBArticle, KBCategory } = await import("../models/KnowledgeBase.js");
+    const { category, search } = req.query;
+    const filter = { status: "published" };
+
+    if (category && category !== "all") {
+      const catDoc = await KBCategory.findOne({ slug: category });
+      if (catDoc) filter.category = catDoc._id;
+    }
+
+    if (search && typeof search === "string" && search.trim()) {
+      const safeSearch = escapeRegex(search.trim());
+      filter.$or = [
+        { title: { $regex: safeSearch, $options: "i" } },
+        { excerpt: { $regex: safeSearch, $options: "i" } },
+      ];
+    }
+
+    const articles = await KBArticle.find(filter)
+      .populate("category", "name slug icon")
+      .sort({ sortOrder: 1, createdAt: -1 })
+      .lean();
+
+    const categories = await KBCategory.find({ isActive: true }).sort({ sortOrder: 1 }).lean();
+    return res.json({ articles, categories });
+  } catch (error) {
+    console.error("Error fetching public KB:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/kb/:slug", async (req, res) => {
+  try {
+    const { KBArticle } = await import("../models/KnowledgeBase.js");
+    const article = await KBArticle.findOne({ slug: req.params.slug, status: "published" })
+      .populate("category", "name slug icon")
+      .lean();
+
+    if (!article) return res.status(404).json({ message: "Article not found" });
+
+    await KBArticle.updateOne({ _id: article._id }, { $inc: { views: 1 } });
+    return res.json({ article });
+  } catch (error) {
+    console.error("Error fetching KB article:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Contact Form Submission ────────────────────────────
+router.post("/contact", async (req, res) => {
+  try {
+    const { name, email, phone, subject, message, recaptchaToken } = req.body || {};
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: "Name, email and message are required." });
+    }
+
+    const { verifyRecaptcha } = await import("../services/recaptcha.js");
+    const recapResult = await verifyRecaptcha(recaptchaToken, req.ip, "contact");
+    if (!recapResult.success) {
+      return res.status(400).json({ message: recapResult.error || "Security verification failed." });
+    }
+
+    const { SupportTicket } = await import("../models/Support.js").catch(() => ({}));
+    if (SupportTicket) {
+      await SupportTicket.create({
+        subject: String(subject || `Website Pre-Sales Enquiry from ${name}`).slice(0, 200),
+        description: `Name: ${String(name).slice(0, 100)}\nEmail: ${String(email).slice(0, 100)}\nPhone: ${String(phone || "N/A").slice(0, 30)}\n\nMessage:\n${String(message).slice(0, 5000)}`,
+        category: "general",
+        priority: "medium",
+        status: "open",
+      });
+    }
+
+    return res.status(201).json({ message: "Enquiry submitted successfully! Our team will contact you shortly." });
+  } catch (error) {
+    console.error("Error saving contact message:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// ── Public Testimonials ────────────────────────────────────────
+router.get("/testimonials", async (req, res) => {
+  try {
+    const { Testimonial, DEFAULT_TESTIMONIALS } = await import("../models/Testimonial.js");
+    const count = await Testimonial.countDocuments();
+    if (count === 0) {
+      await Testimonial.insertMany(DEFAULT_TESTIMONIALS);
+    }
+    const testimonials = await Testimonial.find({ isActive: true })
+      .sort({ sortOrder: 1, createdAt: -1 })
+      .lean();
+    return res.json({ testimonials });
+  } catch (error) {
+    console.error("Error fetching public testimonials:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+function sanitizeCssValue(v) {
+  if (typeof v !== "string") return "";
+  return v.replace(/[;{}()<>\\]/g, "").slice(0, 200);
+}
+
 function themeCss(theme) {
-  if (!theme) return "";
+  if (!theme || typeof theme !== "object") return "";
+  const fontBody = sanitizeCssValue(theme.fontBody);
+  const fontHeading = sanitizeCssValue(theme.fontHeading);
+  const background = sanitizeCssValue(theme.background);
+  const text = sanitizeCssValue(theme.text);
+  const radius = sanitizeCssValue(theme.radius);
+  const shadow = sanitizeCssValue(theme.shadow);
+  const container = sanitizeCssValue(theme.container);
+
   return `
-    body { font-family: ${theme.fontBody} !important; background: ${theme.background} !important; color: ${theme.text} !important; }
-    h1,h2,h3,h4,h5 { font-family: ${theme.fontHeading} !important; }
-    .card, .btn-primary, .btn-secondary, input, textarea, button { border-radius: ${theme.radius} !important; }
-    .card { box-shadow: ${theme.shadow}; }
-    .sect { max-width: ${theme.container} !important; }
+    body { ${fontBody ? `font-family: ${fontBody} !important;` : ""} ${background ? `background: ${background} !important;` : ""} ${text ? `color: ${text} !important;` : ""} }
+    ${fontHeading ? `h1,h2,h3,h4,h5 { font-family: ${fontHeading} !important; }` : ""}
+    ${radius ? `.card, .btn-primary, .btn-secondary, input, textarea, button { border-radius: ${radius} !important; }` : ""}
+    ${shadow ? `.card { box-shadow: ${shadow}; }` : ""}
+    ${container ? `.sect { max-width: ${container} !important; }` : ""}
   `;
 }
 
@@ -270,7 +515,8 @@ router.post("/site/:domainOrId/form", async (req, res, next) => {
   try {
     const website = await resolvePublishedWebsite(req.params.domainOrId);
     if (!website) return res.status(404).json({ message: "Website not found." });
-    const submission = await FormSubmission.create({ websiteId: website._id, tenantId: website.owner, data: req.body });
+    const cleanData = sanitizeFormData(req.body);
+    const submission = await FormSubmission.create({ websiteId: website._id, tenantId: website.owner, data: cleanData });
     return res.status(201).json({ message: "Form submitted successfully", id: submission._id });
   } catch (error) {
     return next(error);

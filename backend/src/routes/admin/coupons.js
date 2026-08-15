@@ -16,7 +16,10 @@ router.get("/", async (req, res, next) => {
     const { page, limit, skip } = parsePagination(req.query);
     const filter = {};
     if (req.query.status && COUPON_STATUSES.includes(req.query.status)) filter.status = req.query.status;
-    if (req.query.search) filter.code = { $regex: req.query.search, $options: "i" };
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      filter.code = { $regex: escapeRegex(req.query.search.trim()), $options: "i" };
+    }
 
     const [coupons, total] = await Promise.all([
       Coupon.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),

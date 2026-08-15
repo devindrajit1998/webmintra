@@ -8,7 +8,7 @@ import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js"
 import { SupportTicket, TICKET_STATUSES, TICKET_PRIORITIES } from "../../models/SupportTicket.js";
 import { Notification } from "../../models/Notification.js";
 import { logActivity, buildLogContext } from "../../services/activityLog.js";
-import { parsePagination, parseSort, isMongoId, isString, stripUndefined } from "../../lib/validate.js";
+import { parsePagination, parseSort, isMongoId, isString, stripUndefined, escapeRegex } from "../../lib/validate.js";
 
 const router = Router();
 router.use(requireAuthenticatedUser, requireRole("admin"));
@@ -25,10 +25,11 @@ router.get("/", async (req, res, next) => {
     if (req.query.tenant && isMongoId(req.query.tenant)) filter.tenant = req.query.tenant;
     if (req.query.assignedTo && isMongoId(req.query.assignedTo)) filter.assignedTo = req.query.assignedTo;
     if (req.query.unassigned === "true") filter.assignedTo = { $exists: false };
-    if (req.query.search) {
+    if (req.query.search && typeof req.query.search === "string") {
+      const q = escapeRegex(req.query.search.trim());
       filter.$or = [
-        { subject: { $regex: req.query.search, $options: "i" } },
-        { ticketNumber: { $regex: req.query.search, $options: "i" } },
+        { subject: { $regex: q, $options: "i" } },
+        { ticketNumber: { $regex: q, $options: "i" } },
       ];
     }
 

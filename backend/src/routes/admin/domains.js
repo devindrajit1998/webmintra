@@ -28,8 +28,9 @@ router.get("/", async (req, res, next) => {
       filter.expiresAt = { $lte: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) };
     }
 
-    if (req.query.search) {
-      filter.domain = { $regex: req.query.search, $options: "i" };
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      filter.domain = { $regex: escapeRegex(req.query.search.trim()), $options: "i" };
     }
 
     const [domains, total] = await Promise.all([

@@ -63,8 +63,12 @@ function DomainsPage() {
     <div className="max-w-[1600px] space-y-8">
       {/* Header */}
       <div>
-        <h1 className="font-display text-3xl font-bold tracking-tight text-white">Custom Domains</h1>
-        <p className="mt-2 text-sm text-slate-400">Manage custom domains for your websites. Connect your own domain to make your site public.</p>
+        <h1 className="font-display text-3xl font-bold tracking-tight text-white">
+          Custom Domains
+        </h1>
+        <p className="mt-2 text-sm text-slate-400">
+          Manage custom domains for your websites. Connect your own domain to make your site public.
+        </p>
       </div>
 
       {/* Add Domain Section */}
@@ -88,7 +92,9 @@ function DomainsPage() {
               onChange={(e) => setSelectedWebsiteId(e.target.value)}
               className="w-full rounded-xl border border-slate-700 bg-[#0d1c2d] px-4 py-2.5 text-white focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500"
             >
-              <option value="" disabled>Select a website</option>
+              <option value="" disabled>
+                Select a website
+              </option>
               {websites.map((w) => (
                 <option key={w.id} value={w.id}>
                   {w.name}
@@ -101,7 +107,11 @@ function DomainsPage() {
             disabled={!newDomain || !selectedWebsiteId || addMutation.isPending}
             className="flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-2.5 font-medium text-white transition-all hover:bg-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-[#0b1826] disabled:opacity-50"
           >
-            {addMutation.isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Plus className="h-5 w-5" />}
+            {addMutation.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Plus className="h-5 w-5" />
+            )}
             Add Domain
           </button>
         </div>
@@ -123,7 +133,10 @@ function DomainsPage() {
         ) : (
           <div className="grid gap-6">
             {domains.map((domain) => (
-              <div key={domain.id} className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+              <div
+                key={domain.id}
+                className="flex flex-col gap-4 rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+              >
                 <div>
                   <div className="flex items-center gap-3">
                     <h3 className="font-display text-lg font-bold text-white">{domain.domain}</h3>
@@ -140,14 +153,18 @@ function DomainsPage() {
                     )}
                   </div>
                   <div className="mt-1 text-sm text-slate-400">
-                    Connected to <span className="font-semibold text-slate-300">{websites.find(w => w.id === domain.websiteId)?.name || 'Unknown Website'}</span>
+                    Connected to{" "}
+                    <span className="font-semibold text-slate-300">
+                      {websites.find((w) => w.id === domain.websiteId)?.name || "Unknown Website"}
+                    </span>
                   </div>
-                  
+
                   {domain.status === "pending_verification" && (
                     <div className="mt-4 rounded-xl border border-blue-900/30 bg-blue-900/10 p-4 space-y-3">
                       <p className="text-sm font-semibold text-blue-400">Setup Instructions</p>
                       <p className="text-xs text-slate-400">
-                        Add the following <strong>CNAME</strong> record in your DNS provider, then click <strong>Verify DNS</strong>:
+                        Add the following <strong>CNAME</strong> record in your DNS provider, then
+                        click <strong>Verify DNS</strong>:
                       </p>
                       <div className="overflow-x-auto rounded-lg border border-slate-700">
                         <table className="w-full text-xs">
@@ -155,21 +172,31 @@ function DomainsPage() {
                             <tr>
                               <th className="px-4 py-2 text-left font-semibold">Type</th>
                               <th className="px-4 py-2 text-left font-semibold">Name / Host</th>
-                              <th className="px-4 py-2 text-left font-semibold">Value / Points To</th>
+                              <th className="px-4 py-2 text-left font-semibold">
+                                Value / Points To
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-800">
                             <tr className="bg-[#0b1826]">
                               <td className="px-4 py-2 font-mono text-amber-400">CNAME</td>
-                              <td className="px-4 py-2 font-mono text-slate-300">{domain.domain}</td>
+                              <td className="px-4 py-2 font-mono text-slate-300">
+                                {domain.domain}
+                              </td>
                               <td className="px-4 py-2 font-mono text-cyan-400">
-                                {window.location.hostname.includes("localhost") ? `cname.${window.location.host}` : "cname.webmintra.cloud"}
+                                {window.location.hostname.includes("localhost")
+                                  ? `cname.${window.location.host}`
+                                  : "cname.webmintra.cloud"}
                               </td>
                             </tr>
                           </tbody>
                         </table>
                       </div>
-                      <p className="text-xs text-slate-500">DNS propagation may take up to 48 hours. For root/apex domains (e.g. mycompany.com without www), use an A record pointing to our server IP instead.</p>
+                      <p className="text-xs text-slate-500">
+                        DNS propagation may take up to 48 hours. For root/apex domains (e.g.
+                        mycompany.com without www), use an A record pointing to our server IP
+                        instead.
+                      </p>
                     </div>
                   )}
                 </div>

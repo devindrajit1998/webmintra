@@ -57,6 +57,19 @@ router.get("/tenant", requireRole("tenant"), async (request, response, next) => 
         : fallbackLimits.storage,
     };
 
+    const { Subscription } = await import("../models/Subscription.js");
+    const activeSub = await Subscription.findOne({ tenant: request.user._id })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    let isTrialing = false;
+    let trialDaysLeft = 0;
+    if (activeSub?.status === "trialing" && activeSub?.trialEndsAt) {
+      isTrialing = true;
+      const diffMs = new Date(activeSub.trialEndsAt).getTime() - Date.now();
+      trialDaysLeft = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
     return response.json({
       account: {
         name: request.user.name,
@@ -67,6 +80,10 @@ router.get("/tenant", requireRole("tenant"), async (request, response, next) => 
         planName: entitlements.planName,
         limits,
         seoFeatures: entitlements.seoFeatures,
+        subscriptionStatus: activeSub?.status || "active",
+        isTrialing,
+        trialEndsAt: activeSub?.trialEndsAt || null,
+        trialDaysLeft,
       },
     });
   } catch (error) {

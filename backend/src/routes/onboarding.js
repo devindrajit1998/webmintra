@@ -89,7 +89,8 @@ router.get("/templates", async (req, res, next) => {
     }
 
     if (category && typeof category === "string" && category.trim()) {
-      filter.category = { $regex: category.trim(), $options: "i" };
+      const { escapeRegex } = await import("../lib/validate.js");
+      filter.category = { $regex: escapeRegex(category.trim()), $options: "i" };
     }
 
     const templates = await Template.find(filter)
@@ -169,9 +170,10 @@ router.post("/create-order", async (req, res, next) => {
       ? (plan.pricing?.yearly ?? 0)
       : (plan.pricing?.monthly ?? 0);
 
-    // Free plans (₹0) skip Razorpay — handled by verify-payment with amount=0
-    if (priceInRupees === 0) {
-      return res.json({ free: true, planId, interval, amount: 0 });
+    // If plan is free (₹0) OR has trialDays > 0, skip Razorpay at onboarding
+    const hasFreeTrial = (plan.trialDays ?? 0) > 0;
+    if (priceInRupees === 0 || hasFreeTrial) {
+      return res.json({ free: true, hasTrial: hasFreeTrial, trialDays: plan.trialDays || 0, planId, interval, amount: 0 });
     }
 
     const razorpay = getRazorpay();
@@ -200,8 +202,8 @@ router.post("/create-order", async (req, res, next) => {
 });
 
 // ── POST /api/onboarding/verify-payment ───────────────────────
-// Verifies Razorpay signature (or handles free plans), then finalises onboarding:
-//   • Creates Subscription + Payment records
+// Verifies Razorpay signature (or handles free/trial plans), then finalises onboarding:
+//   • Creates Subscription (with trial status & trialEndsAt) + Payment records
 //   • Creates Website in draft status
 //   • Marks onboarding as complete
 //   • Sends welcome email
@@ -242,14 +244,15 @@ router.post("/verify-payment", async (req, res, next) => {
     const bizResult = validateBusiness(business);
     if (bizResult.error) return res.status(400).json({ message: bizResult.error });
 
-    // ── Verify Razorpay payment signature (unless free) ──
+    // ── Verify payment or trial status ──
     const priceInRupees = interval === "yearly"
       ? (plan.pricing?.yearly ?? 0)
       : (plan.pricing?.monthly ?? 0);
 
-    const isPaid = priceInRupees > 0;
+    const hasTrial = (plan.trialDays ?? 0) > 0;
+    const isPaidUpfront = priceInRupees > 0 && !hasTrial;
 
-    if (isPaid) {
+    if (isPaidUpfront) {
       if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
         return res.status(400).json({ message: "Payment details are incomplete." });
       }
@@ -266,6 +269,9 @@ router.post("/verify-payment", async (req, res, next) => {
 
     // ── All valid → create records ──────────────────────────────
     const now = new Date();
+    const trialDays = plan.trialDays || 14;
+    const trialEndDate = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+
     const endDate = new Date(now);
     if (interval === "yearly") endDate.setFullYear(endDate.getFullYear() + 1);
     else endDate.setMonth(endDate.getMonth() + 1);
@@ -280,9 +286,10 @@ router.post("/verify-payment", async (req, res, next) => {
         currency: plan.currency || "INR",
         limits: plan.limits,
       },
-      status: isPaid ? "active" : "trialing",
+      status: hasTrial ? "trialing" : isPaidUpfront ? "active" : "trialing",
       startDate: now,
-      endDate,
+      endDate: hasTrial ? trialEndDate : endDate,
+      trialEndsAt: hasTrial ? trialEndDate : null,
       limits: {
         websites: plan.limits?.websites ?? 1,
         storageMb: plan.limits?.storageMb ?? 500,
@@ -295,17 +302,20 @@ router.post("/verify-payment", async (req, res, next) => {
     const payment = await Payment.create({
       tenant: req.user._id,
       subscription: subscription._id,
-      amount: priceInRupees,
+      amount: isPaidUpfront ? priceInRupees : 0,
       currency: plan.currency || "INR",
-      subtotal: priceInRupees,
-      status: isPaid ? "succeeded" : "succeeded",
-      method: isPaid ? "card" : "free",
+      subtotal: isPaidUpfront ? priceInRupees : 0,
+      status: "succeeded",
+      method: isPaidUpfront ? "card" : "free",
       externalTransactionId: razorpayPaymentId || null,
       paidAt: now,
-      description: `${plan.slug === "pro" ? "Business" : plan.name} subscription – ${interval}`,
+      description: hasTrial
+        ? `${plan.name} – ${trialDays}-Day Free Trial`
+        : `${plan.name} subscription – ${interval}`,
       metadata: {
         razorpayOrderId: razorpayOrderId || null,
         razorpayPaymentId: razorpayPaymentId || null,
+        isTrial: hasTrial,
       },
     });
 

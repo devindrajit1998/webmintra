@@ -54,4 +54,7 @@ export const DEFAULT_SETTINGS = [
   // Registration
   { key: "registration.inviteOnly", value: true, group: "registration", label: "Invite Only Registration", type: "boolean" },
   { key: "registration.defaultTrialDays", value: 14, group: "registration", label: "Default Trial Days", type: "number" },
+  // Security & reCAPTCHA v3
+  { key: "security.recaptchaEnabled", value: false, group: "security", label: "Enable Google reCAPTCHA v3", type: "boolean", isPublic: true },
+  { key: "security.recaptchaSiteKey", value: "", group: "security", label: "reCAPTCHA v3 Site Key", type: "string", isPublic: true },
 ];

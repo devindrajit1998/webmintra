@@ -110,10 +110,12 @@ export function TenantLayout({ user, dashboard, websites, onSignOut }: TenantLay
             )}
             {!sidebarCollapsed && (
               <div className="min-w-0">
-                <p className="truncate font-display text-sm font-bold">
-                  {settings["site.name"] || "WebMintra"}
+                <p className="truncate text-[17px] font-black tracking-tight leading-none bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase font-sans">
+                  {settings["site.name"] || "webmintra"}
                 </p>
-                <p className="truncate text-[10px] text-slate-500">{user.name}&apos;s workspace</p>
+                <p className="truncate text-[10px] font-medium tracking-wide text-slate-500 mt-0.5">
+                  {user.name}&apos;s workspace
+                </p>
               </div>
             )}
           </div>
@@ -245,8 +247,41 @@ export function TenantDashboardIndex() {
     "Starter";
   const limits = dashboard?.account.limits || { websites: 1, storage: 1 };
 
+  const isTrialing = dashboard?.account?.isTrialing;
+  const trialDaysLeft = dashboard?.account?.trialDaysLeft ?? 0;
+
   return (
     <div className="space-y-6">
+      {/* Free Trial Banner */}
+      {isTrialing && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-[#0a1b2d] to-emerald-950/30 p-4 shadow-lg">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-white flex items-center gap-2">
+                <span>Free Trial Active</span>
+                <span className="rounded-full bg-cyan-500/20 px-2.5 py-0.5 text-[11px] font-extrabold text-cyan-300 border border-cyan-500/30">
+                  {trialDaysLeft} {trialDaysLeft === 1 ? "day" : "days"} remaining
+                </span>
+              </p>
+              <p className="text-xs text-slate-300 mt-0.5">
+                You have full access to edit, design, and preview your website templates without
+                restrictions.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to="/tenant/billing"
+            className="shrink-0 whitespace-nowrap rounded-xl bg-cyan-500 px-4 py-2 text-xs font-bold text-slate-950 shadow-md transition hover:bg-cyan-400"
+          >
+            Upgrade / Subscribe
+          </Link>
+        </div>
+      )}
+
       <section className="flex flex-col gap-4 border-b border-slate-800 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">

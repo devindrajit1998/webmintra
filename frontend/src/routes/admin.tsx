@@ -24,6 +24,7 @@ import {
   ShieldCheck,
   BarChart,
   HardDrive,
+  Quote,
 } from "lucide-react";
 import { clearSessionUser, getAuthenticatedUser, type SessionUser } from "@/lib/auth-api";
 import { apiFetch, clearCsrfToken } from "@/lib/api-fetch";
@@ -52,6 +53,7 @@ const billing = [
 const content = [
   { label: "Blog", icon: FileText, to: "/admin/blog" },
   { label: "Knowledge Base", icon: FileText, to: "/admin/kb" },
+  { label: "Testimonials", icon: Quote, to: "/admin/testimonials" },
   { label: "Support", icon: CircleHelp, to: "/admin/support" },
   { label: "Announcements", icon: Megaphone, to: "/admin/announcements" },
 ];
@@ -133,10 +135,12 @@ function AdminLayout() {
             )}
             {!sidebarCollapsed && (
               <div className="min-w-0">
-                <p className="truncate font-display text-sm font-bold">
-                  {settings["site.name"] || "WebMintra"}
+                <p className="truncate text-[17px] font-black tracking-tight leading-none bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase font-sans">
+                  {settings["site.name"] || "webmintra"}
                 </p>
-                <p className="truncate text-[10px] text-slate-500">Admin Platform</p>
+                <p className="truncate text-[10px] font-medium tracking-wide text-slate-500 mt-0.5">
+                  Admin Platform
+                </p>
               </div>
             )}
           </div>

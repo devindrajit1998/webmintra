@@ -1,8 +1,28 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { getTenants, createTenant, updateTenantStatus, deleteTenant, updateTenant, impersonateTenant, getInvitations, cancelInvitation } from "@/lib/admin-api";
-import { Loader2, Search, Plus, Filter, UserCheck, UserX, AlertTriangle, Trash2, Pencil, LogIn } from "lucide-react";
+import {
+  getTenants,
+  createTenant,
+  updateTenantStatus,
+  deleteTenant,
+  updateTenant,
+  impersonateTenant,
+  getInvitations,
+  cancelInvitation,
+} from "@/lib/admin-api";
+import {
+  Loader2,
+  Search,
+  Plus,
+  Filter,
+  UserCheck,
+  UserX,
+  AlertTriangle,
+  Trash2,
+  Pencil,
+  LogIn,
+} from "lucide-react";
 
 import { toast } from "sonner";
 export const Route = createFileRoute("/admin/tenants/")({
@@ -40,7 +60,8 @@ function TenantsPage() {
   });
 
   const statusMutation = useMutation({
-    mutationFn: ({ id, newStatus }: { id: string, newStatus: string }) => updateTenantStatus(id, newStatus),
+    mutationFn: ({ id, newStatus }: { id: string; newStatus: string }) =>
+      updateTenantStatus(id, newStatus),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminTenants"] });
     },
@@ -87,7 +108,7 @@ function TenantsPage() {
       ownerEmail: form.email,
       businessName: form.businessName,
       plan: form.plan,
-      category: "Other"
+      category: "Other",
     });
   }
 
@@ -122,26 +143,64 @@ function TenantsPage() {
       </div>
 
       {isInviteOpen && (
-        <form onSubmit={handleInvite} className="mb-6 rounded-xl border border-slate-800 bg-[#0b1826] p-5">
+        <form
+          onSubmit={handleInvite}
+          className="mb-6 rounded-xl border border-slate-800 bg-[#0b1826] p-5"
+        >
           <h2 className="font-display text-lg font-bold mb-4">Invite new tenant</h2>
           <div className="grid gap-4 md:grid-cols-4">
-            <input required placeholder="Owner Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" />
-            <input required type="email" placeholder="Owner Email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" />
-            <input required placeholder="Business Name" value={form.businessName} onChange={e => setForm({ ...form, businessName: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" />
-            <select value={form.plan} onChange={e => setForm({ ...form, plan: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm">
+            <input
+              required
+              placeholder="Owner Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            />
+            <input
+              required
+              type="email"
+              placeholder="Owner Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            />
+            <input
+              required
+              placeholder="Business Name"
+              value={form.businessName}
+              onChange={(e) => setForm({ ...form, businessName: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            />
+            <select
+              value={form.plan}
+              onChange={(e) => setForm({ ...form, plan: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            >
               <option value="starter">Starter</option>
               <option value="growth">Growth</option>
               <option value="pro">Business</option>
             </select>
           </div>
           <div className="mt-4 flex gap-2 justify-end">
-            <button type="button" onClick={() => setIsInviteOpen(false)} className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-white">Cancel</button>
-            <button type="submit" disabled={inviteMutation.isPending} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsInviteOpen(false)}
+              className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={inviteMutation.isPending}
+              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
               {inviteMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {inviteMutation.isPending ? "Sending..." : "Send Invitation"}
             </button>
           </div>
-          {inviteMutation.isError && <p className="mt-2 text-sm text-red-400">{inviteMutation.error.message}</p>}
+          {inviteMutation.isError && (
+            <p className="mt-2 text-sm text-red-400">{inviteMutation.error.message}</p>
+          )}
         </form>
       )}
 
@@ -153,30 +212,65 @@ function TenantsPage() {
               name: editingTenant.name,
               email: editingTenant.email,
               businessName: editingTenant.businessName,
-              plan: editingTenant.plan
+              plan: editingTenant.plan,
             });
           }}
           className="mb-6 rounded-xl border border-slate-800 bg-[#0b1826] p-5"
         >
           <h2 className="font-display text-lg font-bold mb-4">Edit tenant</h2>
           <div className="grid gap-4 md:grid-cols-4">
-            <input required placeholder="Owner Name" value={editingTenant.name || ""} onChange={e => setEditingTenant({ ...editingTenant, name: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" />
-            <input required type="email" placeholder="Owner Email" value={editingTenant.email || ""} onChange={e => setEditingTenant({ ...editingTenant, email: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" />
-            <input required placeholder="Business Name" value={editingTenant.businessName || ""} onChange={e => setEditingTenant({ ...editingTenant, businessName: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm" />
-            <select value={editingTenant.plan || "starter"} onChange={e => setEditingTenant({ ...editingTenant, plan: e.target.value })} className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm">
+            <input
+              required
+              placeholder="Owner Name"
+              value={editingTenant.name || ""}
+              onChange={(e) => setEditingTenant({ ...editingTenant, name: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            />
+            <input
+              required
+              type="email"
+              placeholder="Owner Email"
+              value={editingTenant.email || ""}
+              onChange={(e) => setEditingTenant({ ...editingTenant, email: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            />
+            <input
+              required
+              placeholder="Business Name"
+              value={editingTenant.businessName || ""}
+              onChange={(e) => setEditingTenant({ ...editingTenant, businessName: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            />
+            <select
+              value={editingTenant.plan || "starter"}
+              onChange={(e) => setEditingTenant({ ...editingTenant, plan: e.target.value })}
+              className="h-10 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+            >
               <option value="starter">Starter</option>
               <option value="growth">Growth</option>
               <option value="pro">Business</option>
             </select>
           </div>
           <div className="mt-4 flex gap-2 justify-end">
-            <button type="button" onClick={() => setEditingTenant(null)} className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-white">Cancel</button>
-            <button type="submit" disabled={editMutation.isPending} className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => setEditingTenant(null)}
+              className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-white"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={editMutation.isPending}
+              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
               {editMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {editMutation.isPending ? "Saving..." : "Save Changes"}
             </button>
           </div>
-          {editMutation.isError && <p className="mt-2 text-sm text-red-400">{editMutation.error.message}</p>}
+          {editMutation.isError && (
+            <p className="mt-2 text-sm text-red-400">{editMutation.error.message}</p>
+          )}
         </form>
       )}
 
@@ -217,18 +311,24 @@ function TenantsPage() {
                       </td>
                       <td className="px-5 py-4 capitalize text-slate-300">{inv.plan}</td>
                       <td className="px-5 py-4">
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                          inv.status === "pending" ? "bg-amber-500/10 text-amber-400" :
-                          inv.status === "accepted" ? "bg-emerald-500/10 text-emerald-400" :
-                          "bg-slate-800 text-slate-400"
-                        }`}>
+                        <span
+                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                            inv.status === "pending"
+                              ? "bg-amber-500/10 text-amber-400"
+                              : inv.status === "accepted"
+                                ? "bg-emerald-500/10 text-emerald-400"
+                                : "bg-slate-800 text-slate-400"
+                          }`}
+                        >
                           {inv.status}
                         </span>
                       </td>
                       <td className="px-5 py-4 text-xs text-slate-400">
                         {new Date(inv.createdAt).toLocaleDateString()}
                         <br />
-                        <span className="text-slate-500">Exp: {new Date(inv.expiresAt).toLocaleDateString()}</span>
+                        <span className="text-slate-500">
+                          Exp: {new Date(inv.expiresAt).toLocaleDateString()}
+                        </span>
                       </td>
                       <td className="px-5 py-4 text-right">
                         {inv.status === "pending" && (
@@ -241,12 +341,15 @@ function TenantsPage() {
                           </button>
                         )}
                         {inv.status === "pending" && inv.invitationUrl && (
-                           <button
-                             onClick={() => { navigator.clipboard.writeText(inv.invitationUrl); toast.success("Link copied!"); }}
-                             className="ml-2 inline-flex h-8 items-center justify-center rounded border border-slate-700 bg-slate-800 px-3 text-xs font-medium text-slate-300 transition hover:bg-slate-700"
-                           >
-                             Copy Link
-                           </button>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(inv.invitationUrl);
+                              toast.success("Link copied!");
+                            }}
+                            className="ml-2 inline-flex h-8 items-center justify-center rounded border border-slate-700 bg-slate-800 px-3 text-xs font-medium text-slate-300 transition hover:bg-slate-700"
+                          >
+                            Copy Link
+                          </button>
                         )}
                       </td>
                     </tr>
@@ -267,14 +370,20 @@ function TenantsPage() {
                 <input
                   placeholder="Search tenants..."
                   value={search}
-                  onChange={e => { setSearch(e.target.value); setPage(1); }}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
                   className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900/60 pl-9 pr-4 text-xs focus:border-cyan-400 focus:outline-none"
                 />
               </div>
               <div className="relative">
                 <select
                   value={status}
-                  onChange={e => { setStatus(e.target.value); setPage(1); }}
+                  onChange={(e) => {
+                    setStatus(e.target.value);
+                    setPage(1);
+                  }}
                   className="h-9 appearance-none rounded-lg border border-slate-700 bg-slate-900/60 pl-9 pr-8 text-xs focus:border-cyan-400 focus:outline-none"
                 >
                   <option value="">All statuses</option>
@@ -300,18 +409,33 @@ function TenantsPage() {
               </thead>
               <tbody className="divide-y divide-slate-800/70">
                 {isLoading ? (
-                  <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500"><div className="flex flex-col items-center justify-center gap-3"><Loader2 className="h-6 w-6 animate-spin text-cyan-500" /><p className="text-sm text-slate-500">Loading tenants...</p></div></td></tr>
+                  <tr>
+                    <td colSpan={5} className="px-6 py-10 text-center text-slate-500">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <Loader2 className="h-6 w-6 animate-spin text-cyan-500" />
+                        <p className="text-sm text-slate-500">Loading tenants...</p>
+                      </div>
+                    </td>
+                  </tr>
                 ) : data?.tenants?.length ? (
                   data.tenants.map((tenant: any) => (
                     <tr key={tenant.id} className="transition-colors hover:bg-slate-800/20">
                       <td className="px-6 py-4">
-                        <Link to="/admin/tenants/$id" params={{ id: tenant.id }} className="flex items-center gap-3 group">
+                        <Link
+                          to="/admin/tenants/$id"
+                          params={{ id: tenant.id }}
+                          className="flex items-center gap-3 group"
+                        >
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-800 font-bold text-slate-300 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-colors">
                             {(tenant.businessName || tenant.name || "?").charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-medium text-slate-200 group-hover:text-cyan-400 transition-colors">{tenant.businessName || "No Business Name"}</p>
-                            <p className="text-xs text-slate-500">{tenant.name} · {tenant.email}</p>
+                            <p className="font-medium text-slate-200 group-hover:text-cyan-400 transition-colors">
+                              {tenant.businessName || "No Business Name"}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {tenant.name} · {tenant.email}
+                            </p>
                           </div>
                         </Link>
                       </td>
@@ -321,9 +445,21 @@ function TenantsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        {tenant.tenantStatus === "active" && <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400"><UserCheck className="h-3.5 w-3.5" /> Active</span>}
-                        {tenant.tenantStatus === "suspended" && <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-400"><UserX className="h-3.5 w-3.5" /> Suspended</span>}
-                        {tenant.tenantStatus === "invitation-sent" && <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400"><AlertTriangle className="h-3.5 w-3.5" /> Invited</span>}
+                        {tenant.tenantStatus === "active" && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-medium text-emerald-400">
+                            <UserCheck className="h-3.5 w-3.5" /> Active
+                          </span>
+                        )}
+                        {tenant.tenantStatus === "suspended" && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/10 px-2.5 py-1 text-xs font-medium text-rose-400">
+                            <UserX className="h-3.5 w-3.5" /> Suspended
+                          </span>
+                        )}
+                        {tenant.tenantStatus === "invitation-sent" && (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400">
+                            <AlertTriangle className="h-3.5 w-3.5" /> Invited
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-xs text-slate-500">
                         {new Date(tenant.createdAt).toLocaleDateString()}
@@ -332,13 +468,17 @@ function TenantsPage() {
                         <div className="flex items-center justify-end gap-2">
                           <select
                             value={tenant.tenantStatus}
-                            onChange={(e) => statusMutation.mutate({ id: tenant.id, newStatus: e.target.value })}
+                            onChange={(e) =>
+                              statusMutation.mutate({ id: tenant.id, newStatus: e.target.value })
+                            }
                             className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-300"
                             disabled={statusMutation.isPending}
                           >
                             <option value="active">Active</option>
                             <option value="suspended">Suspend</option>
-                            {tenant.tenantStatus === "invitation-sent" && <option value="invitation-sent">Invited</option>}
+                            {tenant.tenantStatus === "invitation-sent" && (
+                              <option value="invitation-sent">Invited</option>
+                            )}
                           </select>
                           <button
                             onClick={() => setEditingTenant(tenant)}
@@ -349,7 +489,11 @@ function TenantsPage() {
                           </button>
                           <button
                             onClick={() => {
-                              if (window.confirm(`Log in as ${tenant.businessName || tenant.name}? You will need to log back in to your admin account later.`)) {
+                              if (
+                                window.confirm(
+                                  `Log in as ${tenant.businessName || tenant.name}? You will need to log back in to your admin account later.`,
+                                )
+                              ) {
                                 impersonateMutation.mutate(tenant.id);
                               }
                             }}
@@ -361,7 +505,11 @@ function TenantsPage() {
                           </button>
                           <button
                             onClick={() => {
-                              if (window.confirm("Are you sure you want to delete this tenant? This action cannot be undone.")) {
+                              if (
+                                window.confirm(
+                                  "Are you sure you want to delete this tenant? This action cannot be undone.",
+                                )
+                              ) {
                                 deleteMutation.mutate(tenant.id);
                               }
                             }}
@@ -376,7 +524,11 @@ function TenantsPage() {
                     </tr>
                   ))
                 ) : (
-                  <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-500">No tenants found.</td></tr>
+                  <tr>
+                    <td colSpan={5} className="px-6 py-10 text-center text-slate-500">
+                      No tenants found.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
@@ -388,8 +540,20 @@ function TenantsPage() {
                 Showing page {page} of {data.pagination.pages}
               </span>
               <div className="flex gap-2">
-                <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="rounded border border-slate-700 bg-slate-900 px-3 py-1 text-xs disabled:opacity-50">Prev</button>
-                <button disabled={page >= data.pagination.pages} onClick={() => setPage(p => p + 1)} className="rounded border border-slate-700 bg-slate-900 px-3 py-1 text-xs disabled:opacity-50">Next</button>
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="rounded border border-slate-700 bg-slate-900 px-3 py-1 text-xs disabled:opacity-50"
+                >
+                  Prev
+                </button>
+                <button
+                  disabled={page >= data.pagination.pages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="rounded border border-slate-700 bg-slate-900 px-3 py-1 text-xs disabled:opacity-50"
+                >
+                  Next
+                </button>
               </div>
             </div>
           )}

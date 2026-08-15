@@ -20,8 +20,11 @@ function landingHead(settings: Record<string, unknown> = {}) {
   const twitterHandle = String(settings["seo.twitterHandle"] || "");
   const locale = String(settings["seo.locale"] || "en_IN");
   const organizationName = String(settings["seo.organizationName"] || siteName);
-  const organizationLogoUrl = String(settings["seo.organizationLogoUrl"] || settings["brand.logoUrl"] || "");
-  const allowIndexing = settings["seo.allowIndexing"] !== false && settings["seo.allowIndexing"] !== "false";
+  const organizationLogoUrl = String(
+    settings["seo.organizationLogoUrl"] || settings["brand.logoUrl"] || "",
+  );
+  const allowIndexing =
+    settings["seo.allowIndexing"] !== false && settings["seo.allowIndexing"] !== "false";
   const robots = allowIndexing ? "index, follow, max-image-preview:large" : "noindex, nofollow";
 
   const organization = {
@@ -53,7 +56,12 @@ function landingHead(settings: Record<string, unknown> = {}) {
       { property: "og:url", content: canonicalUrl },
       { property: "og:site_name", content: siteName },
       { property: "og:locale", content: locale },
-      ...(socialImageUrl ? [{ property: "og:image", content: socialImageUrl }, { property: "og:image:alt", content: `${siteName} landing page` }] : []),
+      ...(socialImageUrl
+        ? [
+            { property: "og:image", content: socialImageUrl },
+            { property: "og:image:alt", content: `${siteName} landing page` },
+          ]
+        : []),
       { name: "twitter:card", content: socialImageUrl ? "summary_large_image" : "summary" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },

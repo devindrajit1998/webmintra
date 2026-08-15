@@ -20,7 +20,10 @@ router.get("/", async (req, res, next) => {
 
     if (req.query.status && ANNOUNCEMENT_STATUSES.includes(req.query.status)) filter.status = req.query.status;
     if (req.query.audience && ANNOUNCEMENT_AUDIENCES.includes(req.query.audience)) filter.audience = req.query.audience;
-    if (req.query.search) filter.title = { $regex: req.query.search, $options: "i" };
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      filter.title = { $regex: escapeRegex(req.query.search.trim()), $options: "i" };
+    }
 
     const [announcements, total] = await Promise.all([
       Announcement.find(filter).sort(sort).skip(skip).limit(limit)

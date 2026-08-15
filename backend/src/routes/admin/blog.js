@@ -80,7 +80,10 @@ router.get("/posts", async (req, res, next) => {
     if (req.query.status && POST_STATUSES.includes(req.query.status)) filter.status = req.query.status;
     if (req.query.category && isMongoId(req.query.category)) filter.category = req.query.category;
     if (req.query.featured === "true") filter.featured = true;
-    if (req.query.search) filter.title = { $regex: req.query.search, $options: "i" };
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      filter.title = { $regex: escapeRegex(req.query.search.trim()), $options: "i" };
+    }
 
     const [posts, total] = await Promise.all([
       BlogPost.find(filter)

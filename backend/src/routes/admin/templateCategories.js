@@ -1,6 +1,8 @@
 import { Router } from "express";
+import mongoose from "mongoose";
 import { TemplateCategory } from "../../models/TemplateCategory.js";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
+import { logActivity, buildLogContext } from "../../services/activityLog.js";
 
 const router = Router();
 
@@ -71,11 +73,27 @@ router.put("/:id", async (req, res) => {
 // Delete a category
 router.delete("/:id", async (req, res) => {
   try {
-    const category = await TemplateCategory.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid category ID." });
+    }
+    const category = await TemplateCategory.findByIdAndDelete(id);
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
-    res.json({ message: "Category deleted successfully" });
+
+    try {
+      await logActivity({
+        ...buildLogContext(req),
+        action: "template_category_deleted",
+        description: `Template category "${category.name}" was deleted.`,
+        resource: { type: "template_category", id: String(category._id), name: category.name },
+      });
+    } catch {
+      // Ignore logging failure if context is missing
+    }
+
+    res.json({ message: "Category deleted successfully", id: category._id });
   } catch (error) {
     console.error("Error deleting template category:", error);
     res.status(500).json({ message: "Internal server error" });

@@ -31,8 +31,9 @@ router.get("/", async (req, res, next) => {
     }
 
     // Search by invoice number
-    if (req.query.search) {
-      filter.invoiceNumber = { $regex: req.query.search, $options: "i" };
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      filter.invoiceNumber = { $regex: escapeRegex(req.query.search.trim()), $options: "i" };
     }
 
     const [payments, total] = await Promise.all([

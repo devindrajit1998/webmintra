@@ -1,7 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { getTemplates, importTemplate, updateTemplate, deleteTemplate, getTemplateCategories } from "@/lib/admin-api";
+import {
+  getTemplates,
+  importTemplate,
+  updateTemplate,
+  deleteTemplate,
+  toggleTemplateStatus,
+  getTemplateCategories,
+} from "@/lib/admin-api";
 import { TemplateAnalysis, EditorState } from "@/lib/template-engine/types";
 import { ImportWizard } from "@/components/engine/ImportWizard";
 import { Editor as InlineVisualEditor } from "@/components/engine/Editor";
@@ -14,6 +21,8 @@ import {
   Trash2,
   CheckCircle2,
   Eye,
+  EyeOff,
+  Archive,
   X,
   Monitor,
   Tablet,
@@ -55,6 +64,7 @@ function AdminTemplatesPage() {
   const queryClient = useQueryClient();
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState<any>(null);
+  const [previewActivePage, setPreviewActivePage] = useState<string>("index.html");
   const [previewMode, setPreviewMode] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [isCategoriesManagerOpen, setIsCategoriesManagerOpen] = useState(false);
 
@@ -104,6 +114,15 @@ function AdminTemplatesPage() {
     onError: (err) => toast.error(err.message),
   });
 
+  const toggleStatusMutation = useMutation({
+    mutationFn: (id: string) => toggleTemplateStatus(id),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ["adminTemplates"] });
+      toast.success(data?.message || "Template status updated");
+    },
+    onError: (err: any) => toast.error(err.message || "Failed to update template status"),
+  });
+
   const [inlineVisualTemplate, setInlineVisualTemplate] = useState<any>(null);
   const [templateAnalysis, setTemplateAnalysis] = useState<TemplateAnalysis | null>(null);
 
@@ -122,8 +141,11 @@ function AdminTemplatesPage() {
     if (!inlineVisualTemplate || !templateAnalysis) return;
 
     // Render updated HTML for each page
-    const homePage = templateAnalysis.pages.find((p) => p.name === "index.html") || templateAnalysis.pages[0];
-    const newHomeHtml = homePage ? renderPage(templateAnalysis, homePage, state) : inlineVisualTemplate.htmlContent;
+    const homePage =
+      templateAnalysis.pages.find((p) => p.name === "index.html") || templateAnalysis.pages[0];
+    const newHomeHtml = homePage
+      ? renderPage(templateAnalysis, homePage, state)
+      : inlineVisualTemplate.htmlContent;
 
     const newPages = templateAnalysis.pages
       .filter((p) => p !== homePage)
@@ -228,9 +250,7 @@ function AdminTemplatesPage() {
 
     setEditData({
       ...editData,
-      pages: editData.pages.map((p) =>
-        p.name === renamePagePrompt ? { ...p, name: newName } : p,
-      ),
+      pages: editData.pages.map((p) => (p.name === renamePagePrompt ? { ...p, name: newName } : p)),
     });
 
     if (activePage === renamePagePrompt) {
@@ -257,11 +277,15 @@ function AdminTemplatesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: deleteTemplate,
-    onSuccess: () => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ["adminTemplates"] });
       setDeleteTemplateId(null);
+      toast.success(data?.message || "Template deleted successfully");
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err: any) => {
+      toast.error(err.message || "Failed to delete template");
+      setDeleteTemplateId(null);
+    },
   });
 
   const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
@@ -391,17 +415,16 @@ function AdminTemplatesPage() {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0b1826]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteTemplateId(template._id);
-                    }}
-                    className="bg-rose-500/90 text-white p-2 rounded-lg hover:bg-rose-600 transition shadow-lg backdrop-blur"
-                    title="Delete Template"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                <div className="absolute top-3 left-3 z-10">
+                  {template.isActive === false ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md shadow-md">
+                      <EyeOff className="h-3 w-3" /> Archived
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300 backdrop-blur-md shadow-md">
+                      <CheckCircle2 className="h-3 w-3" /> Live (Onboarding)
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="p-5 flex flex-col flex-1">
@@ -431,25 +454,65 @@ function AdminTemplatesPage() {
                   </div>
                 )}
 
-                <div className="mt-auto flex flex-col gap-2">
+                <div className="mt-auto flex flex-col gap-2 pt-2 border-t border-slate-800/70">
                   <button
                     onClick={() => openVisualEdit(template)}
                     className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/15 py-2 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500 hover:text-slate-950"
                   >
                     <Sparkles className="h-3.5 w-3.5" /> Edit Inline (Visual)
                   </button>
-                  <div className="grid grid-cols-2 gap-2">
+
+                  <div className="grid grid-cols-4 gap-1.5">
                     <button
                       onClick={() => openEdit(template)}
-                      className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/50 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                      className="flex items-center justify-center gap-1 rounded-lg border border-slate-700 bg-slate-800/50 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                      title="Edit HTML Source Code"
                     >
                       <Pencil className="h-3.5 w-3.5" /> Code
                     </button>
                     <button
                       onClick={() => setPreviewTemplate(template)}
-                      className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/30 py-1.5 text-xs font-semibold text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                      className="flex items-center justify-center gap-1 rounded-lg border border-slate-700 bg-slate-800/30 py-1.5 text-xs font-semibold text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                      title="Preview Template"
                     >
                       <Eye className="h-3.5 w-3.5" /> Preview
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleStatusMutation.mutate(template._id);
+                      }}
+                      disabled={toggleStatusMutation.isPending}
+                      className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 text-xs font-semibold transition ${
+                        template.isActive === false
+                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+                          : "border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
+                      }`}
+                      title={
+                        template.isActive === false
+                          ? "Restore to Onboarding"
+                          : "Archive (Hide from Onboarding)"
+                      }
+                    >
+                      {template.isActive === false ? (
+                        <>
+                          <Eye className="h-3.5 w-3.5" /> Restore
+                        </>
+                      ) : (
+                        <>
+                          <Archive className="h-3.5 w-3.5" /> Archive
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteTemplateId(template._id);
+                      }}
+                      className="flex items-center justify-center gap-1 rounded-lg border border-rose-500/30 bg-rose-500/10 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500 hover:text-white"
+                      title="Delete Template"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Delete
                     </button>
                   </div>
                 </div>
@@ -478,61 +541,132 @@ function AdminTemplatesPage() {
         </div>
       )}
 
-      {previewTemplate && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h2 className="text-white font-bold text-xl">{previewTemplate.title}</h2>
-              <p className="text-slate-400 text-sm">Live Preview</p>
-            </div>
+      {previewTemplate &&
+        (() => {
+          const pagesList = [
+            { name: "index.html", content: previewTemplate.htmlContent || "" },
+            ...(previewTemplate.pages || []).map((p: any) => ({
+              name: p.name,
+              content: p.htmlContent || "",
+            })),
+          ];
+          const activePageObj = pagesList.find((p) => p.name === previewActivePage) || pagesList[0];
 
-            <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
-              <button
-                onClick={() => setPreviewMode("desktop")}
-                className={`p-1.5 rounded-md transition-all ${previewMode === "desktop" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
-                title="Desktop View"
-              >
-                <Monitor className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setPreviewMode("tablet")}
-                className={`p-1.5 rounded-md transition-all ${previewMode === "tablet" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
-                title="Tablet View"
-              >
-                <Tablet className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setPreviewMode("mobile")}
-                className={`p-1.5 rounded-md transition-all ${previewMode === "mobile" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
-                title="Mobile View"
-              >
-                <Smartphone className="h-4 w-4" />
-              </button>
-            </div>
+          // Inject router bridge script into HTML so internal clicks navigate inside preview
+          const injectedScript = `
+        <script>
+        document.addEventListener('click', function(e) {
+          var a = e.target.closest('a');
+          if (!a) return;
+          var href = a.getAttribute('href');
+          if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+          if (href.startsWith('http://') || href.startsWith('https://')) return;
+          
+          e.preventDefault();
+          var targetName = href.replace(/^\\//, '').replace(/\\.html$/, '') + '.html';
+          if (href === '/' || href === '/index.html' || href === 'index.html') targetName = 'index.html';
+          window.parent.postMessage({ type: 'preview-navigate', targetName: targetName }, '*');
+        }, true);
+        </script>
+        `;
+          const previewHtml = activePageObj?.content ? activePageObj.content + injectedScript : "";
 
-            <button
-              onClick={() => {
-                setPreviewTemplate(null);
-                setPreviewMode("desktop");
-              }}
-              className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition p-2 rounded-full"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="flex-1 flex justify-center w-full">
-            <div
-              className={`h-full rounded-xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${previewMode === "desktop" ? "w-full" : previewMode === "tablet" ? "w-[768px]" : "w-[375px]"}`}
-            >
-              <iframe
-                srcDoc={previewTemplate.htmlContent}
-                className="w-full h-full border-0 bg-white"
-                title="Template Preview"
-              />
+          return (
+            <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <h2 className="text-white font-bold text-lg">{previewTemplate.title}</h2>
+                    <p className="text-slate-400 text-xs">Live Multi-Page Preview</p>
+                  </div>
+
+                  {pagesList.length > 1 && (
+                    <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
+                      {pagesList.map((p) => (
+                        <button
+                          key={p.name}
+                          onClick={() => setPreviewActivePage(p.name)}
+                          className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                            previewActivePage === p.name
+                              ? "bg-cyan-500 text-slate-950 shadow-sm"
+                              : "text-slate-400 hover:text-white"
+                          }`}
+                        >
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+                    <button
+                      onClick={() => setPreviewMode("desktop")}
+                      className={`p-1.5 rounded-md transition-all ${previewMode === "desktop" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      title="Desktop View"
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setPreviewMode("tablet")}
+                      className={`p-1.5 rounded-md transition-all ${previewMode === "tablet" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      title="Tablet View"
+                    >
+                      <Tablet className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setPreviewMode("mobile")}
+                      className={`p-1.5 rounded-md transition-all ${previewMode === "mobile" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      title="Mobile View"
+                    >
+                      <Smartphone className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setPreviewTemplate(null);
+                      setPreviewActivePage("index.html");
+                      setPreviewMode("desktop");
+                    }}
+                    className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition p-2 rounded-full"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 flex justify-center w-full min-h-0">
+                <div
+                  className={`h-full rounded-xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${previewMode === "desktop" ? "w-full" : previewMode === "tablet" ? "w-[768px]" : "w-[375px]"}`}
+                >
+                  <iframe
+                    srcDoc={previewHtml}
+                    className="w-full h-full border-0 bg-white"
+                    title="Template Preview"
+                    onLoad={(e) => {
+                      const iframe = e.currentTarget;
+                      const handleMessage = (event: MessageEvent) => {
+                        if (event.data?.type === "preview-navigate" && event.data.targetName) {
+                          const exists = pagesList.some((p) => p.name === event.data.targetName);
+                          if (exists) {
+                            setPreviewActivePage(event.data.targetName);
+                          } else {
+                            toast.error(
+                              `Page "${event.data.targetName}" does not exist in this template yet.`,
+                            );
+                          }
+                        }
+                      };
+                      window.addEventListener("message", handleMessage);
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          );
+        })()}
 
       {editTemplate && (
         <div className="fixed inset-0 z-50 flex flex-col bg-slate-950 animate-in fade-in duration-200">
@@ -707,51 +841,118 @@ function AdminTemplatesPage() {
 
           {isPreviewModalOpen && (
             <div className="fixed inset-0 z-[60] flex flex-col bg-slate-950/95 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-200">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <h2 className="text-white font-bold text-xl">{editData.title}</h2>
-                  <p className="text-slate-400 text-sm">Live Preview</p>
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <h2 className="text-white font-bold text-lg">{editData.title}</h2>
+                    <p className="text-slate-400 text-xs">Live Multi-Page Preview</p>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
+                    <button
+                      onClick={() => setActivePage("index.html")}
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                        activePage === "index.html"
+                          ? "bg-cyan-500 text-slate-950 shadow-sm"
+                          : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      index.html
+                    </button>
+                    {editData.pages.map((p) => (
+                      <button
+                        key={p.name}
+                        onClick={() => setActivePage(p.name)}
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                          activePage === p.name
+                            ? "bg-cyan-500 text-slate-950 shadow-sm"
+                            : "text-slate-400 hover:text-white"
+                        }`}
+                      >
+                        {p.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+                    <button
+                      onClick={() => setEditorPreviewMode("desktop")}
+                      className={`p-1.5 rounded-md transition-all ${editorPreviewMode === "desktop" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      title="Desktop View"
+                    >
+                      <Monitor className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setEditorPreviewMode("tablet")}
+                      className={`p-1.5 rounded-md transition-all ${editorPreviewMode === "tablet" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      title="Tablet View"
+                    >
+                      <Tablet className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => setEditorPreviewMode("mobile")}
+                      className={`p-1.5 rounded-md transition-all ${editorPreviewMode === "mobile" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      title="Mobile View"
+                    >
+                      <Smartphone className="h-4 w-4" />
+                    </button>
+                  </div>
+
                   <button
-                    onClick={() => setEditorPreviewMode("desktop")}
-                    className={`p-1.5 rounded-md transition-all ${editorPreviewMode === "desktop" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
-                    title="Desktop View"
+                    onClick={() => setIsPreviewModalOpen(false)}
+                    className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition p-2 rounded-full"
                   >
-                    <Monitor className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setEditorPreviewMode("tablet")}
-                    className={`p-1.5 rounded-md transition-all ${editorPreviewMode === "tablet" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
-                    title="Tablet View"
-                  >
-                    <Tablet className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setEditorPreviewMode("mobile")}
-                    className={`p-1.5 rounded-md transition-all ${editorPreviewMode === "mobile" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
-                    title="Mobile View"
-                  >
-                    <Smartphone className="h-4 w-4" />
+                    <X className="h-5 w-5" />
                   </button>
                 </div>
-
-                <button
-                  onClick={() => setIsPreviewModalOpen(false)}
-                  className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition p-2 rounded-full"
-                >
-                  <X className="h-5 w-5" />
-                </button>
               </div>
-              <div className="flex-1 flex justify-center w-full overflow-hidden">
+              <div className="flex-1 flex justify-center w-full overflow-hidden min-h-0">
                 <div
                   className={`h-full rounded-xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${editorPreviewMode === "desktop" ? "w-full" : editorPreviewMode === "tablet" ? "w-[768px]" : "w-[375px]"}`}
                 >
                   <iframe
-                    srcDoc={currentEditorValue}
+                    srcDoc={
+                      currentEditorValue +
+                      `
+                      <script>
+                      document.addEventListener('click', function(e) {
+                        var a = e.target.closest('a');
+                        if (!a) return;
+                        var href = a.getAttribute('href');
+                        if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+                        if (href.startsWith('http://') || href.startsWith('https://')) return;
+                        
+                        e.preventDefault();
+                        var targetName = href.replace(/^\\//, '').replace(/\\.html$/, '') + '.html';
+                        if (href === '/' || href === '/index.html' || href === 'index.html') targetName = 'index.html';
+                        window.parent.postMessage({ type: 'editor-preview-navigate', targetName: targetName }, '*');
+                      }, true);
+                      </script>
+                      `
+                    }
                     className="w-full h-full border-0 bg-white"
                     title="Editor Live Preview"
+                    onLoad={() => {
+                      const handleMessage = (event: MessageEvent) => {
+                        if (
+                          event.data?.type === "editor-preview-navigate" &&
+                          event.data.targetName
+                        ) {
+                          const target = event.data.targetName;
+                          if (
+                            target === "index.html" ||
+                            editData.pages.some((p) => p.name === target)
+                          ) {
+                            setActivePage(target);
+                          } else {
+                            toast.error(`Page "${target}" does not exist in this template.`);
+                          }
+                        }
+                      };
+                      window.addEventListener("message", handleMessage);
+                    }}
                   />
                 </div>
               </div>
@@ -804,14 +1005,17 @@ function AdminTemplatesPage() {
                             {cat.name}
                           </SelectItem>
                         ))}
-                        {editData.category && !categoriesData?.categories?.some((c: any) => c.name === editData.category) && (
-                          <SelectItem
-                            value={editData.category}
-                            className="focus:bg-slate-800 focus:text-white"
-                          >
-                            {editData.category}
-                          </SelectItem>
-                        )}
+                        {editData.category &&
+                          !categoriesData?.categories?.some(
+                            (c: any) => c.name === editData.category,
+                          ) && (
+                            <SelectItem
+                              value={editData.category}
+                              className="focus:bg-slate-800 focus:text-white"
+                            >
+                              {editData.category}
+                            </SelectItem>
+                          )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -882,7 +1086,8 @@ function AdminTemplatesPage() {
                       className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none"
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Will automatically append <span className="font-mono text-cyan-400">.html</span> if omitted.
+                      Will automatically append{" "}
+                      <span className="font-mono text-cyan-400">.html</span> if omitted.
                     </p>
                   </div>
                 </div>
@@ -913,7 +1118,11 @@ function AdminTemplatesPage() {
               <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-2xl animate-in zoom-in-95">
                 <h3 className="text-base font-bold text-white mb-2">Delete Page</h3>
                 <p className="text-xs text-slate-400 mb-6">
-                  Are you sure you want to delete <span className="font-semibold text-slate-200 font-mono">"{deletePagePrompt}"</span>? Any unsaved edits for this page will be discarded.
+                  Are you sure you want to delete{" "}
+                  <span className="font-semibold text-slate-200 font-mono">
+                    "{deletePagePrompt}"
+                  </span>
+                  ? Any unsaved edits for this page will be discarded.
                 </p>
                 <div className="flex justify-end gap-2">
                   <button
@@ -967,7 +1176,8 @@ function AdminTemplatesPage() {
                       className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none"
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
-                      Will automatically append <span className="font-mono text-cyan-400">.html</span> if omitted.
+                      Will automatically append{" "}
+                      <span className="font-mono text-cyan-400">.html</span> if omitted.
                     </p>
                   </div>
                 </div>

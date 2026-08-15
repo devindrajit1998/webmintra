@@ -12,7 +12,7 @@ import { Template } from "../models/Template.js";
 const router = Router();
 const OTP_TTL_MS = 10 * 60 * 1000;
 const MAX_OTP_ATTEMPTS = 5;
-const PASSWORD_MIN_LENGTH = 12;
+const PASSWORD_MIN_LENGTH = 8;
 
 function normalizeEmail(value) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -107,8 +107,16 @@ async function verifyOtp(user, field, code) {
 
 router.post("/register", async (request, response, next) => {
   try {
-    const { name, password } = request.body ?? {};
+    const { name, password, recaptchaToken } = request.body ?? {};
     const email = normalizeEmail(request.body?.email);
+
+    // Optional reCAPTCHA v3 verification
+    const { verifyRecaptcha } = await import("../services/recaptcha.js");
+    const recapResult = await verifyRecaptcha(recaptchaToken, request.ip, "register");
+    if (!recapResult.success) {
+      return response.status(400).json({ message: recapResult.error || "Security verification failed. Please refresh." });
+    }
+
     if (
       typeof name !== "string" ||
       !name.trim() ||
@@ -120,7 +128,7 @@ router.post("/register", async (request, response, next) => {
         .status(400)
         .json({
           message:
-            "Provide a valid name, email, and password of at least 12 characters.",
+            "Provide a valid name, email, and password of at least 8 characters.",
         });
     }
     if (await User.exists({ email }))
@@ -185,6 +193,15 @@ router.post("/resend-verification", async (request, response, next) => {
 
 router.post("/login", async (request, response, next) => {
   try {
+    const { recaptchaToken } = request.body ?? {};
+
+    // Optional reCAPTCHA v3 verification
+    const { verifyRecaptcha } = await import("../services/recaptcha.js");
+    const recapResult = await verifyRecaptcha(recaptchaToken, request.ip, "login");
+    if (!recapResult.success) {
+      return response.status(400).json({ message: recapResult.error || "Security verification failed. Please refresh." });
+    }
+
     const user = await User.findOne({
       email: normalizeEmail(request.body?.email),
     });
@@ -241,7 +258,7 @@ router.put("/password", requireAuthenticatedUser, async (request, response, next
     }
 
     if (!validPassword(newPassword)) {
-      return response.status(400).json({ message: "Use a password with at least 12 characters." });
+      return response.status(400).json({ message: "Use a password with at least 8 characters." });
     }
 
     if (!(await bcrypt.compare(currentPassword, request.user.passwordHash))) {
@@ -278,7 +295,7 @@ router.post("/reset-password", async (request, response, next) => {
     if (!validPassword(password))
       return response
         .status(400)
-        .json({ message: "Use a password with at least 12 characters." });
+        .json({ message: "Use a password with at least 8 characters." });
     const user = await User.findOne({
       email: normalizeEmail(request.body?.email),
     });

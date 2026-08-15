@@ -41,8 +41,7 @@ export const getAdminWebsites = (params?: {
   status?: string;
   search?: string;
 }) => adminRequest<any>(`/websites${buildQuery(params)}`);
-export const getAdminWebsiteEditor = (id: string) =>
-  adminRequest<any>(`/websites/${id}/editor`);
+export const getAdminWebsiteEditor = (id: string) => adminRequest<any>(`/websites/${id}/editor`);
 export const saveAdminWebsiteDraft = (id: string, draftState: any) =>
   adminRequest<any>(`/websites/${id}/draft`, {
     method: "PUT",
@@ -71,9 +70,11 @@ export const createTenant = async (data: any) => {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(data),
-    credentials: "include"
+    credentials: "include",
   });
-  const payload = await response.json().catch(() => ({ message: "Unable to process your request." }));
+  const payload = await response
+    .json()
+    .catch(() => ({ message: "Unable to process your request." }));
   if (!response.ok) throw new Error(payload.message || "An error occurred.");
   return payload;
 };
@@ -83,7 +84,10 @@ export const getInvitations = async () => {
   return response.json();
 };
 export const cancelInvitation = async (id: string) => {
-  const response = await apiFetch(`${API_URL}/invitations/${id}/cancel`, { method: "POST", credentials: "include" });
+  const response = await apiFetch(`${API_URL}/invitations/${id}/cancel`, {
+    method: "POST",
+    credentials: "include",
+  });
   if (!response.ok) throw new Error("Failed to cancel invitation.");
   return response.json();
 };
@@ -189,6 +193,8 @@ export const importTemplate = (formData: FormData) =>
   });
 export const updateTemplate = (id: string, data: any) =>
   adminRequest<any>(`/templates/${id}`, { method: "PUT", body: JSON.stringify(data) });
+export const toggleTemplateStatus = (id: string) =>
+  adminRequest<any>(`/templates/${id}/toggle-status`, { method: "PATCH" });
 export const deleteTemplate = (id: string) =>
   adminRequest<any>(`/templates/${id}`, { method: "DELETE" });
 
@@ -339,6 +345,24 @@ export const updateTemplateCategory = (id: string, data: { name: string }) =>
     body: JSON.stringify(data),
   });
 export const deleteTemplateCategory = (id: string) =>
-  adminRequest<any>(`/template-categories/${id}`, {
+  adminRequest<any>(`/template-categories/${id}`, { method: "DELETE" });
+
+// ── Testimonials ──────────────────────────────────────────────
+export const getAdminTestimonials = () => adminRequest<{ testimonials: any[] }>("/testimonials");
+
+export const createAdminTestimonial = (data: any) =>
+  adminRequest<{ testimonial: any }>("/testimonials", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateAdminTestimonial = (id: string, data: any) =>
+  adminRequest<{ testimonial: any }>(`/testimonials/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+
+export const deleteAdminTestimonial = (id: string) =>
+  adminRequest<{ message: string }>(`/testimonials/${id}`, {
     method: "DELETE",
   });

@@ -49,6 +49,7 @@ import adminStorageRouter from "./routes/admin/storage.js";
 import adminCouponsRouter from "./routes/admin/coupons.js";
 import adminTemplatesRouter from "./routes/admin/templates.js";
 import adminTemplateCategoriesRouter from "./routes/admin/templateCategories.js";
+import adminTestimonialsRouter from "./routes/admin/testimonials.js";
 import adminUploadRouter from "./routes/admin/upload.js";
 import { initCronJobs } from "./services/cron.js";
 
@@ -68,17 +69,19 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com"],
+      "script-src": ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://www.google.com", "https://www.gstatic.com", "https://checkout.razorpay.com"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.tailwindcss.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
       "img-src": ["'self'", "data:", "https:", "http:"],
+      "frame-src": ["'self'", "https://www.google.com", "https://api.razorpay.com", "https://checkout.razorpay.com"],
       "connect-src": ["'self'", "https:", "http:"],
     },
   },
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 app.use(cors(corsOptions()));
-app.use(express.json({ limit: "50mb" }));
+// Default body limit set to 2MB for general endpoints (specific high-volume routes like draft saves handle larger bodies safely)
+app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 app.use(requireTrustedOrigin);
 app.use(requireCsrfToken);
@@ -90,6 +93,22 @@ const authLimiter = rateLimit({
   standardHeaders: "draft-8",
   legacyHeaders: false,
   message: { message: "Too many attempts. Try again later." },
+});
+
+const onboardingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 50,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many onboarding requests. Please wait a moment." },
+});
+
+const publicSubmissionsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { message: "Too many requests. Please try again in a few minutes." },
 });
 
 const adminLimiter = rateLimit({
@@ -112,7 +131,7 @@ app.use("/api/templates", templatesRouter);
 app.use("/api/invitations", invitationsRouter);
 app.use("/api/tenants", tenantsRouter);
 app.use("/api/domains", domainsRouter);
-app.use("/api/onboarding", onboardingRouter);
+app.use("/api/onboarding", onboardingLimiter, onboardingRouter);
 app.use("/api/billing", billingRouter);
 app.use("/api/workspace", workspaceRouter);
 
@@ -143,10 +162,11 @@ app.use("/api/admin/storage", adminStorageRouter);
 app.use("/api/admin/coupons", adminCouponsRouter);
 app.use("/api/admin/templates", adminTemplatesRouter);
 app.use("/api/admin/template-categories", adminTemplateCategoriesRouter);
+app.use("/api/admin/testimonials", adminTestimonialsRouter);
 app.use("/api/admin/upload", adminUploadRouter);
 
 // ── Public APIs ──────────────────────────────────────────────────
-app.use("/api/public", publicRouter);
+app.use("/api/public", publicSubmissionsLimiter, publicRouter);
 
 // ── Health Check ────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
@@ -160,7 +180,13 @@ app.get("/api/health", (_req, res) => {
 // ── Global Error Handler ────────────────────────────────────────
 app.use((error, _request, response, _next) => {
   console.error(error);
-  response.status(500).json({ message: error.message || "Unable to process your request." });
+  const status = Number.isInteger(error.status) && error.status >= 400 && error.status < 600 ? error.status : 500;
+  // Never leak internal driver/database messages on 500 in production
+  const message = status < 500 || process.env.NODE_ENV !== "production"
+    ? error.message || "Unable to process your request."
+    : "An unexpected error occurred. Please try again later.";
+
+  response.status(status).json({ message });
 });
 
 // ── Start ───────────────────────────────────────────────────────

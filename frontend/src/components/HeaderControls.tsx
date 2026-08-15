@@ -58,8 +58,8 @@ export function TenantHeaderControls({ websites }: { websites: Website[] }) {
   const term = search.trim().toLowerCase();
   const destinations = term
     ? tenantDestinations.filter((item) =>
-      `${item.label} ${item.description}`.toLowerCase().includes(term),
-    )
+        `${item.label} ${item.description}`.toLowerCase().includes(term),
+      )
     : tenantDestinations.slice(0, 5);
   const matchingWebsites = term
     ? websites.filter((website) => website.name.toLowerCase().includes(term)).slice(0, 4)

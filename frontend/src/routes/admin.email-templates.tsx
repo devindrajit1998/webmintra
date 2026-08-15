@@ -1,17 +1,30 @@
 ﻿import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
-import { 
-  getEmailTemplates, 
-  getEmailTemplateVariables, 
+import {
+  getEmailTemplates,
+  getEmailTemplateVariables,
   updateEmailTemplate,
   createEmailTemplate,
   deleteEmailTemplate,
   setDefaultEmailTemplate,
   sendTestEmail,
-  uploadEmailTemplateImage
+  uploadEmailTemplateImage,
 } from "@/lib/admin-api";
-import { Loader2, Mail, Edit, Info, Save, Trash, Image as ImageIcon, Eye, Code, Play, CheckCircle, Plus } from "lucide-react";
+import {
+  Loader2,
+  Mail,
+  Edit,
+  Info,
+  Save,
+  Trash,
+  Image as ImageIcon,
+  Eye,
+  Code,
+  Play,
+  CheckCircle,
+  Plus,
+} from "lucide-react";
 import { toast } from "sonner";
 import Editor from "@monaco-editor/react";
 
@@ -23,14 +36,21 @@ function EmailTemplatesPage() {
   const queryClient = useQueryClient();
   const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [form, setForm] = useState({ 
-    name: "", type: "custom", category: "General", subject: "", 
-    htmlBody: "", textBody: "", previewText: "", isDefault: false, isActive: true 
+  const [form, setForm] = useState({
+    name: "",
+    type: "custom",
+    category: "General",
+    subject: "",
+    htmlBody: "",
+    textBody: "",
+    previewText: "",
+    isDefault: false,
+    isActive: true,
   });
   const [viewMode, setViewMode] = useState<"code" | "preview">("code");
   const [testEmail, setTestEmail] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<any>(null);
 
@@ -41,17 +61,20 @@ function EmailTemplatesPage() {
 
   const { data: variablesData } = useQuery({
     queryKey: ["adminEmailTemplateVariables", activeTemplateId],
-    queryFn: () => activeTemplateId && activeTemplateId !== "new" ? getEmailTemplateVariables(activeTemplateId) : { variables: [] },
+    queryFn: () =>
+      activeTemplateId && activeTemplateId !== "new"
+        ? getEmailTemplateVariables(activeTemplateId)
+        : { variables: [] },
     enabled: !!activeTemplateId && activeTemplateId !== "new",
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => updateEmailTemplate(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => updateEmailTemplate(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminEmailTemplates"] });
       toast.success("Template updated successfully");
     },
-    onError: (err: any) => toast.error(err.message || "Failed to update template")
+    onError: (err: any) => toast.error(err.message || "Failed to update template"),
   });
 
   const createMutation = useMutation({
@@ -62,7 +85,7 @@ function EmailTemplatesPage() {
       setIsCreating(false);
       setActiveTemplateId(res.template._id);
     },
-    onError: (err: any) => toast.error(err.message || "Failed to create template")
+    onError: (err: any) => toast.error(err.message || "Failed to create template"),
   });
 
   const deleteMutation = useMutation({
@@ -73,7 +96,7 @@ function EmailTemplatesPage() {
       setActiveTemplateId(null);
     },
   });
-  
+
   const setDefaultMutation = useMutation({
     mutationFn: (id: string) => setDefaultEmailTemplate(id),
     onSuccess: () => {
@@ -83,22 +106,31 @@ function EmailTemplatesPage() {
   });
 
   const sendTestMutation = useMutation({
-    mutationFn: ({ id, to }: { id: string, to: string }) => sendTestEmail(id, to),
+    mutationFn: ({ id, to }: { id: string; to: string }) => sendTestEmail(id, to),
     onSuccess: () => toast.success("Test email sent"),
-    onError: (err: any) => toast.error(err.message || "Failed to send test email")
+    onError: (err: any) => toast.error(err.message || "Failed to send test email"),
   });
 
   const templates = templatesData?.templates || [];
   const types = templatesData?.types || [];
-  const activeTemplate = activeTemplateId === "new" ? form : templates.find((t: any) => t._id === activeTemplateId || t.id === activeTemplateId);
+  const activeTemplate =
+    activeTemplateId === "new"
+      ? form
+      : templates.find((t: any) => t._id === activeTemplateId || t.id === activeTemplateId);
 
   function handleSelectTemplate(t: any) {
     setIsCreating(false);
     setActiveTemplateId(t._id || t.id);
-    setForm({ 
-      name: t.name, type: t.type, category: t.category || "General", 
-      subject: t.subject, htmlBody: t.htmlBody || "", textBody: t.textBody || "", 
-      previewText: t.previewText || "", isDefault: t.isDefault, isActive: t.isActive 
+    setForm({
+      name: t.name,
+      type: t.type,
+      category: t.category || "General",
+      subject: t.subject,
+      htmlBody: t.htmlBody || "",
+      textBody: t.textBody || "",
+      previewText: t.previewText || "",
+      isDefault: t.isDefault,
+      isActive: t.isActive,
     });
     setViewMode("code");
   }
@@ -106,10 +138,16 @@ function EmailTemplatesPage() {
   function handleCreateNew() {
     setIsCreating(true);
     setActiveTemplateId("new");
-    setForm({ 
-      name: "New Template", type: "custom", category: "General", 
-      subject: "", htmlBody: "<h1>Hello {{name}}</h1>", textBody: "", 
-      previewText: "", isDefault: false, isActive: true 
+    setForm({
+      name: "New Template",
+      type: "custom",
+      category: "General",
+      subject: "",
+      htmlBody: "<h1>Hello {{name}}</h1>",
+      textBody: "",
+      previewText: "",
+      isDefault: false,
+      isActive: true,
     });
     setViewMode("code");
   }
@@ -130,10 +168,15 @@ function EmailTemplatesPage() {
       const position = editor.getPosition();
       editor.executeEdits("", [
         {
-          range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
+          range: new monaco.Range(
+            position.lineNumber,
+            position.column,
+            position.lineNumber,
+            position.column,
+          ),
           text: `{{${variable}}}`,
-          forceMoveMarkers: true
-        }
+          forceMoveMarkers: true,
+        },
       ]);
       editor.focus();
     } else {
@@ -145,27 +188,32 @@ function EmailTemplatesPage() {
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     setIsUploading(true);
     try {
       const res = await uploadEmailTemplateImage(file);
       if (editorRef.current) {
-         const editor = editorRef.current;
-         const position = editor.getPosition();
-         editor.executeEdits("", [
-           {
-             range: new monaco.Range(position.lineNumber, position.column, position.lineNumber, position.column),
-             text: `<img src="${res.url}" alt="Email Image" style="max-width: 100%; height: auto;" />`,
-             forceMoveMarkers: true
-           }
-         ]);
+        const editor = editorRef.current;
+        const position = editor.getPosition();
+        editor.executeEdits("", [
+          {
+            range: new monaco.Range(
+              position.lineNumber,
+              position.column,
+              position.lineNumber,
+              position.column,
+            ),
+            text: `<img src="${res.url}" alt="Email Image" style="max-width: 100%; height: auto;" />`,
+            forceMoveMarkers: true,
+          },
+        ]);
       }
       toast.success("Image uploaded and inserted");
     } catch (err: any) {
       toast.error(err.message || "Failed to upload image");
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
 
@@ -174,7 +222,7 @@ function EmailTemplatesPage() {
     let html = form.htmlBody;
     const testVars = variablesData?.variables || [];
     testVars.forEach((v: string) => {
-      html = html.replace(new RegExp(`{{${v}}}`, 'g'), `[${v}]`);
+      html = html.replace(new RegExp(`{{${v}}}`, "g"), `[${v}]`);
     });
     return html;
   }
@@ -186,7 +234,10 @@ function EmailTemplatesPage() {
           <h1 className="font-display text-2xl font-bold tracking-tight">Email Templates</h1>
           <p className="mt-1 text-xs text-slate-500">Design and manage system emails.</p>
         </div>
-        <button onClick={handleCreateNew} className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400">
+        <button
+          onClick={handleCreateNew}
+          className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400"
+        >
           <Plus className="h-4 w-4" /> New Template
         </button>
       </div>
@@ -195,7 +246,12 @@ function EmailTemplatesPage() {
         {/* Sidebar */}
         <div className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
           {isLoading ? (
-            <div className="p-4 text-slate-500"><div className="flex flex-col items-center justify-center gap-3 py-8"><Loader2 className="h-8 w-8 animate-spin text-cyan-500" /><p className="text-sm text-slate-500">Loading templates...</p></div></div>
+            <div className="p-4 text-slate-500">
+              <div className="flex flex-col items-center justify-center gap-3 py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+                <p className="text-sm text-slate-500">Loading templates...</p>
+              </div>
+            </div>
           ) : (
             <>
               {templates.map((t: any) => (
@@ -218,8 +274,12 @@ function EmailTemplatesPage() {
                     {t.isDefault && <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-400">{t.type}</span>
-                    <span className="rounded bg-slate-800/50 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">{t.category}</span>
+                    <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-400">
+                      {t.type}
+                    </span>
+                    <span className="rounded bg-slate-800/50 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">
+                      {t.category}
+                    </span>
                   </div>
                 </button>
               ))}
@@ -234,24 +294,50 @@ function EmailTemplatesPage() {
               {/* Header */}
               <div className="flex items-start justify-between border-b border-slate-800 p-4 bg-slate-900/50">
                 <div className="flex-1 mr-4">
-                  <input 
-                    required 
-                    value={form.name} 
-                    onChange={e => setForm({...form, name: e.target.value})} 
-                    className="text-lg font-bold text-slate-200 bg-transparent border-none outline-none w-full mb-1 placeholder-slate-600" 
+                  <input
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    className="text-lg font-bold text-slate-200 bg-transparent border-none outline-none w-full mb-1 placeholder-slate-600"
                     placeholder="Template Name"
                   />
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2 text-xs text-slate-400">
                       Type:
-                      <select value={form.type} onChange={e => setForm({...form, type: e.target.value})} className="bg-slate-800 rounded px-2 py-1 text-slate-300 border border-slate-700 outline-none">
-                        {types.map((t: string) => <option key={t} value={t}>{t}</option>)}
+                      <select
+                        value={form.type}
+                        onChange={(e) => setForm({ ...form, type: e.target.value })}
+                        className="bg-slate-800 rounded px-2 py-1 text-slate-300 border border-slate-700 outline-none"
+                      >
+                        {types.map((t: string) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
                       </select>
                     </label>
                     <label className="flex items-center gap-2 text-xs text-slate-400">
                       Category:
-                      <select value={form.category} onChange={e => setForm({...form, category: e.target.value})} className="bg-slate-800 rounded px-2 py-1 text-slate-300 border border-slate-700 outline-none">
-                        {["User", "Auth", "Business", "Invitation", "Subscription", "Invoice", "Offer", "Global", "General"].map(c => <option key={c} value={c}>{c}</option>)}
+                      <select
+                        value={form.category}
+                        onChange={(e) => setForm({ ...form, category: e.target.value })}
+                        className="bg-slate-800 rounded px-2 py-1 text-slate-300 border border-slate-700 outline-none"
+                      >
+                        {[
+                          "User",
+                          "Auth",
+                          "Business",
+                          "Invitation",
+                          "Subscription",
+                          "Invoice",
+                          "Offer",
+                          "Global",
+                          "General",
+                        ].map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
                       </select>
                     </label>
                   </div>
@@ -259,15 +345,30 @@ function EmailTemplatesPage() {
                 <div className="flex items-center gap-2">
                   {activeTemplateId !== "new" && (
                     <>
-                      <button type="button" onClick={() => setDefaultMutation.mutate(activeTemplateId)} disabled={form.isDefault || setDefaultMutation.isPending} className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50">
+                      <button
+                        type="button"
+                        onClick={() => setDefaultMutation.mutate(activeTemplateId)}
+                        disabled={form.isDefault || setDefaultMutation.isPending}
+                        className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"
+                      >
                         Set Default
                       </button>
-                      <button type="button" onClick={() => { if(confirm("Are you sure?")) deleteMutation.mutate(activeTemplateId); }} className="inline-flex items-center justify-center rounded-lg border border-red-900/30 bg-red-900/20 p-1.5 text-red-400 hover:bg-red-900/40">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm("Are you sure?")) deleteMutation.mutate(activeTemplateId);
+                        }}
+                        className="inline-flex items-center justify-center rounded-lg border border-red-900/30 bg-red-900/20 p-1.5 text-red-400 hover:bg-red-900/40"
+                      >
                         <Trash className="h-4 w-4" />
                       </button>
                     </>
                   )}
-                  <button type="submit" disabled={updateMutation.isPending || createMutation.isPending} className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-1.5 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-50">
+                  <button
+                    type="submit"
+                    disabled={updateMutation.isPending || createMutation.isPending}
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-1.5 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-50"
+                  >
                     <Save className="h-4 w-4" /> Save
                   </button>
                 </div>
@@ -279,11 +380,24 @@ function EmailTemplatesPage() {
                   <div className="p-4 space-y-4 border-b border-slate-800">
                     <div>
                       <label className="text-xs font-medium text-slate-400">Subject Line</label>
-                      <input required value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} className="mt-1 h-9 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500" placeholder="e.g. Welcome to {{appName}}" />
+                      <input
+                        required
+                        value={form.subject}
+                        onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                        className="mt-1 h-9 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
+                        placeholder="e.g. Welcome to {{appName}}"
+                      />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-slate-400">Preview Text (Optional)</label>
-                      <input value={form.previewText} onChange={e => setForm({...form, previewText: e.target.value})} className="mt-1 h-9 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500" placeholder="Displays in email client snippet..." />
+                      <label className="text-xs font-medium text-slate-400">
+                        Preview Text (Optional)
+                      </label>
+                      <input
+                        value={form.previewText}
+                        onChange={(e) => setForm({ ...form, previewText: e.target.value })}
+                        className="mt-1 h-9 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
+                        placeholder="Displays in email client snippet..."
+                      />
                     </div>
                   </div>
 
@@ -291,19 +405,42 @@ function EmailTemplatesPage() {
                   <div className="flex flex-col flex-1 min-h-0">
                     <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/30 px-4 py-2">
                       <div className="flex gap-1 bg-slate-900 p-0.5 rounded-lg border border-slate-800">
-                        <button type="button" onClick={() => setViewMode("code")} className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium ${viewMode === "code" ? "bg-slate-700 text-slate-200" : "text-slate-400 hover:text-slate-300"}`}>
+                        <button
+                          type="button"
+                          onClick={() => setViewMode("code")}
+                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium ${viewMode === "code" ? "bg-slate-700 text-slate-200" : "text-slate-400 hover:text-slate-300"}`}
+                        >
                           <Code className="h-3.5 w-3.5" /> HTML Source
                         </button>
-                        <button type="button" onClick={() => setViewMode("preview")} className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium ${viewMode === "preview" ? "bg-slate-700 text-slate-200" : "text-slate-400 hover:text-slate-300"}`}>
+                        <button
+                          type="button"
+                          onClick={() => setViewMode("preview")}
+                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium ${viewMode === "preview" ? "bg-slate-700 text-slate-200" : "text-slate-400 hover:text-slate-300"}`}
+                        >
                           <Eye className="h-3.5 w-3.5" /> Visual Preview
                         </button>
                       </div>
-                      
+
                       {viewMode === "code" && (
                         <div>
-                          <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
-                          <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="inline-flex items-center gap-1.5 rounded-md text-xs font-medium text-cyan-400 hover:text-cyan-300 disabled:opacity-50">
-                            {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ImageIcon className="h-3.5 w-3.5" />}
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleImageUpload}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                            className="inline-flex items-center gap-1.5 rounded-md text-xs font-medium text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+                          >
+                            {isUploading ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <ImageIcon className="h-3.5 w-3.5" />
+                            )}
                             Upload Image
                           </button>
                         </div>
@@ -312,22 +449,22 @@ function EmailTemplatesPage() {
 
                     <div className="flex-1 min-h-[300px] relative bg-white">
                       {viewMode === "code" ? (
-                         <Editor
+                        <Editor
                           height="100%"
                           defaultLanguage="html"
                           theme="vs-dark"
                           value={form.htmlBody}
                           onChange={(val) => setForm({ ...form, htmlBody: val || "" })}
-                          onMount={(editor) => editorRef.current = editor}
+                          onMount={(editor) => (editorRef.current = editor)}
                           options={{
                             minimap: { enabled: false },
                             wordWrap: "on",
                             fontSize: 13,
-                            padding: { top: 16 }
+                            padding: { top: 16 },
                           }}
                         />
                       ) : (
-                        <iframe 
+                        <iframe
                           className="w-full h-full border-none"
                           srcDoc={getPreviewHtml()}
                           title="Email Preview"
@@ -340,13 +477,17 @@ function EmailTemplatesPage() {
                 {/* Right Sidebar - Tools */}
                 <div className="w-[280px] flex flex-col bg-slate-900/30 overflow-y-auto">
                   <div className="p-4 border-b border-slate-800">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Variables</h3>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                      Variables
+                    </h3>
                     {activeTemplateId === "new" ? (
-                      <p className="text-xs text-slate-500">Save template to see available variables.</p>
+                      <p className="text-xs text-slate-500">
+                        Save template to see available variables.
+                      </p>
                     ) : variablesData?.variables?.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
                         {variablesData.variables.map((v: string) => (
-                          <button 
+                          <button
                             key={v}
                             type="button"
                             onClick={() => handleInsertVariable(v)}
@@ -366,20 +507,22 @@ function EmailTemplatesPage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Test Send</h3>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                      Test Send
+                    </h3>
                     <div className="space-y-2">
-                      <input 
-                        type="email" 
-                        placeholder="Recipient Email" 
+                      <input
+                        type="email"
+                        placeholder="Recipient Email"
                         value={testEmail}
-                        onChange={e => setTestEmail(e.target.value)}
-                        className="w-full h-8 rounded border border-slate-700 bg-slate-900 px-2 text-xs text-slate-200 outline-none focus:border-cyan-500" 
+                        onChange={(e) => setTestEmail(e.target.value)}
+                        className="w-full h-8 rounded border border-slate-700 bg-slate-900 px-2 text-xs text-slate-200 outline-none focus:border-cyan-500"
                       />
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         onClick={() => {
-                          if(!testEmail) return toast.error("Enter an email");
-                          if(activeTemplateId === "new") return toast.error("Save template first");
+                          if (!testEmail) return toast.error("Enter an email");
+                          if (activeTemplateId === "new") return toast.error("Save template first");
                           sendTestMutation.mutate({ id: activeTemplateId, to: testEmail });
                         }}
                         disabled={sendTestMutation.isPending || activeTemplateId === "new"}

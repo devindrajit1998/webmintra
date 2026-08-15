@@ -39,7 +39,8 @@ function PagesPage() {
           </div>
           <h1 className="font-display text-3xl font-bold text-white">Pages</h1>
           <p className="mt-2 text-sm text-slate-400">
-            View the pages available for your website. Pages are created and designed inside the visual builder.
+            View the pages available for your website. Pages are created and designed inside the
+            visual builder.
           </p>
         </div>
       </header>
@@ -69,14 +70,16 @@ function PagesPage() {
                 className="h-9 min-w-48 rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm focus:border-cyan-400 focus:outline-none"
               >
                 {websites.map((w) => (
-                  <option key={w.id} value={w.id}>{w.name}</option>
+                  <option key={w.id} value={w.id}>
+                    {w.name}
+                  </option>
                 ))}
               </select>
             </div>
-            
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-              <input 
+              <input
                 placeholder="Search pages..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

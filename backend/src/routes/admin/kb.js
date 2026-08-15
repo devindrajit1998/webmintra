@@ -75,7 +75,10 @@ router.get("/articles", async (req, res, next) => {
     if (req.query.status && ARTICLE_STATUSES.includes(req.query.status)) filter.status = req.query.status;
     if (req.query.category && isMongoId(req.query.category)) filter.category = req.query.category;
     if (req.query.isFaq === "true") filter.isFaq = true;
-    if (req.query.search) filter.title = { $regex: req.query.search, $options: "i" };
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      filter.title = { $regex: escapeRegex(req.query.search.trim()), $options: "i" };
+    }
 
     const [articles, total] = await Promise.all([
       KBArticle.find(filter).sort(sort).skip(skip).limit(limit)

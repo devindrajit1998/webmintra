@@ -106,8 +106,8 @@ export function ImportGuideModal({ onClose }: { onClose: () => void }) {
           </Chip>
           <h2 className="mt-3 text-2xl font-bold">How bringing in a website works</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Choose the files for an existing website. WebMintra checks each page, finds the parts you can update, and lets you
-            review everything before you start editing.
+            Choose the files for an existing website. WebMintra checks each page, finds the parts
+            you can update, and lets you review everything before you start editing.
           </p>
         </div>
         <div className="grid gap-7 p-7 md:grid-cols-3">
@@ -129,7 +129,10 @@ export function ImportGuideModal({ onClose }: { onClose: () => void }) {
           <SectionTitle hint="WebMintra guides every step">What happens next</SectionTitle>
           <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {STEPS.map((s, i) => (
-              <li key={s} className="flex items-center gap-2.5 rounded-lg border border-border bg-elevated/60 px-3 py-2.5">
+              <li
+                key={s}
+                className="flex items-center gap-2.5 rounded-lg border border-border bg-elevated/60 px-3 py-2.5"
+              >
                 <span className="text-primary grid h-6 w-6 shrink-0 place-items-center rounded-md bg-primary/12 font-mono text-[11px] font-bold">
                   {i + 1}
                 </span>
@@ -140,8 +143,9 @@ export function ImportGuideModal({ onClose }: { onClose: () => void }) {
           <div className="mt-6 flex items-start gap-3 rounded-lg border border-accent/25 bg-accent/8 p-4">
             <Sparkles className="text-accent mt-0.5 h-4 w-4 shrink-0" />
             <p className="text-xs leading-relaxed text-muted-foreground">
-              <span className="text-foreground font-semibold">Review suggestions.</span> WebMintra shows how sure it is about
-              each item it found. You can keep, change, or remove any suggestion before you begin editing.
+              <span className="text-foreground font-semibold">Review suggestions.</span> WebMintra
+              shows how sure it is about each item it found. You can keep, change, or remove any
+              suggestion before you begin editing.
             </p>
           </div>
         </div>
@@ -165,7 +169,11 @@ export function ImportWizard({ onComplete }: { onComplete: (a: TemplateAnalysis)
   const [tab, setTab] = useState<"summary" | "detections" | "assets" | "validation">("summary");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const run = async (files: { name: string; content: string }[], assetNames: string[], name: string) => {
+  const run = async (
+    files: { name: string; content: string }[],
+    assetNames: string[],
+    name: string,
+  ) => {
     if (!files.length) {
       setError("No HTML pages found in that selection. Include at least one .html file.");
       return;
@@ -189,7 +197,8 @@ export function ImportWizard({ onComplete }: { onComplete: (a: TemplateAnalysis)
     const assets: string[] = [];
     for (const f of files) {
       const rel = (f as File & { webkitRelativePath?: string }).webkitRelativePath || f.name;
-      if (/\.html?$/i.test(f.name)) html.push({ name: rel.split("/").slice(-1)[0] ?? f.name, content: await f.text() });
+      if (/\.html?$/i.test(f.name))
+        html.push({ name: rel.split("/").slice(-1)[0] ?? f.name, content: await f.text() });
       else assets.push(rel);
     }
     void run(html, assets, files.length ? "Uploaded website" : "Website");
@@ -205,7 +214,9 @@ export function ImportWizard({ onComplete }: { onComplete: (a: TemplateAnalysis)
             <Layers className="h-3 w-3" /> Importing
           </Chip>
           <h2 className="mt-3 text-xl font-bold">Checking your website</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Finding pages, pictures, links, and the parts you can update.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Finding pages, pictures, links, and the parts you can update.
+          </p>
           <div className="mt-7 space-y-2.5">
             {STEPS.slice(0, STEPS.length - 1).map((s, i) => (
               <div
@@ -270,9 +281,7 @@ export function ImportWizard({ onComplete }: { onComplete: (a: TemplateAnalysis)
   return (
     <div className="mx-auto max-w-4xl px-5 py-10 w-full">
       <div className="fade-up mb-8 text-left">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-100">
-          Import Template
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-100">Import Template</h1>
         <p className="mt-1.5 text-sm text-slate-400">
           Upload your HTML file and we'll extract editable content automatically.
         </p>
@@ -291,7 +300,9 @@ export function ImportWizard({ onComplete }: { onComplete: (a: TemplateAnalysis)
         }}
         className={cn(
           "fade-up relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-20 text-center transition-all duration-300",
-          dragging ? "border-cyan-500 bg-cyan-500/10 shadow-glow" : "border-slate-700 bg-[#0b1826] hover:bg-slate-900 hover:border-cyan-500/50"
+          dragging
+            ? "border-cyan-500 bg-cyan-500/10 shadow-glow"
+            : "border-slate-700 bg-[#0b1826] hover:bg-slate-900 hover:border-cyan-500/50",
         )}
       >
         <div className="mb-5 grid h-16 w-16 place-items-center rounded-2xl bg-cyan-500/10 text-cyan-400">
@@ -299,19 +310,20 @@ export function ImportWizard({ onComplete }: { onComplete: (a: TemplateAnalysis)
         </div>
         <h3 className="text-lg font-bold text-slate-200">Drag & drop your HTML file here</h3>
         <p className="mt-1 text-sm text-slate-400">or click to browse</p>
-        
+
         <div className="mt-6 flex flex-col items-center gap-4">
           <Btn variant="primary" onClick={() => inputRef.current?.click()}>
             Choose HTML File
           </Btn>
-          <button onClick={() => void run(SAMPLE_TEMPLATE_FILES, SAMPLE_ASSET_NAMES, "Northwind Studio")} className="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition">
+          <button
+            onClick={() => void run(SAMPLE_TEMPLATE_FILES, SAMPLE_ASSET_NAMES, "Northwind Studio")}
+            className="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition"
+          >
             Or try an example website
           </button>
         </div>
-        
-        <p className="mt-8 text-xs text-slate-500">
-          We support HTML files up to 50MB
-        </p>
+
+        <p className="mt-8 text-xs text-slate-500">We support HTML files up to 50MB</p>
 
         <input
           ref={inputRef}
@@ -383,7 +395,8 @@ function ImportReport({
           </Chip>
           <h1 className="mt-3 text-3xl font-bold">Import report</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {analysis.name} · {analysis.pages.length} pages · {analysis.stats["Editable fields"]} editable fields detected
+            {analysis.name} · {analysis.pages.length} pages · {analysis.stats["Editable fields"]}{" "}
+            editable fields detected
           </p>
         </div>
         <div className="flex gap-2">
@@ -402,10 +415,24 @@ function ImportReport({
           return (
             <Panel key={k} className="p-4">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">{k}</span>
-                <Icon className={cn("h-3.5 w-3.5", k === "Errors" ? "text-destructive" : "text-primary")} />
+                <span className="text-[11px] font-semibold tracking-wide text-muted-foreground uppercase">
+                  {k}
+                </span>
+                <Icon
+                  className={cn(
+                    "h-3.5 w-3.5",
+                    k === "Errors" ? "text-destructive" : "text-primary",
+                  )}
+                />
               </div>
-              <p className={cn("font-display mt-2 text-2xl font-bold", k === "Errors" && v > 0 && "text-destructive")}>{v}</p>
+              <p
+                className={cn(
+                  "font-display mt-2 text-2xl font-bold",
+                  k === "Errors" && v > 0 && "text-destructive",
+                )}
+              >
+                {v}
+              </p>
             </Panel>
           );
         })}
@@ -425,7 +452,9 @@ function ImportReport({
             onClick={() => setTab(id)}
             className={cn(
               "rounded-lg border px-3.5 py-2 text-xs font-semibold transition",
-              tab === id ? "border-primary bg-primary/12 text-primary" : "border-border text-muted-foreground hover:text-foreground",
+              tab === id
+                ? "border-primary bg-primary/12 text-primary"
+                : "border-border text-muted-foreground hover:text-foreground",
             )}
           >
             {label}
@@ -452,7 +481,9 @@ function ImportReport({
                     <Chip>{p.repeaters.length} repeaters</Chip>
                     <Chip>{p.forms.length} forms</Chip>
                     <Chip>{p.navGroups.length} menus</Chip>
-                    {p.linksTo.length ? <Chip tone="accent">links to {p.linksTo.join(", ")}</Chip> : null}
+                    {p.linksTo.length ? (
+                      <Chip tone="accent">links to {p.linksTo.join(", ")}</Chip>
+                    ) : null}
                   </div>
                 </div>
               ))}
@@ -463,9 +494,15 @@ function ImportReport({
               <SectionTitle hint="Extracted from CSS">Theme variables</SectionTitle>
               <div className="grid grid-cols-2 gap-2">
                 {Object.entries(analysis.theme).map(([k, v]) => (
-                  <div key={k} className="flex items-center gap-2 rounded-lg border border-border bg-elevated/50 px-2.5 py-2">
+                  <div
+                    key={k}
+                    className="flex items-center gap-2 rounded-lg border border-border bg-elevated/50 px-2.5 py-2"
+                  >
                     {v.startsWith("#") ? (
-                      <span className="h-5 w-5 shrink-0 rounded border border-border" style={{ background: v }} />
+                      <span
+                        className="h-5 w-5 shrink-0 rounded border border-border"
+                        style={{ background: v }}
+                      />
                     ) : null}
                     <div className="min-w-0">
                       <p className="text-[11px] font-semibold">{k}</p>
@@ -480,7 +517,10 @@ function ImportReport({
               <div className="space-y-2">
                 {analysis.pages.flatMap((p) =>
                   p.repeaters.map((r) => (
-                    <div key={r.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-elevated/50 px-3 py-2">
+                    <div
+                      key={r.id}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-border bg-elevated/50 px-3 py-2"
+                    >
                       <div className="min-w-0">
                         <p className="truncate text-xs font-semibold">{r.label}</p>
                         <p className="text-[11px] text-muted-foreground">
@@ -493,7 +533,10 @@ function ImportReport({
                 )}
                 {analysis.pages.flatMap((p) =>
                   p.forms.map((f) => (
-                    <div key={f.id} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-elevated/50 px-3 py-2">
+                    <div
+                      key={f.id}
+                      className="flex items-center justify-between gap-3 rounded-lg border border-border bg-elevated/50 px-3 py-2"
+                    >
                       <div className="min-w-0">
                         <p className="truncate text-xs font-semibold">{f.label}</p>
                         <p className="text-[11px] text-muted-foreground">
@@ -523,7 +566,12 @@ function ImportReport({
               />
             </div>
             {analysis.pages.map((p) => (
-              <Btn key={p.id} size="sm" variant={p.id === pageId ? "primary" : "default"} onClick={() => setPageId(p.id)}>
+              <Btn
+                key={p.id}
+                size="sm"
+                variant={p.id === pageId ? "primary" : "default"}
+                onClick={() => setPageId(p.id)}
+              >
                 {p.name}
               </Btn>
             ))}
@@ -566,7 +614,11 @@ function ImportReport({
               );
             })}
             {fields.length === 0 ? (
-              <EmptyState icon={<Search className="h-5 w-5" />} title="No detections match" body="Try a different search term or switch page." />
+              <EmptyState
+                icon={<Search className="h-5 w-5" />}
+                title="No detections match"
+                body="Try a different search term or switch page."
+              />
             ) : null}
           </div>
         </Panel>
@@ -574,18 +626,25 @@ function ImportReport({
 
       {tab === "assets" ? (
         <Panel className="fade-up mt-5 p-5">
-          <SectionTitle hint={`${analysis.assets.filter((a) => a.missing).length} missing · ${analysis.assets.filter((a) => a.duplicateOf).length} duplicates`}>
+          <SectionTitle
+            hint={`${analysis.assets.filter((a) => a.missing).length} missing · ${analysis.assets.filter((a) => a.duplicateOf).length} duplicates`}
+          >
             Assets found
           </SectionTitle>
           <div className="grid max-h-[26rem] gap-1.5 overflow-y-auto pr-1">
             {analysis.assets.map((a) => (
-              <div key={a.url} className="flex items-center gap-3 rounded-lg border border-border bg-elevated/40 px-3 py-2.5">
+              <div
+                key={a.url}
+                className="flex items-center gap-3 rounded-lg border border-border bg-elevated/40 px-3 py-2.5"
+              >
                 <Chip tone="primary">{a.kind}</Chip>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold">{a.name}</p>
                   <p className="truncate font-mono text-[10px] text-muted-foreground">{a.url}</p>
                 </div>
-                <span className="hidden text-[11px] text-muted-foreground sm:block">used on {a.usedOn.join(", ")}</span>
+                <span className="hidden text-[11px] text-muted-foreground sm:block">
+                  used on {a.usedOn.join(", ")}
+                </span>
                 {a.duplicateOf ? <Chip tone="warning">duplicate</Chip> : null}
                 {a.missing ? <Chip tone="danger">missing</Chip> : <Chip tone="success">ok</Chip>}
               </div>
@@ -612,7 +671,10 @@ function ImportReport({
             <SectionTitle hint="Severity and suggested fix">Validation report</SectionTitle>
             <div className="max-h-[24rem] space-y-1.5 overflow-y-auto pr-1">
               {analysis.issues.map((i) => (
-                <div key={i.id} className="flex gap-3 rounded-lg border border-border bg-elevated/40 px-3 py-2.5">
+                <div
+                  key={i.id}
+                  className="flex gap-3 rounded-lg border border-border bg-elevated/40 px-3 py-2.5"
+                >
                   {i.severity === "error" ? (
                     <CircleAlert className="text-destructive mt-0.5 h-4 w-4 shrink-0" />
                   ) : i.severity === "warning" ? (
@@ -628,7 +690,11 @@ function ImportReport({
                 </div>
               ))}
               {analysis.issues.length === 0 ? (
-                <EmptyState icon={<CheckCircle2 className="h-5 w-5" />} title="Nothing to fix" body="This template passed every validation rule." />
+                <EmptyState
+                  icon={<CheckCircle2 className="h-5 w-5" />}
+                  title="Nothing to fix"
+                  body="This template passed every validation rule."
+                />
               ) : null}
             </div>
           </Panel>

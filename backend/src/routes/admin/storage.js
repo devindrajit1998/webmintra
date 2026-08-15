@@ -6,7 +6,7 @@
 import { Router } from "express";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
 import { StorageItem, MEDIA_TYPES } from "../../models/StorageItem.js";
-import { parsePagination, parseSort, isMongoId } from "../../lib/validate.js";
+import { parsePagination, parseSort, isMongoId, escapeRegex } from "../../lib/validate.js";
 import ImageKit from "imagekit";
 
 const imagekit = new ImageKit({
@@ -31,10 +31,11 @@ router.get("/", async (req, res, next) => {
     if (req.query.isUsed === "true") filter.isUsed = true;
     if (req.query.isUsed === "false") filter.isUsed = false;
 
-    if (req.query.search) {
+    if (req.query.search && typeof req.query.search === "string") {
+      const q = escapeRegex(req.query.search.trim());
       filter.$or = [
-        { filename: { $regex: req.query.search, $options: "i" } },
-        { originalName: { $regex: req.query.search, $options: "i" } },
+        { filename: { $regex: q, $options: "i" } },
+        { originalName: { $regex: q, $options: "i" } },
       ];
     }
 

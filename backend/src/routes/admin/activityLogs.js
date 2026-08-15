@@ -20,11 +20,13 @@ router.get("/", async (req, res, next) => {
     if (req.query.action && ACTIVITY_ACTIONS.includes(req.query.action)) filter.action = req.query.action;
     if (req.query.actor && isMongoId(req.query.actor)) filter.actor = req.query.actor;
     if (req.query.resourceType) filter["resource.type"] = req.query.resourceType;
-    if (req.query.search) {
+    if (req.query.search && typeof req.query.search === "string") {
+      const { escapeRegex } = await import("../../lib/validate.js");
+      const q = escapeRegex(req.query.search.trim());
       filter.$or = [
-        { description: { $regex: req.query.search, $options: "i" } },
-        { actorName: { $regex: req.query.search, $options: "i" } },
-        { actorEmail: { $regex: req.query.search, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+        { actorName: { $regex: q, $options: "i" } },
+        { actorEmail: { $regex: q, $options: "i" } },
       ];
     }
 

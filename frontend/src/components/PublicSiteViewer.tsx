@@ -7,7 +7,7 @@ export function PublicSiteViewer({ subdomain }: { subdomain: string }) {
   useEffect(() => {
     // In dev, the API URL is typically http://localhost:5000/api
     const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-    
+
     // We construct the backend URL for the public site
     const targetUrl = `${apiUrl}/public/site/${subdomain}${window.location.pathname}${window.location.search}`;
 
@@ -27,11 +27,24 @@ export function PublicSiteViewer({ subdomain }: { subdomain: string }) {
   }, [subdomain]);
 
   if (error) {
-    return <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>Error loading site: {error}</div>;
+    return (
+      <div style={{ padding: "2rem", fontFamily: "sans-serif" }}>Error loading site: {error}</div>
+    );
   }
 
   if (!html) {
-    return <div style={{ padding: "2rem", fontFamily: "sans-serif", textAlign: "center", paddingTop: "20vh" }}>Loading...</div>;
+    return (
+      <div
+        style={{
+          padding: "2rem",
+          fontFamily: "sans-serif",
+          textAlign: "center",
+          paddingTop: "20vh",
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   // We write the HTML directly to the document to replace the React app

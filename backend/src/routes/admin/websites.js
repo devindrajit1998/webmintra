@@ -11,7 +11,7 @@ import { Domain } from "../../models/Domain.js";
 import { StorageItem } from "../../models/StorageItem.js";
 import { Template } from "../../models/Template.js";
 import { logActivity, buildLogContext } from "../../services/activityLog.js";
-import { parsePagination, parseSort, isMongoId } from "../../lib/validate.js";
+import { parsePagination, parseSort, isMongoId, escapeRegex } from "../../lib/validate.js";
 
 const router = Router();
 router.use(requireAuthenticatedUser, requireRole("admin"));
@@ -26,10 +26,11 @@ router.get("/", async (req, res, next) => {
     if (req.query.status) filter.status = req.query.status;
     if (req.query.owner && isMongoId(req.query.owner)) filter.owner = req.query.owner;
 
-    if (req.query.search) {
+    if (req.query.search && typeof req.query.search === "string") {
+      const q = escapeRegex(req.query.search.trim());
       filter.$or = [
-        { name: { $regex: req.query.search, $options: "i" } },
-        { templateName: { $regex: req.query.search, $options: "i" } },
+        { name: { $regex: q, $options: "i" } },
+        { templateName: { $regex: q, $options: "i" } },
       ];
     }
 

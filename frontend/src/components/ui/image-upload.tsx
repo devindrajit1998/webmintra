@@ -10,7 +10,12 @@ interface ImageUploadProps {
   placeholder?: string;
 }
 
-export function ImageUpload({ value, onChange, className = "", placeholder = "Upload an image" }: ImageUploadProps) {
+export function ImageUpload({
+  value,
+  onChange,
+  className = "",
+  placeholder = "Upload an image",
+}: ImageUploadProps) {
   const [isUploading, setIsUploading] = React.useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -85,7 +90,7 @@ export function ImageUpload({ value, onChange, className = "", placeholder = "Up
           )}
         </button>
       )}
-      
+
       <div className="flex gap-2">
         <input
           value={value}

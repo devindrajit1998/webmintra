@@ -29,8 +29,8 @@ router.get("/validate", async (request, response, next) => {
 router.post("/accept", async (request, response, next) => {
   try {
     const { token, password, acceptedTerms } = request.body ?? {};
-    if (typeof token !== "string" || typeof password !== "string" || password.length < 12 || acceptedTerms !== true)
-      return response.status(400).json({ message: "Provide a valid invitation, password, and accept the terms." });
+    if (typeof token !== "string" || typeof password !== "string" || password.length < 8 || acceptedTerms !== true)
+      return response.status(400).json({ message: "Provide a valid invitation, password (min 8 characters), and accept the terms." });
     const invitation = await Invitation.findOne({ tokenHash: hashToken(token), status: "pending" });
     if (!invitation || invitation.expiresAt <= new Date()) return response.status(410).json({ message: "This invitation has expired or is no longer available." });
     if (await User.exists({ email: invitation.ownerEmail })) return response.status(409).json({ message: "An account with this email already exists." });

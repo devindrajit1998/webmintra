@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { X, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
-import { getTemplateCategories, createTemplateCategory, updateTemplateCategory, deleteTemplateCategory } from "@/lib/admin-api";
+import {
+  getTemplateCategories,
+  createTemplateCategory,
+  updateTemplateCategory,
+  deleteTemplateCategory,
+} from "@/lib/admin-api";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -166,25 +171,40 @@ export function TemplateCategoriesManager({ onClose }: { onClose: () => void }) 
         </div>
       </div>
 
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent className="bg-[#0b1826] border-slate-800 text-white">
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent className="z-[80] bg-[#0b1826] border-slate-800 text-white">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Category?</AlertDialogTitle>
             <AlertDialogDescription className="text-slate-400">
-              This action cannot be undone. Templates using this category will still retain the text string, but it won't appear in the dropdown.
+              This action cannot be undone. Templates using this category will still retain the text
+              string, but it won't appear in future dropdowns.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700">
+            <AlertDialogCancel
+              onClick={() => setDeleteId(null)}
+              className="bg-slate-800 text-white border-slate-700 hover:bg-slate-700"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                if (deleteId) deleteMutation.mutate(deleteId);
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                if (deleteId) {
+                  deleteMutation.mutate(deleteId);
+                }
               }}
-              className="bg-red-500 hover:bg-red-600 text-white"
+              disabled={deleteMutation.isPending}
+              className="bg-rose-500 hover:bg-rose-600 text-white"
             >
-              {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> Deleting...
+                </>
+              ) : (
+                "Delete Category"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

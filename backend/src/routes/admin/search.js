@@ -21,7 +21,8 @@ router.get("/", async (req, res, next) => {
     if (!q || typeof q !== "string" || q.trim().length < 2)
       return res.status(400).json({ message: "Provide a search query of at least 2 characters." });
 
-    const query = q.trim();
+    const { escapeRegex } = await import("../../lib/validate.js");
+    const query = escapeRegex(q.trim());
     const regex = { $regex: query, $options: "i" };
     const limit = 5;
 

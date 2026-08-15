@@ -3,8 +3,28 @@ import multer from "multer";
 import { imagekit } from "../../lib/imagekit.js";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
 
-const router = Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const ALLOWED_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/svg+xml",
+  "image/gif",
+  "image/x-icon",
+  "application/pdf",
+];
+const MAX_UPLOAD_SIZE = 15 * 1024 * 1024; // 15MB
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_UPLOAD_SIZE },
+  fileFilter: (_req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only standard images and documents are allowed."), false);
+    }
+  },
+});
 
 router.use(requireAuthenticatedUser, requireRole("admin"));
 

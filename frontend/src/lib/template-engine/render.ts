@@ -1,11 +1,26 @@
-import type { PageAnalysis, TemplateAnalysis, EditorState, ElementEdit, ThemeTokens } from "./types";
+import type {
+  PageAnalysis,
+  TemplateAnalysis,
+  EditorState,
+  ElementEdit,
+  ThemeTokens,
+} from "./types";
 
 const PLACEHOLDER = (label: string) =>
   `data:image/svg+xml;utf8,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="520"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cbd5e1"/><stop offset="1" stop-color="#94a3b8"/></linearGradient></defs><rect width="800" height="520" fill="url(#g)"/><text x="50%" y="50%" font-family="system-ui" font-size="26" fill="#0f172a" text-anchor="middle">${label}</text></svg>`,
   )}`;
 
-const COLOR_TOKENS = ["primary", "secondary", "accent", "background", "surface", "text", "muted", "border"] as const;
+const COLOR_TOKENS = [
+  "primary",
+  "secondary",
+  "accent",
+  "background",
+  "surface",
+  "text",
+  "muted",
+  "border",
+] as const;
 
 export function defaultRepeaterItems(itemIds: string[]) {
   return itemIds.map((_, i) => ({ key: `i${i}`, srcIndex: i }));
@@ -32,9 +47,16 @@ function applyEdit(el: Element, edit: ElementEdit) {
     if (v) el.setAttribute(a, "");
     else el.removeAttribute(a);
   });
-  if (edit.fill) el.querySelectorAll("path,circle,rect,polygon").forEach((p) => p.setAttribute("fill", edit.fill!));
-  if (edit.stroke) el.querySelectorAll("path,circle,rect,polygon").forEach((p) => p.setAttribute("stroke", edit.stroke!));
-  if (edit.hidden) el.setAttribute("style", `${el.getAttribute("style") ?? ""};display:none !important`);
+  if (edit.fill)
+    el.querySelectorAll("path,circle,rect,polygon").forEach((p) =>
+      p.setAttribute("fill", edit.fill!),
+    );
+  if (edit.stroke)
+    el.querySelectorAll("path,circle,rect,polygon").forEach((p) =>
+      p.setAttribute("stroke", edit.stroke!),
+    );
+  if (edit.hidden)
+    el.setAttribute("style", `${el.getAttribute("style") ?? ""};display:none !important`);
   if (edit.style) {
     const extra = Object.entries(edit.style)
       .filter(([, v]) => v !== "")
@@ -210,7 +232,9 @@ export function renderPage(
   page.repeaters.forEach((r) => {
     const container = doc.querySelector(`[data-te-id="${r.containerId}"]`);
     if (!container) return;
-    const originals = r.itemIds.map((id) => container.querySelector(`[data-te-id="${id}"]`)).filter(Boolean) as Element[];
+    const originals = r.itemIds
+      .map((id) => container.querySelector(`[data-te-id="${id}"]`))
+      .filter(Boolean) as Element[];
     if (!originals.length) return;
     const templates = originals.map((o) => o.cloneNode(true) as Element);
     originals.forEach((o) => o.remove());
@@ -247,7 +271,8 @@ export function renderPage(
   });
   doc.querySelectorAll("video").forEach((v) => {
     const poster = v.getAttribute("poster") ?? "";
-    if (!/^(https?:|data:|blob:)/.test(poster)) v.setAttribute("poster", PLACEHOLDER("video poster"));
+    if (!/^(https?:|data:|blob:)/.test(poster))
+      v.setAttribute("poster", PLACEHOLDER("video poster"));
   });
 
   // 4. seo edits
@@ -284,12 +309,21 @@ export function renderPage(
     ([from, to]) => from && to && from.toLowerCase() !== to.toLowerCase(),
   );
   if (pairs.length) {
-    const re = new RegExp(pairs.map(([from]) => from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "gi");
-    html = html.replace(re, (m) => pairs.find(([from]) => from.toLowerCase() === m.toLowerCase())?.[1] ?? m);
+    const re = new RegExp(
+      pairs.map(([from]) => from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+      "gi",
+    );
+    html = html.replace(
+      re,
+      (m) => pairs.find(([from]) => from.toLowerCase() === m.toLowerCase())?.[1] ?? m,
+    );
   }
 
   const faLink = `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />`;
-  html = html.replace("</head>", `${faLink}<style id="te-theme">${themeCss(state.theme)}</style></head>`);
+  html = html.replace(
+    "</head>",
+    `${faLink}<style id="te-theme">${themeCss(state.theme)}</style></head>`,
+  );
   if (opts.interactive) html = html.replace("</body>", `${BRIDGE}</body>`);
   return html;
 }

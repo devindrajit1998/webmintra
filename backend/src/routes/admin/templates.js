@@ -131,19 +131,24 @@ router.post("/import", upload.single("file"), async (req, res) => {
 // Update a template
 router.put("/:id", async (req, res) => {
   try {
-    const { title, description, category, thumbnailUrl, htmlContent, pages } = req.body;
+    const { title, description, category, thumbnailUrl, htmlContent, pages, isActive } = req.body;
     const normalizedPages = parseImportedPages(pages);
+    const updateData = {
+      title,
+      description,
+      category,
+      thumbnailUrl,
+      htmlContent,
+      pages: normalizedPages,
+      pageCount: normalizedPages.length + 1,
+    };
+    if (typeof isActive === "boolean") {
+      updateData.isActive = isActive;
+    }
+
     const template = await Template.findByIdAndUpdate(
       req.params.id,
-      {
-        title,
-        description,
-        category,
-        thumbnailUrl,
-        htmlContent,
-        pages: normalizedPages,
-        pageCount: normalizedPages.length + 1,
-      },
+      updateData,
       { new: true }
     );
     if (!template) {
@@ -159,22 +164,52 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Deactivate a template without breaking websites that already use it.
-router.delete("/:id", async (req, res) => {
+// Toggle Archive / Active status of a template
+router.patch("/:id/toggle-status", async (req, res) => {
   try {
-    const template = await Template.findById(req.params.id).select("_id");
+    const template = await Template.findById(req.params.id);
     if (!template) {
       return res.status(404).json({ message: "Template not found" });
     }
 
-    const inUse = await Website.exists({ templateId: template._id });
-    if (inUse) {
-      await Template.updateOne({ _id: template._id }, { $set: { isActive: false } });
-      return res.json({ message: "Template archived because existing websites use it." });
+    template.isActive = !template.isActive;
+    await template.save();
+
+    const statusText = template.isActive ? "activated (visible on onboarding)" : "archived (hidden from onboarding)";
+    return res.json({
+      message: `Template "${template.title}" is now ${statusText}.`,
+      template,
+    });
+  } catch (error) {
+    console.error("Error toggling template status:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Delete a template (blocked if assigned to any tenant websites)
+router.delete("/:id", async (req, res) => {
+  try {
+    const template = await Template.findById(req.params.id);
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+
+    const assignedWebsites = await Website.find({ templateId: template._id })
+      .populate("owner", "name email business")
+      .lean();
+
+    if (assignedWebsites.length > 0) {
+      const siteCount = assignedWebsites.length;
+      const siteNames = assignedWebsites.slice(0, 3).map(w => w.name).join(", ");
+      const extra = siteCount > 3 ? ` and ${siteCount - 3} other(s)` : "";
+
+      return res.status(400).json({
+        message: `Cannot delete template "${template.title}". It is currently assigned to ${siteCount} tenant website(s) (${siteNames}${extra}). Please reassign or delete those websites first.`
+      });
     }
 
     await Template.deleteOne({ _id: template._id });
-    return res.json({ message: "Template deleted successfully" });
+    return res.json({ message: `Template "${template.title}" deleted successfully.` });
   } catch (error) {
     console.error("Error deleting template:", error);
     return res.status(500).json({ message: "Internal server error" });

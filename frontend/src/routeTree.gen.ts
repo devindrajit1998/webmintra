@@ -12,11 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as BlogRouteImport } from './routes/blog'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CreateAccountRouteImport } from './routes/create-account'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as RefundCancellationPolicyRouteImport } from './routes/refund-cancellation-policy'
 import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TenantRouteImport } from './routes/tenant'
+import { Route as TermsAndConditionsRouteImport } from './routes/terms-and-conditions'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as VerifyPasswordResetRouteImport } from './routes/verify-password-reset'
 import { Route as AdminActivityLogsRouteImport } from './routes/admin.activity-logs'
@@ -39,6 +46,7 @@ import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSubscriptionsRouteImport } from './routes/admin.subscriptions'
 import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
+import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminWebsitesRouteImport } from './routes/admin.websites'
 import { Route as TenantIndexRouteImport } from './routes/tenant.index'
 import { Route as TenantActivityRouteImport } from './routes/tenant.activity'
@@ -76,6 +84,16 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreateAccountRoute = CreateAccountRouteImport.update({
   id: '/create-account',
   path: '/create-account',
@@ -86,19 +104,45 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundCancellationPolicyRoute =
+  RefundCancellationPolicyRouteImport.update({
+    id: '/refund-cancellation-policy',
+    path: '/refund-cancellation-policy',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TenantRoute = TenantRouteImport.update({
   id: '/tenant',
   path: '/tenant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsAndConditionsRoute = TermsAndConditionsRouteImport.update({
+  id: '/terms-and-conditions',
+  path: '/terms-and-conditions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -211,6 +255,11 @@ const AdminTemplatesRoute = AdminTemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTestimonialsRoute = AdminTestimonialsRouteImport.update({
+  id: '/testimonials',
+  path: '/testimonials',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminWebsitesRoute = AdminWebsitesRouteImport.update({
   id: '/websites',
   path: '/websites',
@@ -321,11 +370,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invitation': typeof AcceptInvitationRoute
   '/admin': typeof AdminRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/create-account': typeof CreateAccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/refund-cancellation-policy': typeof RefundCancellationPolicyRoute
   '/sign-in': typeof SignInRoute
+  '/templates': typeof TemplatesRoute
   '/tenant': typeof TenantRouteWithChildren
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/verify-password-reset': typeof VerifyPasswordResetRoute
   '/admin/activity-logs': typeof AdminActivityLogsRoute
@@ -348,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/websites': typeof AdminWebsitesRoute
   '/tenant/activity': typeof TenantActivityRoute
   '/tenant/analytics': typeof TenantAnalyticsRoute
@@ -374,10 +431,17 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invitation': typeof AcceptInvitationRoute
   '/admin': typeof AdminRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/create-account': typeof CreateAccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/refund-cancellation-policy': typeof RefundCancellationPolicyRoute
   '/sign-in': typeof SignInRoute
+  '/templates': typeof TemplatesRoute
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/verify-password-reset': typeof VerifyPasswordResetRoute
   '/admin/activity-logs': typeof AdminActivityLogsRoute
@@ -400,6 +464,7 @@ export interface FileRoutesByTo {
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/websites': typeof AdminWebsitesRoute
   '/tenant/activity': typeof TenantActivityRoute
   '/tenant/analytics': typeof TenantAnalyticsRoute
@@ -427,11 +492,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accept-invitation': typeof AcceptInvitationRoute
   '/admin': typeof AdminRouteWithChildren
+  '/blog': typeof BlogRoute
+  '/contact': typeof ContactRoute
   '/create-account': typeof CreateAccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/help': typeof HelpRoute
   '/onboarding': typeof OnboardingRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/refund-cancellation-policy': typeof RefundCancellationPolicyRoute
   '/sign-in': typeof SignInRoute
+  '/templates': typeof TemplatesRoute
   '/tenant': typeof TenantRouteWithChildren
+  '/terms-and-conditions': typeof TermsAndConditionsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/verify-password-reset': typeof VerifyPasswordResetRoute
   '/admin/activity-logs': typeof AdminActivityLogsRoute
@@ -454,6 +526,7 @@ export interface FileRoutesById {
   '/admin/subscriptions': typeof AdminSubscriptionsRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/templates': typeof AdminTemplatesRoute
+  '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/websites': typeof AdminWebsitesRoute
   '/tenant/activity': typeof TenantActivityRoute
   '/tenant/analytics': typeof TenantAnalyticsRoute
@@ -482,11 +555,18 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-invitation'
     | '/admin'
+    | '/blog'
+    | '/contact'
     | '/create-account'
     | '/forgot-password'
+    | '/help'
     | '/onboarding'
+    | '/privacy-policy'
+    | '/refund-cancellation-policy'
     | '/sign-in'
+    | '/templates'
     | '/tenant'
+    | '/terms-and-conditions'
     | '/verify-email'
     | '/verify-password-reset'
     | '/admin/activity-logs'
@@ -509,6 +589,7 @@ export interface FileRouteTypes {
     | '/admin/subscriptions'
     | '/admin/support'
     | '/admin/templates'
+    | '/admin/testimonials'
     | '/admin/websites'
     | '/tenant/activity'
     | '/tenant/analytics'
@@ -535,10 +616,17 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-invitation'
     | '/admin'
+    | '/blog'
+    | '/contact'
     | '/create-account'
     | '/forgot-password'
+    | '/help'
     | '/onboarding'
+    | '/privacy-policy'
+    | '/refund-cancellation-policy'
     | '/sign-in'
+    | '/templates'
+    | '/terms-and-conditions'
     | '/verify-email'
     | '/verify-password-reset'
     | '/admin/activity-logs'
@@ -561,6 +649,7 @@ export interface FileRouteTypes {
     | '/admin/subscriptions'
     | '/admin/support'
     | '/admin/templates'
+    | '/admin/testimonials'
     | '/admin/websites'
     | '/tenant/activity'
     | '/tenant/analytics'
@@ -587,11 +676,18 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-invitation'
     | '/admin'
+    | '/blog'
+    | '/contact'
     | '/create-account'
     | '/forgot-password'
+    | '/help'
     | '/onboarding'
+    | '/privacy-policy'
+    | '/refund-cancellation-policy'
     | '/sign-in'
+    | '/templates'
     | '/tenant'
+    | '/terms-and-conditions'
     | '/verify-email'
     | '/verify-password-reset'
     | '/admin/activity-logs'
@@ -614,6 +710,7 @@ export interface FileRouteTypes {
     | '/admin/subscriptions'
     | '/admin/support'
     | '/admin/templates'
+    | '/admin/testimonials'
     | '/admin/websites'
     | '/tenant/activity'
     | '/tenant/analytics'
@@ -641,11 +738,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AcceptInvitationRoute: typeof AcceptInvitationRoute
   AdminRoute: typeof AdminRouteWithChildren
+  BlogRoute: typeof BlogRoute
+  ContactRoute: typeof ContactRoute
   CreateAccountRoute: typeof CreateAccountRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HelpRoute: typeof HelpRoute
   OnboardingRoute: typeof OnboardingRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  RefundCancellationPolicyRoute: typeof RefundCancellationPolicyRoute
   SignInRoute: typeof SignInRoute
+  TemplatesRoute: typeof TemplatesRoute
   TenantRoute: typeof TenantRouteWithChildren
+  TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   VerifyPasswordResetRoute: typeof VerifyPasswordResetRoute
   TenantBuilderIdRoute: typeof TenantBuilderIdRoute
@@ -674,6 +778,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/create-account': {
       id: '/create-account'
       path: '/create-account'
@@ -688,11 +806,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-cancellation-policy': {
+      id: '/refund-cancellation-policy'
+      path: '/refund-cancellation-policy'
+      fullPath: '/refund-cancellation-policy'
+      preLoaderRoute: typeof RefundCancellationPolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sign-in': {
@@ -702,11 +841,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tenant': {
       id: '/tenant'
       path: '/tenant'
       fullPath: '/tenant'
       preLoaderRoute: typeof TenantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-and-conditions': {
+      id: '/terms-and-conditions'
+      path: '/terms-and-conditions'
+      fullPath: '/terms-and-conditions'
+      preLoaderRoute: typeof TermsAndConditionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verify-email': {
@@ -861,6 +1014,13 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/admin/templates'
       preLoaderRoute: typeof AdminTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/testimonials': {
+      id: '/admin/testimonials'
+      path: '/testimonials'
+      fullPath: '/admin/testimonials'
+      preLoaderRoute: typeof AdminTestimonialsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/websites': {
@@ -1034,6 +1194,7 @@ interface AdminRouteChildren {
   AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminSupportRoute: typeof AdminSupportRoute
   AdminTemplatesRoute: typeof AdminTemplatesRoute
+  AdminTestimonialsRoute: typeof AdminTestimonialsRoute
   AdminWebsitesRoute: typeof AdminWebsitesRoute
   AdminTenantsIdRoute: typeof AdminTenantsIdRoute
   AdminTenantsIndexRoute: typeof AdminTenantsIndexRoute
@@ -1061,6 +1222,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminSupportRoute: AdminSupportRoute,
   AdminTemplatesRoute: AdminTemplatesRoute,
+  AdminTestimonialsRoute: AdminTestimonialsRoute,
   AdminWebsitesRoute: AdminWebsitesRoute,
   AdminTenantsIdRoute: AdminTenantsIdRoute,
   AdminTenantsIndexRoute: AdminTenantsIndexRoute,
@@ -1114,11 +1276,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcceptInvitationRoute: AcceptInvitationRoute,
   AdminRoute: AdminRouteWithChildren,
+  BlogRoute: BlogRoute,
+  ContactRoute: ContactRoute,
   CreateAccountRoute: CreateAccountRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  HelpRoute: HelpRoute,
   OnboardingRoute: OnboardingRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  RefundCancellationPolicyRoute: RefundCancellationPolicyRoute,
   SignInRoute: SignInRoute,
+  TemplatesRoute: TemplatesRoute,
   TenantRoute: TenantRouteWithChildren,
+  TermsAndConditionsRoute: TermsAndConditionsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   VerifyPasswordResetRoute: VerifyPasswordResetRoute,
   TenantBuilderIdRoute: TenantBuilderIdRoute,

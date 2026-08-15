@@ -91,14 +91,28 @@ function SupportPage() {
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight">Support tickets</h1>
-          <p className="mt-1 text-xs text-slate-500">View, reply, and manage all tenant support requests.</p>
+          <p className="mt-1 text-xs text-slate-500">
+            View, reply, and manage all tenant support requests.
+          </p>
         </div>
         {/* Summary chips */}
         <div className="flex gap-2 flex-wrap">
           {[
-            { label: "Open", key: "open", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-            { label: "In Progress", key: "in_progress", color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
-            { label: "Resolved", key: "resolved", color: "text-slate-400 bg-slate-700/40 border-slate-700" },
+            {
+              label: "Open",
+              key: "open",
+              color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+            },
+            {
+              label: "In Progress",
+              key: "in_progress",
+              color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
+            },
+            {
+              label: "Resolved",
+              key: "resolved",
+              color: "text-slate-400 bg-slate-700/40 border-slate-700",
+            },
           ].map(({ label, key, color }) => (
             <div key={key} className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${color}`}>
               {summary[key] ?? 0} {label}
@@ -117,7 +131,10 @@ function SupportPage() {
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               <input
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="Search tickets..."
                 className="h-9 w-full rounded-lg border border-slate-700 bg-slate-950/60 pl-9 pr-3 text-xs outline-none focus:border-cyan-500"
               />
@@ -135,12 +152,17 @@ function SupportPage() {
                   <button
                     key={tab.value}
                     type="button"
-                    onClick={() => { setStatus(tab.value); setPage(1); }}
+                    onClick={() => {
+                      setStatus(tab.value);
+                      setPage(1);
+                    }}
                     className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[11px] font-medium transition ${status === tab.value ? "bg-slate-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
                   >
                     {tab.label}
                     {tab.count !== undefined && tab.count > 0 && (
-                      <span className={`rounded-full px-1.5 py-0.5 text-[9px] ${status === tab.value ? "bg-slate-800 text-slate-300" : "bg-slate-800/50 text-slate-500"}`}>
+                      <span
+                        className={`rounded-full px-1.5 py-0.5 text-[9px] ${status === tab.value ? "bg-slate-800 text-slate-300" : "bg-slate-800/50 text-slate-500"}`}
+                      >
                         {tab.count}
                       </span>
                     )}
@@ -149,7 +171,10 @@ function SupportPage() {
               </div>
               <select
                 value={priority}
-                onChange={(e) => { setPriority(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setPriority(e.target.value);
+                  setPage(1);
+                }}
                 className="h-8 rounded-lg border border-slate-700 bg-slate-950/60 px-2 text-[11px] text-slate-400"
               >
                 <option value="">Priority</option>
@@ -164,15 +189,26 @@ function SupportPage() {
           {/* List */}
           <div className="flex-1 overflow-y-auto">
             {listQuery.isLoading ? (
-              <Centered icon={<Loader2 className="h-7 w-7 animate-spin text-cyan-400" />} title="Loading tickets..." />
+              <Centered
+                icon={<Loader2 className="h-7 w-7 animate-spin text-cyan-400" />}
+                title="Loading tickets..."
+              />
             ) : listQuery.isError ? (
               <Centered
                 icon={<AlertCircle className="h-7 w-7 text-rose-400" />}
                 title="Could not load tickets"
-                action={<button onClick={() => listQuery.refetch()} className="text-xs text-cyan-400">Retry</button>}
+                action={
+                  <button onClick={() => listQuery.refetch()} className="text-xs text-cyan-400">
+                    Retry
+                  </button>
+                }
               />
             ) : tickets.length === 0 ? (
-              <Centered icon={<Inbox className="h-8 w-8 text-slate-600" />} title="No tickets found" description="Try changing the filters." />
+              <Centered
+                icon={<Inbox className="h-8 w-8 text-slate-600" />}
+                title="No tickets found"
+                description="Try changing the filters."
+              />
             ) : (
               tickets.map((t) => (
                 <TicketRow
@@ -192,13 +228,19 @@ function SupportPage() {
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
                 className="rounded px-2 py-1 text-xs text-slate-400 hover:bg-slate-800 disabled:opacity-30"
-              >← Prev</button>
-              <span className="text-[11px] text-slate-500">{page} / {pagination.pages}</span>
+              >
+                ← Prev
+              </button>
+              <span className="text-[11px] text-slate-500">
+                {page} / {pagination.pages}
+              </span>
               <button
                 disabled={page >= pagination.pages}
                 onClick={() => setPage((p) => p + 1)}
                 className="rounded px-2 py-1 text-xs text-slate-400 hover:bg-slate-800 disabled:opacity-30"
-              >Next →</button>
+              >
+                Next →
+              </button>
             </div>
           )}
         </div>
@@ -227,7 +269,15 @@ function SupportPage() {
 }
 
 // ── Ticket Row ────────────────────────────────────────────────
-function TicketRow({ ticket, active, onClick }: { ticket: TicketSummary; active: boolean; onClick: () => void }) {
+function TicketRow({
+  ticket,
+  active,
+  onClick,
+}: {
+  ticket: TicketSummary;
+  active: boolean;
+  onClick: () => void;
+}) {
   const priorityColors: Record<string, string> = {
     urgent: "text-rose-400 bg-rose-500/10",
     high: "text-orange-400 bg-orange-500/10",
@@ -244,7 +294,10 @@ function TicketRow({ ticket, active, onClick }: { ticket: TicketSummary; active:
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-slate-200">{ticket.subject}</p>
-          <p className="mt-0.5 text-[11px] text-slate-500">{ticket.ticketNumber} · {ticket.tenant?.businessName || ticket.tenant?.email || "Unknown tenant"}</p>
+          <p className="mt-0.5 text-[11px] text-slate-500">
+            {ticket.ticketNumber} ·{" "}
+            {ticket.tenant?.businessName || ticket.tenant?.email || "Unknown tenant"}
+          </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <StatusBadge status={ticket.status} />
@@ -252,8 +305,14 @@ function TicketRow({ ticket, active, onClick }: { ticket: TicketSummary; active:
       </div>
       <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">{ticket.description}</p>
       <div className="mt-2.5 flex items-center justify-between gap-2">
-        <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${priorityColors[ticket.priority] ?? "text-slate-400"}`}>{ticket.priority}</span>
-        <span className="text-[10px] text-slate-600">{formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}</span>
+        <span
+          className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${priorityColors[ticket.priority] ?? "text-slate-400"}`}
+        >
+          {ticket.priority}
+        </span>
+        <span className="text-[10px] text-slate-600">
+          {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
+        </span>
       </div>
     </button>
   );
@@ -264,7 +323,9 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
   const queryClient = useQueryClient();
   const [reply, setReply] = useState("");
   const [isInternal, setIsInternal] = useState(false);
-  const [attachments, setAttachments] = useState<{ url: string; filename: string; size: number }[]>([]);
+  const [attachments, setAttachments] = useState<{ url: string; filename: string; size: number }[]>(
+    [],
+  );
   const [uploading, setUploading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -308,15 +369,17 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
   };
 
   const replyMutation = useMutation({
-    mutationFn: () => replySupportTicket(ticketId, { content: reply.trim(), isInternal, attachments }),
+    mutationFn: () =>
+      replySupportTicket(ticketId, { content: reply.trim(), isInternal, attachments }),
     onSuccess: (data) => {
       setReply("");
       setIsInternal(false);
       setAttachments([]);
       // Optimistically update the detail
-      queryClient.setQueryData(["admin-support-detail", ticketId], data.ticket
-        ? { ticket: data.ticket }
-        : (old: any) => old);
+      queryClient.setQueryData(
+        ["admin-support-detail", ticketId],
+        data.ticket ? { ticket: data.ticket } : (old: any) => old,
+      );
       queryClient.invalidateQueries({ queryKey: ["admin-support-detail", ticketId] });
       onUpdated();
       toast.success(isInternal ? "Internal note added" : "Reply sent");
@@ -355,7 +418,12 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
   });
 
   if (detailQuery.isLoading) {
-    return <Centered icon={<Loader2 className="h-8 w-8 animate-spin text-cyan-400" />} title="Loading conversation..." />;
+    return (
+      <Centered
+        icon={<Loader2 className="h-8 w-8 animate-spin text-cyan-400" />}
+        title="Loading conversation..."
+      />
+    );
   }
 
   if (detailQuery.isError || !ticket) {
@@ -363,7 +431,11 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
       <Centered
         icon={<AlertCircle className="h-8 w-8 text-rose-400" />}
         title="Could not load ticket"
-        action={<button onClick={() => detailQuery.refetch()} className="text-sm text-cyan-400">Retry</button>}
+        action={
+          <button onClick={() => detailQuery.refetch()} className="text-sm text-cyan-400">
+            Retry
+          </button>
+        }
       />
     );
   }
@@ -382,9 +454,9 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
             </div>
             <p className="mt-1 text-xs text-slate-500">
               {ticket.ticketNumber}
-              {ticket.category && <> · {ticket.category}</>}
-              · {ticket.tenant?.businessName || ticket.tenant?.email || "Unknown tenant"}
-              · {format(new Date(ticket.createdAt), "PPp")}
+              {ticket.category && <> · {ticket.category}</>}·{" "}
+              {ticket.tenant?.businessName || ticket.tenant?.email || "Unknown tenant"}·{" "}
+              {format(new Date(ticket.createdAt), "PPp")}
             </p>
           </div>
 
@@ -431,7 +503,11 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
                 onClick={() => resolveMutation.mutate()}
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 text-xs font-medium text-emerald-400 transition hover:bg-emerald-500/20 disabled:opacity-50"
               >
-                {resolveMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <CheckCircle2 className="h-3 w-3" />}
+                {resolveMutation.isPending ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="h-3 w-3" />
+                )}
                 Resolve
               </button>
             )}
@@ -440,11 +516,23 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
 
         {/* Tenant info strip */}
         <div className="mt-3 flex flex-wrap gap-4 rounded-lg bg-slate-900/50 px-3 py-2 text-[11px] text-slate-500">
-          <span className="flex items-center gap-1.5"><Users className="h-3 w-3" />{ticket.tenant?.email ?? "—"}</span>
-          <span className="flex items-center gap-1.5"><Ticket className="h-3 w-3" />{ticket.ticketNumber}</span>
-          <span className="flex items-center gap-1.5"><Clock3 className="h-3 w-3" />Updated {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}</span>
+          <span className="flex items-center gap-1.5">
+            <Users className="h-3 w-3" />
+            {ticket.tenant?.email ?? "—"}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Ticket className="h-3 w-3" />
+            {ticket.ticketNumber}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Clock3 className="h-3 w-3" />
+            Updated {formatDistanceToNow(new Date(ticket.updatedAt), { addSuffix: true })}
+          </span>
           {ticket.replyCount > 0 && (
-            <span className="flex items-center gap-1.5"><MessageSquare className="h-3 w-3" />{ticket.replyCount} {ticket.replyCount === 1 ? "reply" : "replies"}</span>
+            <span className="flex items-center gap-1.5">
+              <MessageSquare className="h-3 w-3" />
+              {ticket.replyCount} {ticket.replyCount === 1 ? "reply" : "replies"}
+            </span>
           )}
         </div>
       </div>
@@ -464,7 +552,11 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
         {ticket.replies.map((r) => (
           <ChatBubble
             key={r.id}
-            author={r.author.role === "admin" ? (r.author.name || "WebMintra Support") : (ticket.tenant?.businessName || ticket.tenant?.email || "Tenant")}
+            author={
+              r.author.role === "admin"
+                ? r.author.name || "WebMintra Support"
+                : ticket.tenant?.businessName || ticket.tenant?.email || "Tenant"
+            }
             content={r.content}
             date={r.createdAt}
             isAdmin={r.author.role === "admin"}
@@ -484,19 +576,35 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
             This ticket is closed. Change the status to reply.
           </div>
         ) : (
-          <form onSubmit={(e) => { e.preventDefault(); if (reply.trim() || attachments.length > 0) replyMutation.mutate(); }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (reply.trim() || attachments.length > 0) replyMutation.mutate();
+            }}
+          >
             <textarea
               value={reply}
               onChange={(e) => setReply(e.target.value)}
               maxLength={5000}
-              placeholder={isInternal ? "Write an internal note (not visible to tenant)..." : "Write a reply to the tenant..."}
+              placeholder={
+                isInternal
+                  ? "Write an internal note (not visible to tenant)..."
+                  : "Write a reply to the tenant..."
+              }
               className={`h-24 w-full resize-none rounded-lg border p-3 text-sm outline-none transition ${isInternal ? "border-amber-700/50 bg-amber-950/20 text-amber-100 placeholder:text-amber-900/60 focus:border-amber-600" : "border-slate-700 bg-slate-950 text-slate-100 focus:border-cyan-500"}`}
             />
             {attachments.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {attachments.map((file, i) => (
-                  <div key={i} className="group relative rounded border border-slate-700 bg-slate-900 p-1">
-                    <img src={file.url} alt={file.filename} className="h-10 w-10 object-cover opacity-80" />
+                  <div
+                    key={i}
+                    className="group relative rounded border border-slate-700 bg-slate-900 p-1"
+                  >
+                    <img
+                      src={file.url}
+                      alt={file.filename}
+                      className="h-10 w-10 object-cover opacity-80"
+                    />
                     <button
                       type="button"
                       onClick={() => setAttachments((prev) => prev.filter((_, idx) => idx !== i))}
@@ -514,10 +622,18 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
                   onClick={() => setIsInternal(!isInternal)}
                   className={`relative h-4 w-7 rounded-full transition ${isInternal ? "bg-amber-500" : "bg-slate-700"}`}
                 >
-                  <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${isInternal ? "translate-x-3.5" : "translate-x-0.5"}`} />
+                  <span
+                    className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${isInternal ? "translate-x-3.5" : "translate-x-0.5"}`}
+                  />
                 </div>
-                <ShieldAlert className={`h-3.5 w-3.5 ${isInternal ? "text-amber-400" : "text-slate-600"}`} />
-                {isInternal ? <span className="font-medium text-amber-400">Internal note</span> : "Mark as internal note"}
+                <ShieldAlert
+                  className={`h-3.5 w-3.5 ${isInternal ? "text-amber-400" : "text-slate-600"}`}
+                />
+                {isInternal ? (
+                  <span className="font-medium text-amber-400">Internal note</span>
+                ) : (
+                  "Mark as internal note"
+                )}
               </label>
               <div className="flex items-center gap-3">
                 <input
@@ -533,16 +649,28 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
                   disabled={uploading || attachments.length >= 3}
                   className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-cyan-400 disabled:opacity-50"
                 >
-                  {uploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Paperclip className="h-3.5 w-3.5" />}
+                  {uploading ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Paperclip className="h-3.5 w-3.5" />
+                  )}
                   {uploading ? "Uploading..." : "Attach"}
                 </button>
                 <span className="text-[11px] text-slate-600">{reply.length}/5000</span>
                 <button
                   type="submit"
-                  disabled={(!reply.trim() && attachments.length === 0) || replyMutation.isPending || uploading}
+                  disabled={
+                    (!reply.trim() && attachments.length === 0) ||
+                    replyMutation.isPending ||
+                    uploading
+                  }
                   className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-semibold transition disabled:opacity-40 ${isInternal ? "bg-amber-500 text-amber-950 hover:bg-amber-400" : "bg-cyan-500 text-cyan-950 hover:bg-cyan-400"}`}
                 >
-                  {replyMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                  {replyMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <Send className="h-3.5 w-3.5" />
+                  )}
                   {replyMutation.isPending ? "Sending..." : isInternal ? "Add note" : "Send reply"}
                 </button>
               </div>
@@ -556,7 +684,12 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
 
 // ── Chat Bubble ───────────────────────────────────────────────
 function ChatBubble({
-  author, content, date, isAdmin, isInternal, attachments,
+  author,
+  content,
+  date,
+  isAdmin,
+  isInternal,
+  attachments,
 }: {
   author: string;
   content: string;
@@ -588,7 +721,9 @@ function ChatBubble({
         {content}
       </div>
       {attachments && attachments.length > 0 && (
-        <div className={`mt-2 flex flex-wrap gap-2 max-w-[85%] ${isAdmin ? "justify-end" : "justify-start"}`}>
+        <div
+          className={`mt-2 flex flex-wrap gap-2 max-w-[85%] ${isAdmin ? "justify-end" : "justify-start"}`}
+        >
           {attachments.map((file, i) => (
             <a
               key={i}
@@ -597,7 +732,11 @@ function ChatBubble({
               rel="noreferrer"
               className="group relative block overflow-hidden rounded-lg border border-slate-700 bg-slate-900"
             >
-              <img src={file.url} alt={file.filename} className="h-20 w-auto object-cover opacity-90 transition group-hover:opacity-100" />
+              <img
+                src={file.url}
+                alt={file.filename}
+                className="h-20 w-auto object-cover opacity-90 transition group-hover:opacity-100"
+              />
             </a>
           ))}
         </div>
@@ -616,7 +755,9 @@ function StatusBadge({ status }: { status: TicketStatus }) {
     closed: "bg-slate-900 text-slate-600",
   };
   return (
-    <span className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold uppercase ${styles[status] ?? styles.open}`}>
+    <span
+      className={`shrink-0 rounded px-2 py-0.5 text-[10px] font-semibold uppercase ${styles[status] ?? styles.open}`}
+    >
       {status.replace(/_/g, " ")}
     </span>
   );
@@ -624,7 +765,10 @@ function StatusBadge({ status }: { status: TicketStatus }) {
 
 // ── Centered Empty / Loading ──────────────────────────────────
 function Centered({
-  icon, title, description, action,
+  icon,
+  title,
+  description,
+  action,
 }: {
   icon: React.ReactNode;
   title: string;

@@ -95,7 +95,8 @@ router.get("/", async (req, res, next) => {
 
     // Search
     if (req.query.search && typeof req.query.search === "string") {
-      const q = req.query.search.trim();
+      const { escapeRegex } = await import("../../lib/validate.js");
+      const q = escapeRegex(req.query.search.trim());
       filter.$or = [
         { name: { $regex: q, $options: "i" } },
         { email: { $regex: q, $options: "i" } },

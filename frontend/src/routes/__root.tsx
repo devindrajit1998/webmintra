@@ -134,8 +134,8 @@ function RootApp() {
     if (settings?.["brand.faviconUrl"]) {
       let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
       if (!link) {
-        link = document.createElement('link');
-        link.rel = 'icon';
+        link = document.createElement("link");
+        link.rel = "icon";
         document.head.appendChild(link);
       }
       link.href = settings["brand.faviconUrl"];
@@ -144,7 +144,7 @@ function RootApp() {
 
   const hostname = typeof window !== "undefined" ? window.location.hostname : "";
   const isSubdomain = hostname
-    ? hostname.includes("localhost") 
+    ? hostname.includes("localhost")
       ? hostname.split(".")[0] !== "localhost" && hostname.split(".")[0] !== "app"
       : hostname !== "webmintra.cloud" && hostname !== "app.webmintra.cloud"
     : false;

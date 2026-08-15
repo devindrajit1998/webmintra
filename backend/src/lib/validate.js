@@ -118,3 +118,34 @@ export function parseSort(query, allowed = ["createdAt", "updatedAt"]) {
 export function stripUndefined(obj) {
   return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== undefined));
 }
+
+/**
+ * Escapes regex special characters to prevent ReDoS / query injection in MongoDB.
+ */
+export function escapeRegex(str) {
+  if (typeof str !== "string") return "";
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Sanitizes arbitrary form submission JSON data to prevent Stored XSS / memory exhaustion.
+ */
+export function sanitizeFormData(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return {};
+  const safe = {};
+  const keys = Object.keys(body).slice(0, 50); // cap max fields
+  for (const k of keys) {
+    // Sanitize key name
+    const safeKey = String(k).slice(0, 80).replace(/[^\w\s-]/g, "").trim();
+    if (!safeKey) continue;
+    const v = body[k];
+    if (typeof v === "string") {
+      safe[safeKey] = v.slice(0, 5000);
+    } else if (typeof v === "number" && Number.isFinite(v)) {
+      safe[safeKey] = v;
+    } else if (typeof v === "boolean") {
+      safe[safeKey] = v;
+    }
+  }
+  return safe;
+}

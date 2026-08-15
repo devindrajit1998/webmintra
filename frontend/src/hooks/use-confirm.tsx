@@ -12,14 +12,22 @@ import {
 
 export function useConfirm() {
   const [promise, setPromise] = useState<{ resolve: (value: boolean) => void } | null>(null);
-  const [options, setOptions] = useState<{ title: string; message: string; confirmText?: string; cancelText?: string; } | null>(null);
+  const [options, setOptions] = useState<{
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+  } | null>(null);
 
-  const confirm = useCallback((opts: { title: string; message: string; confirmText?: string; cancelText?: string; }) => {
-    setOptions(opts);
-    return new Promise<boolean>((resolve) => {
-      setPromise({ resolve });
-    });
-  }, []);
+  const confirm = useCallback(
+    (opts: { title: string; message: string; confirmText?: string; cancelText?: string }) => {
+      setOptions(opts);
+      return new Promise<boolean>((resolve) => {
+        setPromise({ resolve });
+      });
+    },
+    [],
+  );
 
   const handleClose = useCallback(() => {
     setPromise(null);
@@ -44,8 +52,12 @@ export function useConfirm() {
           <AlertDialogDescription>{options?.message}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>{options?.cancelText || "Cancel"}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>{options?.confirmText || "Continue"}</AlertDialogAction>
+          <AlertDialogCancel onClick={handleCancel}>
+            {options?.cancelText || "Cancel"}
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirm}>
+            {options?.confirmText || "Continue"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
