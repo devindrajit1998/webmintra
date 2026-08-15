@@ -1,22 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-<<<<<<< HEAD
-import { getTemplates, importTemplate, updateTemplate, deleteTemplate } from "@/lib/admin-api";
-import { TemplateAnalysis, EditorState } from "@/lib/template-engine/types";
-import { analyzeTemplate } from "@/lib/template-engine/parser";
-import { renderPage } from "@/lib/template-engine/render";
-import { Editor as InlineVisualEditor } from "@/components/engine/Editor";
-import { ImportWizard } from "@/components/engine/ImportWizard";
-import { LayoutTemplate, Upload, Trash2, CheckCircle2, Eye, X, Monitor, Tablet, Smartphone, Pencil, Loader2, Save, Settings, FileCode2, Plus, Sparkles } from "lucide-react";
-import MonacoEditor from "@monaco-editor/react";
-=======
 import { getTemplates, importTemplate, updateTemplate, deleteTemplate, getTemplateCategories } from "@/lib/admin-api";
 import { TemplateAnalysis, EditorState } from "@/lib/template-engine/types";
-import { ImportWizard } from "@/components/engine/ImportWizard";
-import { Editor as InlineVisualEditor } from "@/components/engine/Editor";
 import { analyzeTemplate } from "@/lib/template-engine/parser";
 import { renderPage } from "@/lib/template-engine/render";
+import { Editor as InlineVisualEditor } from "@/components/engine/Editor";
+import { ImportWizard } from "@/components/engine/ImportWizard";
 import { TemplateCategoriesManager } from "@/components/engine/TemplateCategoriesManager";
 import {
   LayoutTemplate,
@@ -36,8 +26,7 @@ import {
   Plus,
   Sparkles,
 } from "lucide-react";
-import Editor from "@monaco-editor/react";
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
+import MonacoEditor from "@monaco-editor/react";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { toast } from "sonner";
 import {
@@ -133,7 +122,6 @@ function AdminTemplatesPage() {
   const [templateAnalysis, setTemplateAnalysis] = useState<TemplateAnalysis | null>(null);
 
   const openVisualEdit = (template: any) => {
-<<<<<<< HEAD
     try {
       const pages = [];
       const html = template.htmlContent || "<!DOCTYPE html><html><head><title>Template</title></head><body><main><h1>Welcome</h1></main></body></html>";
@@ -151,16 +139,6 @@ function AdminTemplatesPage() {
     } catch (err: any) {
       toast.error("Failed to parse template: " + (err?.message || "Unknown error"));
     }
-=======
-    const pages = [];
-    if (template.htmlContent) pages.push({ name: "index.html", content: template.htmlContent });
-    if (template.pages?.length) {
-      pages.push(...template.pages.map((p: any) => ({ name: p.name, content: p.htmlContent })));
-    }
-    const analysis = analyzeTemplate(pages);
-    setTemplateAnalysis(analysis);
-    setInlineVisualTemplate(template);
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
   };
 
   const handleVisualSave = (state: EditorState) => {
@@ -475,19 +453,10 @@ function AdminTemplatesPage() {
                     )}
                   </div>
                 )}
-<<<<<<< HEAD
-                
                 <div className="mt-auto flex flex-col gap-2">
                   <button
                     onClick={() => openVisualEdit(template)}
                     className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-teal-500 py-2 text-xs font-bold text-slate-950 shadow-md shadow-cyan-500/20 transition hover:from-cyan-400 hover:to-teal-400"
-=======
-
-                <div className="mt-auto flex flex-col gap-2">
-                  <button
-                    onClick={() => openVisualEdit(template)}
-                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/15 py-2 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500 hover:text-slate-950"
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
                   >
                     <Sparkles className="h-3.5 w-3.5" /> Edit Inline (Visual)
                   </button>
@@ -495,20 +464,13 @@ function AdminTemplatesPage() {
                     <button
                       onClick={() => openEdit(template)}
                       className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/50 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
-<<<<<<< HEAD
                       title="Edit HTML Source Code"
-=======
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
                     >
                       <Pencil className="h-3.5 w-3.5" /> Code
                     </button>
                     <button
                       onClick={() => setPreviewTemplate(template)}
-<<<<<<< HEAD
                       className="flex items-center justify-center gap-1.5 rounded-lg border border-cyan-500/20 bg-cyan-500/10 py-1.5 text-xs font-semibold text-cyan-400 transition hover:bg-cyan-500 hover:text-cyan-950"
-=======
-                      className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/30 py-1.5 text-xs font-semibold text-slate-400 transition hover:bg-slate-700 hover:text-white"
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
                     >
                       <Eye className="h-3.5 w-3.5" /> Preview
                     </button>
@@ -529,10 +491,7 @@ function AdminTemplatesPage() {
         <div className="fixed inset-0 z-[100] flex flex-col bg-background animate-in fade-in duration-200">
           <InlineVisualEditor
             analysis={templateAnalysis}
-<<<<<<< HEAD
             isAdmin={true}
-=======
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
             onExit={() => {
               setInlineVisualTemplate(null);
               setTemplateAnalysis(null);
@@ -542,11 +501,7 @@ function AdminTemplatesPage() {
           />
         </div>
       )}
-<<<<<<< HEAD
-      
-=======
 
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
       {previewTemplate && (
         <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="flex justify-between items-center mb-4">
@@ -633,13 +588,8 @@ function AdminTemplatesPage() {
               >
                 <Settings className="h-4 w-4" /> Metadata
               </button>
-<<<<<<< HEAD
-              <button 
-                onClick={() => updateMutation.mutate({ id: editTemplate._id, data: editData })} 
-=======
               <button
                 onClick={() => updateMutation.mutate({ id: editTemplate._id, data: editData })}
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
                 disabled={updateMutation.isPending}
                 className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg bg-cyan-500 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400 disabled:opacity-50 min-w-[120px]"
               >

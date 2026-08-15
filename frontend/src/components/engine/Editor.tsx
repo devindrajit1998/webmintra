@@ -807,87 +807,6 @@ function TreeView({
   );
 }
 
-<<<<<<< HEAD
-const FA_ICONS = [
-  // Common & UI
-  "fa-solid fa-check", "fa-solid fa-check-circle", "fa-solid fa-xmark", "fa-solid fa-circle-xmark",
-  "fa-solid fa-arrow-right", "fa-solid fa-arrow-left", "fa-solid fa-arrow-up", "fa-solid fa-arrow-down",
-  "fa-solid fa-chevron-right", "fa-solid fa-chevron-left", "fa-solid fa-chevron-up", "fa-solid fa-chevron-down",
-  "fa-solid fa-bars", "fa-solid fa-ellipsis", "fa-solid fa-magnifying-glass", "fa-solid fa-plus", "fa-solid fa-minus",
-  "fa-solid fa-gear", "fa-solid fa-sliders", "fa-solid fa-filter", "fa-solid fa-bell", "fa-solid fa-circle-info",
-  "fa-solid fa-triangle-exclamation", "fa-solid fa-circle-question", "fa-solid fa-shield-halved", "fa-solid fa-lock",
-  "fa-solid fa-unlock", "fa-solid fa-key", "fa-solid fa-eye", "fa-solid fa-eye-slash", "fa-solid fa-trash",
-  "fa-solid fa-pen", "fa-solid fa-pen-to-square", "fa-solid fa-floppy-disk", "fa-solid fa-share-nodes",
-
-  // Business & Finance
-  "fa-solid fa-briefcase", "fa-solid fa-building", "fa-solid fa-chart-line", "fa-solid fa-chart-pie",
-  "fa-solid fa-chart-column", "fa-solid fa-dollar-sign", "fa-solid fa-euro-sign", "fa-solid fa-sterling-sign",
-  "fa-solid fa-indian-rupee-sign", "fa-solid fa-credit-card", "fa-solid fa-wallet", "fa-solid fa-coins",
-  "fa-solid fa-receipt", "fa-solid fa-calculator", "fa-solid fa-handshake", "fa-solid fa-award",
-  "fa-solid fa-trophy", "fa-solid fa-medal", "fa-solid fa-crown", "fa-solid fa-gem", "fa-solid fa-scale-balanced",
-
-  // Communication & Contact
-  "fa-solid fa-phone", "fa-solid fa-envelope", "fa-solid fa-envelope-open", "fa-solid fa-message",
-  "fa-solid fa-comments", "fa-solid fa-paper-plane", "fa-solid fa-location-dot", "fa-solid fa-map-pin",
-  "fa-solid fa-map", "fa-solid fa-globe", "fa-solid fa-headset", "fa-solid fa-address-book",
-
-  // Media & Photography
-  "fa-solid fa-camera", "fa-solid fa-camera-retro", "fa-solid fa-image", "fa-solid fa-images",
-  "fa-solid fa-video", "fa-solid fa-film", "fa-solid fa-play", "fa-solid fa-pause", "fa-solid fa-volume-high",
-  "fa-solid fa-music", "fa-solid fa-microphone", "fa-solid fa-clapperboard", "fa-solid fa-palette",
-
-  // Tech & Devices
-  "fa-solid fa-laptop", "fa-solid fa-desktop", "fa-solid fa-mobile-screen", "fa-solid fa-tablet-screen-button",
-  "fa-solid fa-server", "fa-solid fa-database", "fa-solid fa-code", "fa-solid fa-terminal",
-  "fa-solid fa-wifi", "fa-solid fa-signal", "fa-solid fa-cloud", "fa-solid fa-cloud-arrow-up",
-  "fa-solid fa-cloud-arrow-down", "fa-solid fa-bolt", "fa-solid fa-plug", "fa-solid fa-battery-full",
-  "fa-solid fa-microchip", "fa-solid fa-robot", "fa-solid fa-network-wired",
-
-  // People & User
-  "fa-solid fa-user", "fa-solid fa-users", "fa-solid fa-user-group", "fa-solid fa-user-plus",
-  "fa-solid fa-user-tie", "fa-solid fa-user-shield", "fa-solid fa-circle-user", "fa-solid fa-heart",
-  "fa-solid fa-thumbs-up", "fa-solid fa-thumbs-down", "fa-solid fa-star", "fa-solid fa-face-smile",
-
-  // Shopping & Ecommerce
-  "fa-solid fa-cart-shopping", "fa-solid fa-bag-shopping", "fa-solid fa-basket-shopping", "fa-solid fa-tag",
-  "fa-solid fa-tags", "fa-solid fa-box", "fa-solid fa-boxes-stacked", "fa-solid fa-truck", "fa-solid fa-truck-fast",
-  "fa-solid fa-store", "fa-solid fa-barcode", "fa-solid fa-gift",
-
-  // Travel, Food & Lifestyle
-  "fa-solid fa-calendar", "fa-solid fa-calendar-days", "fa-solid fa-clock", "fa-solid fa-hourglass",
-  "fa-solid fa-car", "fa-solid fa-plane", "fa-solid fa-rocket", "fa-solid fa-bicycle", "fa-solid fa-hotel",
-  "fa-solid fa-utensils", "fa-solid fa-mug-hot", "fa-solid fa-wine-glass", "fa-solid fa-burger",
-  "fa-solid fa-dumbbell", "fa-solid fa-tree", "fa-solid fa-fire", "fa-solid fa-droplet", "fa-solid fa-sun",
-  "fa-solid fa-moon", "fa-solid fa-leaf", "fa-solid fa-compass", "fa-solid fa-lightbulb",
-
-  // Social & Brands
-  "fa-brands fa-facebook", "fa-brands fa-instagram", "fa-brands fa-x-twitter", "fa-brands fa-twitter",
-  "fa-brands fa-linkedin", "fa-brands fa-youtube", "fa-brands fa-tiktok", "fa-brands fa-pinterest",
-  "fa-brands fa-whatsapp", "fa-brands fa-telegram", "fa-brands fa-github", "fa-brands fa-google",
-  "fa-brands fa-apple", "fa-brands fa-windows", "fa-brands fa-android", "fa-brands fa-spotify",
-  "fa-brands fa-discord", "fa-brands fa-slack", "fa-brands fa-dribbble", "fa-brands fa-behance"
-];
-
-function FontAwesomeIconPicker({
-  currentClass,
-  onSelect,
-}: {
-  currentClass: string;
-  onSelect: (className: string) => void;
-}) {
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<string>("all");
-
-  const filtered = FA_ICONS.filter((cls) => {
-    const cleanName = cls.replace(/^fa-(solid|brands|regular)\s+fa-/, "");
-    const matchesSearch = cleanName.toLowerCase().includes(search.toLowerCase().trim());
-    if (!matchesSearch) return false;
-    if (category === "brands") return cls.startsWith("fa-brands");
-    if (category === "solid") return cls.startsWith("fa-solid");
-    return true;
-  });
-
-=======
 function FontAwesomeIconPicker({
   selectedClass,
   onChange,
@@ -1037,72 +956,7 @@ function FontAwesomeIconPicker({
   );
 }
 
-function StyleControls({ edit, patch, id }: { edit: ElementEdit; patch: (id: string, p: ElementEdit) => void; id: string }) {
-  const s = edit.style ?? {};
-  const num = (key: string, fallback: number) => parseFloat(String(s[key] ?? fallback));
-  const set = (key: string, value: string) => patch(id, { style: { [key]: value } });
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
-  return (
-    <div className="rounded-xl border border-border bg-elevated/40 p-3 space-y-2.5">
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search 400+ FontAwesome icons..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-lg border border-border bg-background py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
-        />
-      </div>
 
-      {/* Category Pills */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-1 text-[10px]">
-        {[
-          ["all", "All Icons"],
-          ["solid", "Solid / UI"],
-          ["brands", "Brands & Social"],
-        ].map(([cat, label]) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setCategory(cat)}
-            className={cn(
-              "whitespace-nowrap rounded-md px-2 py-1 font-medium transition",
-              category === cat ? "bg-primary text-primary-foreground font-semibold" : "bg-card text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Icons Grid */}
-      <div className="grid grid-cols-6 gap-1.5 max-h-48 overflow-y-auto p-1 border border-border/60 rounded-lg bg-background/50">
-        {filtered.map((cls) => {
-          const isSelected = currentClass === cls || currentClass.includes(cls.split(" ")[1] || "___");
-          return (
-            <button
-              key={cls}
-              type="button"
-              onClick={() => onSelect(cls)}
-              title={cls}
-              className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-lg border text-sm transition hover:scale-110 hover:border-primary hover:bg-primary/10",
-                isSelected ? "border-cyan-500 bg-cyan-500/20 text-cyan-400 font-bold" : "border-border/80 text-foreground bg-card"
-              )}
-            >
-              <i className={cls} />
-            </button>
-          );
-        })}
-      </div>
-      <p className="text-[10px] text-muted-foreground text-center">
-        Showing {filtered.length} icons · Click any icon to apply
-      </p>
-    </div>
-  );
-}
 
 function MediaLibraryModal({
   websiteId,
@@ -1525,7 +1379,7 @@ function ElementPanel({
           <SectionTitle hint={field?.role}>Image</SectionTitle>
           <ImagePreview src={edit.src ?? field?.value ?? ""} alt={edit.alt ?? field?.attrs["alt"] ?? field?.label ?? "Image preview"} />
           <TextInput label="Source URL" value={edit.src ?? field?.value ?? ""} onChange={(v) => patch(selected, { src: v })} />
-          
+
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
@@ -1599,9 +1453,6 @@ function ElementPanel({
         </div>
       ) : null}
 
-<<<<<<< HEAD
-      {kind === "svg" || kind === "badge" || (field?.role === "icon") || (field?.tag === "i") ? (
-=======
       {kind === "icon" ? (
         <FontAwesomeIconPicker
           selectedClass={edit.className ?? field?.attrs?.["className"] ?? field?.value ?? "fa-solid fa-star"}
@@ -1609,14 +1460,13 @@ function ElementPanel({
         />
       ) : null}
 
-      {kind === "svg" ? (
->>>>>>> 4e632640f24d5987a7280e55e1710e37d0190144
+      {kind === "svg" || kind === "badge" || (field?.role === "icon") || (field?.tag === "i") ? (
         <div className="space-y-3">
           <SectionTitle>FontAwesome Icon Library</SectionTitle>
           <FontAwesomeIconPicker
-            currentClass={edit.iconClass || field?.value || ""}
-            onSelect={(cls) => {
-              patch(selected, { iconClass: cls, text: "" });
+            selectedClass={edit.iconClass || edit.className || field?.value || "fa-solid fa-star"}
+            onChange={(cls) => {
+              patch(selected, { iconClass: cls, className: cls, text: "" });
               toast.success(`Icon set to ${cls}`);
             }}
           />
