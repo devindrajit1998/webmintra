@@ -4,11 +4,12 @@ import { establishTenantContext, requireAuthenticatedUser, requireRole } from ".
 import { Website } from "../models/Website.js";
 import { FormSubmission } from "../models/FormSubmission.js";
 import { StorageItem } from "../models/StorageItem.js";
-import { findCatalogTemplate } from "../lib/template-catalog.js";
+import { Template } from "../models/Template.js";
 import { ownedWebsiteScope, tenantScope } from "../lib/tenant-scope.js";
 import { resolveTenantSeoEntitlements, sanitizeDraftSeo } from "../lib/tenant-seo-entitlements.js";
 import multer from "multer";
 import { imagekit } from "../lib/imagekit.js";
+import { checkStorageLimit } from "../services/limits.js";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -64,22 +65,35 @@ router.post("/", async (request, response, next) => {
   try {
     if (!request.user.onboardingCompletedAt)
       return response.status(403).json({ message: "Complete onboarding before creating a website." });
+
+    const entitlements = await resolveTenantSeoEntitlements(request.user);
+    if (entitlements.limits.websites > 0) {
+      const count = await Website.countDocuments(tenantScope(request.user, "owner"));
+      if (count >= entitlements.limits.websites) {
+        return response.status(403).json({ message: `You have reached the maximum of ${entitlements.limits.websites} websites allowed on your plan. Please upgrade to create more.` });
+      }
+    }
+
     const templateId = request.body?.templateId;
-    const template = typeof templateId === "string" ? findCatalogTemplate(templateId) : undefined;
-    const name = request.user.business?.name || template?.name;
-    if (
-      typeof name !== "string" ||
-      !name ||
-      name.length > 120 ||
-      !template
-    )
-      return response.status(400).json({ message: "Provide a valid website and template name." });
+    if (typeof templateId !== "string" || !mongoose.isObjectIdOrHexString(templateId)) {
+      return response.status(400).json({ message: "Select a valid template." });
+    }
+
+    const template = await Template.findOne({ _id: templateId, isActive: true })
+      .select("title")
+      .lean();
+    if (!template) return response.status(404).json({ message: "Template not found." });
+
+    const name = request.user.business?.name || template.title;
+    if (typeof name !== "string" || !name.trim() || name.length > 120) {
+      return response.status(400).json({ message: "Provide a valid website name." });
+    }
 
     const website = await Website.create({
       owner: request.user._id,
-      name,
-      templateId: template.id,
-      templateName: template.name,
+      name: name.trim(),
+      templateId: template._id,
+      templateName: template.title,
     });
     return response.status(201).json({ website: websiteResponse(website) });
   } catch (error) {
@@ -97,17 +111,8 @@ router.get("/:websiteId", async (request, response, next) => {
 
     if (!website) return response.status(404).json({ message: "Website not found." });
 
-    // We also need the raw html content of the template
-    let htmlContent = "";
-    let pages = [];
-    if (website.templateId && website.templateId.htmlContent) {
-      htmlContent = website.templateId.htmlContent;
-      pages = website.templateId.pages || [];
-    } else {
-      // Fallback for hardcoded catalog
-      const template = findCatalogTemplate(website.templateId);
-      if (template) htmlContent = template.html;
-    }
+    const htmlContent = website.templateId?.htmlContent || "";
+    const pages = website.templateId?.pages || [];
 
     const entitlements = await resolveTenantSeoEntitlements(request.user);
     return response.json({
@@ -132,9 +137,39 @@ router.get("/:websiteId/forms", async (request, response, next) => {
     const forms = await FormSubmission.find({
       websiteId: request.params.websiteId,
       ...tenantScope(request.user, "tenantId"),
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
     return response.json({ forms });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.delete("/:websiteId/forms/:submissionId", async (request, response, next) => {
+  try {
+    if (!mongoose.isObjectIdOrHexString(request.params.submissionId)) {
+      return response.status(404).json({ message: "Form submission not found." });
+    }
+
+    const scope = ownedWebsiteScope(request.user, request.params.websiteId);
+    if (!scope) return response.status(404).json({ message: "Website not found." });
+
+    const website = await Website.exists(scope);
+    if (!website) return response.status(404).json({ message: "Website not found." });
+
+    const submission = await FormSubmission.findOneAndDelete({
+      _id: request.params.submissionId,
+      websiteId: request.params.websiteId,
+      ...tenantScope(request.user, "tenantId"),
+    });
+
+    if (!submission) {
+      return response.status(404).json({ message: "Form submission not found." });
+    }
+
+    return response.json({ message: "Form submission deleted successfully." });
   } catch (error) {
     return next(error);
   }
@@ -181,7 +216,15 @@ router.put("/:websiteId/draft", async (request, response, next) => {
 
     const { draftState } = request.body;
     if (!draftState) return response.status(400).json({ message: "Draft state is required." });
+    
     const entitlements = await resolveTenantSeoEntitlements(request.user);
+    
+    if (entitlements.limits.pagesPerWebsite > 0 && draftState.pages && Array.isArray(draftState.pages)) {
+        if (draftState.pages.length > entitlements.limits.pagesPerWebsite) {
+            return response.status(403).json({ message: `You have reached the maximum of ${entitlements.limits.pagesPerWebsite} pages allowed per website on your plan. Please upgrade to add more.` });
+        }
+    }
+
     const sanitizedDraftState = sanitizeDraftSeo(draftState, entitlements.seoFeatures);
 
     const website = await Website.findOneAndUpdate(
@@ -279,6 +322,12 @@ router.post("/:websiteId/upload", upload.single("file"), async (req, res, next) 
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const entitlements = await resolveTenantSeoEntitlements(req.user);
+    const isAllowed = await checkStorageLimit(req.user._id, req.file.size, entitlements.limits);
+    if (!isAllowed) {
+        return res.status(403).json({ message: `You have exceeded your plan's storage limit of ${entitlements.limits.storageMb}MB. Please upgrade your plan or delete some files.` });
     }
 
     const uploadResponse = await imagekit.upload({

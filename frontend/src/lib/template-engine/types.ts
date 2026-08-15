@@ -17,6 +17,7 @@ export type FieldKind =
   | "image"
   | "video"
   | "svg"
+  | "icon"
   | "table";
 
 export interface EditableField {
@@ -167,6 +168,7 @@ export interface TemplateAnalysis {
 
 export interface ElementEdit {
   text?: string;
+  className?: string;
   src?: string;
   alt?: string;
   title?: string;

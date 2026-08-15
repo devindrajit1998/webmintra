@@ -14,6 +14,7 @@ import { getPublicSettings } from "@/lib/public-api";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "sonner";
+import { PublicSiteViewer } from "@/components/PublicSiteViewer";
 
 function NotFoundComponent() {
   return (
@@ -94,6 +95,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
+        href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css",
+      },
+      {
+        rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;600&display=swap",
       },
       {
@@ -141,6 +146,17 @@ function RootApp() {
       link.href = settings["brand.faviconUrl"];
     }
   }, [settings]);
+
+  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  const isSubdomain = hostname
+    ? hostname.includes("localhost") 
+      ? hostname.split(".")[0] !== "localhost" && hostname.split(".")[0] !== "app"
+      : hostname !== "webmintra.cloud" && hostname !== "app.webmintra.cloud"
+    : false;
+
+  if (isSubdomain) {
+    return <PublicSiteViewer subdomain={hostname.split(".")[0]} />;
+  }
 
   return (
     <>

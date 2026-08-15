@@ -44,7 +44,25 @@ export function corsOptions() {
     const origins = allowedOrigins();
     return {
         origin(origin, callback) {
-            if (!origin || origins.has(normalizedOrigin(origin))) return callback(null, true);
+            if (!origin) return callback(null, true);
+            const normalized = normalizedOrigin(origin);
+            if (origins.has(normalized)) return callback(null, true);
+            
+            // Allow subdomains of allowed origins
+            try {
+                const originUrl = new URL(origin);
+                for (const allowed of origins) {
+                    const allowedUrl = new URL(allowed);
+                    if (
+                        originUrl.protocol === allowedUrl.protocol &&
+                        originUrl.port === allowedUrl.port &&
+                        originUrl.hostname.endsWith(`.${allowedUrl.hostname}`)
+                    ) {
+                        return callback(null, true);
+                    }
+                }
+            } catch {}
+
             return callback(null, false);
         },
         credentials: true,

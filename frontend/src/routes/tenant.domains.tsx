@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getDomains, addDomain, deleteDomain, verifyDomain } from "@/lib/auth-api";
@@ -162,7 +162,9 @@ function DomainsPage() {
                             <tr className="bg-[#0b1826]">
                               <td className="px-4 py-2 font-mono text-amber-400">CNAME</td>
                               <td className="px-4 py-2 font-mono text-slate-300">{domain.domain}</td>
-                              <td className="px-4 py-2 font-mono text-cyan-400">cname.webmintra.cloud</td>
+                              <td className="px-4 py-2 font-mono text-cyan-400">
+                                {window.location.hostname.includes("localhost") ? `cname.${window.location.host}` : "cname.webmintra.cloud"}
+                              </td>
                             </tr>
                           </tbody>
                         </table>

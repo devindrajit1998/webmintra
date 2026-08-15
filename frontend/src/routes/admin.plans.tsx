@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getPlans, createPlan, updatePlan, deletePlan } from "@/lib/admin-api";
@@ -71,6 +71,99 @@ type PlanForm = {
   seoFeatures: SeoFeatures;
 };
 
+const SEO_TIER_FEATURES = {
+  basic: {
+    ...Object.fromEntries(SEO_FEATURES.map(([key, , kind]) => [key, kind === "boolean" ? false : Array.isArray(kind) ? kind[0] : "basic"])),
+    pageTitle: true,
+    metaDescription: true,
+    searchKeywords: true,
+    globalSeoSettings: true,
+    xmlSitemap: true,
+    robotsDirective: "basic",
+    seoHealthScore: "basic",
+    seoSettingsPerPage: "limited",
+  },
+  advance: {
+    ...Object.fromEntries(SEO_FEATURES.map(([key, , kind]) => [key, kind === "boolean" ? false : Array.isArray(kind) ? kind[0] : "basic"])),
+    // Basic features
+    pageTitle: true,
+    metaDescription: true,
+    searchKeywords: true,
+    globalSeoSettings: true,
+    xmlSitemap: true,
+    // Advance features
+    canonicalUrl: true,
+    socialTitle: true,
+    socialDescription: true,
+    socialImage: true,
+    twitterCard: true,
+    openGraph: true,
+    robotsDirective: "custom",
+    schemaJsonLd: "basic_presets",
+    structuredDataPresets: true,
+    googleVerification: true,
+    googleAnalytics: true,
+    redirects301: true,
+    seoHealthScore: "advanced",
+    seoRecommendations: "enabled",
+    imageAltText: "enabled",
+    indexNoIndexPerPage: true,
+    seoSettingsPerPage: "enabled",
+  },
+  premium: {
+    ...Object.fromEntries(SEO_FEATURES.map(([key, , kind]) => [key, kind === "boolean" ? false : Array.isArray(kind) ? kind[0] : "basic"])),
+    // Basic + Advance features
+    pageTitle: true,
+    metaDescription: true,
+    searchKeywords: true,
+    globalSeoSettings: true,
+    xmlSitemap: true,
+    canonicalUrl: true,
+    socialTitle: true,
+    socialDescription: true,
+    socialImage: true,
+    twitterCard: true,
+    openGraph: true,
+    robotsDirective: "advanced",
+    schemaJsonLd: "custom_json_ld",
+    structuredDataPresets: true,
+    googleVerification: true,
+    googleAnalytics: true,
+    redirects301: true,
+    seoHealthScore: "advanced",
+    seoRecommendations: "ai_advanced",
+    imageAltText: "enabled",
+    indexNoIndexPerPage: true,
+    seoSettingsPerPage: "enabled",
+    // Premium specific
+    sitemapCustomization: true,
+    searchConsoleIntegration: true,
+    custom404: true,
+  },
+};
+
+type SeoTier = "basic" | "advance" | "premium" | "custom";
+
+function detectSeoTier(seoFeatures: SeoFeatures): SeoTier {
+  const isPremium =
+    seoFeatures.sitemapCustomization === true &&
+    seoFeatures.searchConsoleIntegration === true &&
+    seoFeatures.custom404 === true &&
+    seoFeatures.schemaJsonLd === "custom_json_ld" &&
+    seoFeatures.seoRecommendations === "ai_advanced";
+  if (isPremium) return "premium";
+
+  const isAdvance =
+    seoFeatures.canonicalUrl === true &&
+    seoFeatures.socialTitle === true &&
+    seoFeatures.openGraph === true &&
+    seoFeatures.googleVerification === true &&
+    seoFeatures.redirects301 === true;
+  if (isAdvance) return "advance";
+
+  return "basic";
+}
+
 function makeSlug(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
@@ -81,7 +174,7 @@ const EMPTY_FORM: PlanForm = {
   isPublic: true, sortOrder: 0,
   limits: { ...DEFAULT_LIMITS },
   features: { ...DEFAULT_FEATURES },
-  seoFeatures: { ...DEFAULT_SEO_FEATURES, pageTitle: true, metaDescription: true, searchKeywords: true, xmlSitemap: true, globalSeoSettings: true },
+  seoFeatures: { ...SEO_TIER_FEATURES.basic },
 };
 
 // ── Sub-components ──────────────────────────────────────────────
@@ -260,7 +353,16 @@ function PlanFormDrawer({
     seoFeatures: { ...DEFAULT_SEO_FEATURES, ...initial.seoFeatures },
   } : { ...EMPTY_FORM });
 
+  const [seoTier, setSeoTier] = useState<SeoTier>(() =>
+    initial ? detectSeoTier({ ...DEFAULT_SEO_FEATURES, ...initial.seoFeatures }) : "basic"
+  );
+  const [showDetailedSeo, setShowDetailedSeo] = useState(false);
   const [seoSearch, setSeoSearch] = useState("");
+
+  const setTier = (tier: "basic" | "advance" | "premium") => {
+    setSeoTier(tier);
+    setForm(f => ({ ...f, seoFeatures: { ...SEO_TIER_FEATURES[tier] } }));
+  };
 
   const setLim = (k: keyof typeof DEFAULT_LIMITS) => (v: number) =>
     setForm(f => ({ ...f, limits: { ...f.limits, [k]: v } }));
@@ -414,33 +516,155 @@ function PlanFormDrawer({
             </section>
 
             <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">SEO plan access</h3>
-              <p className="text-[10px] text-slate-500 mb-3">Control which SEO tools and levels this plan includes. The Business plan keeps the internal pro identifier.</p>
-              <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                <input value={seoSearch} onChange={(event) => setSeoSearch(event.target.value)} placeholder="Search SEO capabilities" className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 pl-9 pr-3 text-xs text-slate-200 outline-none focus:border-cyan-500" />
-              </div>
-              <div className="space-y-4">
-                {SEO_GROUPS.map((group) => {
-                  const features = SEO_FEATURES.filter(([key, label]) => group.keys.includes(key) && label.toLowerCase().includes(seoSearch.trim().toLowerCase()));
-                  if (!features.length) return null;
-                  return <div key={group.label}>
-                    <p className="mb-2 text-[10px] font-semibold uppercase text-slate-500">{group.label}</p>
-                    <div className="space-y-2">
-                      {features.map(([key, label, kind]) => kind === "boolean" ? (
-                        <ToggleRow key={key} label={label} icon={Search} enabled={form.seoFeatures[key] === true} onChange={(value) => setSeo(key, value)} />
-                      ) : (
-                        <label key={key} className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-900/30 px-3 py-2.5 text-sm text-slate-300">
-                          <span>{label}</span>
-                          <select value={String(form.seoFeatures[key])} onChange={(event) => setSeo(key, event.target.value)} className="min-w-32 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-200">
-                            {kind.map((value) => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}
-                          </select>
-                        </label>
-                      ))}
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">SEO Package Tier</h3>
+              <p className="text-[10px] text-slate-500 mb-3">Select the SEO tier for this plan. Higher tiers include all features from lower tiers.</p>
+              
+              {/* 3 Tier Selection Cards */}
+              <div className="grid gap-2.5">
+                {/* Basic SEO */}
+                <div
+                  onClick={() => setTier("basic")}
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
+                    seoTier === "basic"
+                      ? "border-cyan-500 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500"
+                      : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`grid h-7 w-7 place-items-center rounded-lg ${seoTier === "basic" ? "bg-cyan-500 text-slate-950" : "bg-slate-800 text-slate-400"}`}>
+                        <Search className="h-3.5 w-3.5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-200">Basic SEO</h4>
+                        <p className="text-[10px] text-slate-400">Essential search engine tags & sitemap</p>
+                      </div>
                     </div>
-                  </div>;
-                })}
-                {seoSearch && !SEO_FEATURES.some(([, label]) => label.toLowerCase().includes(seoSearch.trim().toLowerCase())) ? <p className="rounded-lg border border-slate-800 p-3 text-center text-xs text-slate-500">No SEO capabilities match this search.</p> : null}
+                    <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${seoTier === "basic" ? "border-cyan-500 bg-cyan-500 text-slate-950" : "border-slate-700"}`}>
+                      {seoTier === "basic" && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                    </div>
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Page Titles & Descriptions</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Keywords</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">XML Sitemap</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Standard Robots</span>
+                  </div>
+                </div>
+
+                {/* Advance SEO */}
+                <div
+                  onClick={() => setTier("advance")}
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
+                    seoTier === "advance"
+                      ? "border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500"
+                      : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`grid h-7 w-7 place-items-center rounded-lg ${seoTier === "advance" ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400"}`}>
+                        <Sparkles className="h-3.5 w-3.5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-bold text-slate-200">Advance SEO</h4>
+                          <span className="rounded-full bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-semibold text-emerald-400">Basic + Advance</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">Social cards, Google Analytics, 301 redirects & presets</p>
+                      </div>
+                    </div>
+                    <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${seoTier === "advance" ? "border-emerald-500 bg-emerald-500 text-slate-950" : "border-slate-700"}`}>
+                      {seoTier === "advance" && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                    </div>
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                    <span className="rounded bg-emerald-500/10 text-emerald-300 px-2 py-0.5">All Basic Features</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Open Graph & Twitter Cards</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Google Analytics & Verification</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">301 Redirects</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Schema Presets</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Per-Page SEO</span>
+                  </div>
+                </div>
+
+                {/* Premium SEO */}
+                <div
+                  onClick={() => setTier("premium")}
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
+                    seoTier === "premium"
+                      ? "border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-1 ring-amber-500"
+                      : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`grid h-7 w-7 place-items-center rounded-lg ${seoTier === "premium" ? "bg-amber-500 text-slate-950" : "bg-slate-800 text-slate-400"}`}>
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-bold text-slate-200">Premium SEO</h4>
+                          <span className="rounded-full bg-amber-500/20 px-1.5 py-0.2 text-[9px] font-semibold text-amber-400">Basic + Advance + Premium</span>
+                        </div>
+                        <p className="text-[10px] text-slate-400">Full control, Custom JSON-LD, Search Console, Custom 404 & AI</p>
+                      </div>
+                    </div>
+                    <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${seoTier === "premium" ? "border-amber-500 bg-amber-500 text-slate-950" : "border-slate-700"}`}>
+                      {seoTier === "premium" && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                    </div>
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-800/60 text-[10px] text-slate-400">
+                    <span className="rounded bg-amber-500/10 text-amber-300 px-2 py-0.5">All Basic + Advance</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Custom JSON-LD</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Search Console Integration</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Custom 404 Page</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Sitemap Customization</span>
+                    <span className="rounded bg-slate-800/80 px-2 py-0.5">AI Recommendations</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Optional Advanced Override Accordion */}
+              <div className="mt-4 pt-3 border-t border-slate-800/60">
+                <button
+                  type="button"
+                  onClick={() => setShowDetailedSeo(!showDetailedSeo)}
+                  className="flex items-center justify-between w-full text-[11px] font-medium text-slate-400 hover:text-slate-200 transition"
+                >
+                  <span>Fine-tune individual capabilities ({Object.keys(SEO_FEATURES).length})</span>
+                  <span className="text-[10px] text-cyan-400">{showDetailedSeo ? "Hide details" : "Customize..."}</span>
+                </button>
+
+                {showDetailedSeo && (
+                  <div className="mt-3 space-y-4 pt-3 border-t border-slate-800">
+                    <div className="relative mb-3">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                      <input value={seoSearch} onChange={(event) => setSeoSearch(event.target.value)} placeholder="Search SEO capabilities" className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 pl-9 pr-3 text-xs text-slate-200 outline-none focus:border-cyan-500" />
+                    </div>
+                    {SEO_GROUPS.map((group) => {
+                      const features = SEO_FEATURES.filter(([key, label]) => group.keys.includes(key) && label.toLowerCase().includes(seoSearch.trim().toLowerCase()));
+                      if (!features.length) return null;
+                      return (
+                        <div key={group.label}>
+                          <p className="mb-2 text-[10px] font-semibold uppercase text-slate-500">{group.label}</p>
+                          <div className="space-y-2">
+                            {features.map(([key, label, kind]) => kind === "boolean" ? (
+                              <ToggleRow key={key} label={label} icon={Search} enabled={form.seoFeatures[key] === true} onChange={(value) => { setSeo(key, value); setSeoTier("custom"); }} />
+                            ) : (
+                              <label key={key} className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-900/30 px-3 py-2.5 text-sm text-slate-300">
+                                <span>{label}</span>
+                                <select value={String(form.seoFeatures[key])} onChange={(event) => { setSeo(key, event.target.value); setSeoTier("custom"); }} className="min-w-32 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-200">
+                                  {kind.map((value) => <option key={value} value={value}>{value.replaceAll("_", " ")}</option>)}
+                                </select>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </section>
 
