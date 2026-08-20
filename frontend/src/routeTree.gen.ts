@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AcceptInvitationRouteImport } from './routes/accept-invitation'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CreateAccountRouteImport } from './routes/create-account'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -48,6 +47,8 @@ import { Route as AdminSupportRouteImport } from './routes/admin.support'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminTestimonialsRouteImport } from './routes/admin.testimonials'
 import { Route as AdminWebsitesRouteImport } from './routes/admin.websites'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog_.$slug'
 import { Route as TenantIndexRouteImport } from './routes/tenant.index'
 import { Route as TenantActivityRouteImport } from './routes/tenant.activity'
 import { Route as TenantAnalyticsRouteImport } from './routes/tenant.analytics'
@@ -82,11 +83,6 @@ const AcceptInvitationRoute = AcceptInvitationRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -265,6 +261,16 @@ const AdminWebsitesRoute = AdminWebsitesRouteImport.update({
   path: '/websites',
   getParentRoute: () => AdminRoute,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog_/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TenantIndexRoute = TenantIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -370,7 +376,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invitation': typeof AcceptInvitationRoute
   '/admin': typeof AdminRouteWithChildren
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/create-account': typeof CreateAccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -406,6 +411,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/websites': typeof AdminWebsitesRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/tenant/activity': typeof TenantActivityRoute
   '/tenant/analytics': typeof TenantAnalyticsRoute
   '/tenant/billing': typeof TenantBillingRoute
@@ -421,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/tenant/subscription': typeof TenantSubscriptionRoute
   '/tenant/support': typeof TenantSupportRoute
   '/tenant/websites': typeof TenantWebsitesRoute
+  '/blog/': typeof BlogIndexRoute
   '/tenant/': typeof TenantIndexRoute
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
   '/tenant/builder/$id': typeof TenantBuilderIdRoute
@@ -431,7 +438,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invitation': typeof AcceptInvitationRoute
   '/admin': typeof AdminRouteWithChildren
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/create-account': typeof CreateAccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -466,6 +472,7 @@ export interface FileRoutesByTo {
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/websites': typeof AdminWebsitesRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/tenant/activity': typeof TenantActivityRoute
   '/tenant/analytics': typeof TenantAnalyticsRoute
   '/tenant/billing': typeof TenantBillingRoute
@@ -481,6 +488,7 @@ export interface FileRoutesByTo {
   '/tenant/subscription': typeof TenantSubscriptionRoute
   '/tenant/support': typeof TenantSupportRoute
   '/tenant/websites': typeof TenantWebsitesRoute
+  '/blog': typeof BlogIndexRoute
   '/tenant': typeof TenantIndexRoute
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
   '/tenant/builder/$id': typeof TenantBuilderIdRoute
@@ -492,7 +500,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accept-invitation': typeof AcceptInvitationRoute
   '/admin': typeof AdminRouteWithChildren
-  '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/create-account': typeof CreateAccountRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -528,6 +535,7 @@ export interface FileRoutesById {
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/testimonials': typeof AdminTestimonialsRoute
   '/admin/websites': typeof AdminWebsitesRoute
+  '/blog_/$slug': typeof BlogSlugRoute
   '/tenant/activity': typeof TenantActivityRoute
   '/tenant/analytics': typeof TenantAnalyticsRoute
   '/tenant/billing': typeof TenantBillingRoute
@@ -543,6 +551,7 @@ export interface FileRoutesById {
   '/tenant/subscription': typeof TenantSubscriptionRoute
   '/tenant/support': typeof TenantSupportRoute
   '/tenant/websites': typeof TenantWebsitesRoute
+  '/blog/': typeof BlogIndexRoute
   '/tenant/': typeof TenantIndexRoute
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
   '/tenant_/builder/$id': typeof TenantBuilderIdRoute
@@ -555,7 +564,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-invitation'
     | '/admin'
-    | '/blog'
     | '/contact'
     | '/create-account'
     | '/forgot-password'
@@ -591,6 +599,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/testimonials'
     | '/admin/websites'
+    | '/blog/$slug'
     | '/tenant/activity'
     | '/tenant/analytics'
     | '/tenant/billing'
@@ -606,6 +615,7 @@ export interface FileRouteTypes {
     | '/tenant/subscription'
     | '/tenant/support'
     | '/tenant/websites'
+    | '/blog/'
     | '/tenant/'
     | '/admin/tenants/$id'
     | '/tenant/builder/$id'
@@ -616,7 +626,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-invitation'
     | '/admin'
-    | '/blog'
     | '/contact'
     | '/create-account'
     | '/forgot-password'
@@ -651,6 +660,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/testimonials'
     | '/admin/websites'
+    | '/blog/$slug'
     | '/tenant/activity'
     | '/tenant/analytics'
     | '/tenant/billing'
@@ -666,6 +676,7 @@ export interface FileRouteTypes {
     | '/tenant/subscription'
     | '/tenant/support'
     | '/tenant/websites'
+    | '/blog'
     | '/tenant'
     | '/admin/tenants/$id'
     | '/tenant/builder/$id'
@@ -676,7 +687,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accept-invitation'
     | '/admin'
-    | '/blog'
     | '/contact'
     | '/create-account'
     | '/forgot-password'
@@ -712,6 +722,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/testimonials'
     | '/admin/websites'
+    | '/blog_/$slug'
     | '/tenant/activity'
     | '/tenant/analytics'
     | '/tenant/billing'
@@ -727,6 +738,7 @@ export interface FileRouteTypes {
     | '/tenant/subscription'
     | '/tenant/support'
     | '/tenant/websites'
+    | '/blog/'
     | '/tenant/'
     | '/admin/tenants/$id'
     | '/tenant_/builder/$id'
@@ -738,7 +750,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AcceptInvitationRoute: typeof AcceptInvitationRoute
   AdminRoute: typeof AdminRouteWithChildren
-  BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   CreateAccountRoute: typeof CreateAccountRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -752,6 +763,8 @@ export interface RootRouteChildren {
   TermsAndConditionsRoute: typeof TermsAndConditionsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   VerifyPasswordResetRoute: typeof VerifyPasswordResetRoute
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   TenantBuilderIdRoute: typeof TenantBuilderIdRoute
 }
 
@@ -776,13 +789,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -1030,6 +1036,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWebsitesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog_/$slug': {
+      id: '/blog_/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tenant/': {
       id: '/tenant/'
       path: '/'
@@ -1276,7 +1296,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AcceptInvitationRoute: AcceptInvitationRoute,
   AdminRoute: AdminRouteWithChildren,
-  BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   CreateAccountRoute: CreateAccountRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
@@ -1290,6 +1309,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermsAndConditionsRoute: TermsAndConditionsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   VerifyPasswordResetRoute: VerifyPasswordResetRoute,
+  BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   TenantBuilderIdRoute: TenantBuilderIdRoute,
 }
 export const routeTree = rootRouteImport

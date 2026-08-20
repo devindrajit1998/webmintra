@@ -26,7 +26,7 @@ export const DEFAULT_SETTINGS = [
   // General
   { key: "site.name", value: "WebMintra", group: "general", label: "Platform Name", type: "string", isPublic: true },
   { key: "site.tagline", value: "Build Websites with Ease", group: "general", label: "Tagline", type: "string", isPublic: true },
-  { key: "site.supportEmail", value: "support@webmintra.com", group: "general", label: "Support Email", type: "string" },
+  { key: "site.supportEmail", value: "support@webmintra.in", group: "general", label: "Support Email", type: "string" },
   { key: "site.timezone", value: "UTC", group: "general", label: "Default Timezone", type: "string" },
   { key: "site.currency", value: "INR", group: "general", label: "Default Currency", type: "string", isPublic: true },
   { key: "site.language", value: "en", group: "general", label: "Default Language", type: "string", isPublic: true },

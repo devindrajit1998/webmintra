@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PublicMobileMenu } from "@/components/PublicMobileMenu";
+import { PublicHeader } from "@/components/PublicHeader";
 
 export const Route = createFileRoute("/templates")({
   component: PublicTemplatesCatalogPage,
@@ -95,80 +96,8 @@ export function PublicTemplatesCatalogPage() {
 
   return (
     <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
-      {/* ── HEADER NAVIGATION ────────────────────────────────────────── */}
-      <header className="landing-nav-glass sticky top-0 z-40 w-full">
-        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
-          {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 transition hover:opacity-90">
-            {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
-                W
-              </div>
-            )}
-            <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
-              {siteName}
-            </span>
-          </Link>
-
-          {/* Desktop Nav Links */}
-          <nav className="hidden items-center gap-7 text-[13.5px] font-medium text-[#475569] md:flex">
-            <Link to="/" className="landing-nav-link text-[#475569]">
-              Home
-            </Link>
-            <Link to="/templates" className="landing-nav-link text-[#0f172a] font-bold">
-              Templates
-            </Link>
-            <Link to="/blog" className="landing-nav-link text-[#475569]">
-              Blog
-            </Link>
-            <Link to="/help" className="landing-nav-link text-[#475569]">
-              Help Center
-            </Link>
-            <Link to="/contact" className="landing-nav-link text-[#475569]">
-              Contact
-            </Link>
-          </nav>
-
-          {/* Right Action Buttons */}
-          <div className="flex items-center gap-3">
-            <Link
-              to={user ? routeForRole(user.role) : "/sign-in"}
-              className="text-[13.5px] font-bold text-[#0f172a] hover:text-[#059669] transition px-2 py-1"
-            >
-              Log in
-            </Link>
-            <Link
-              to={primaryRoute}
-              className="hidden h-9 items-center justify-center rounded-lg bg-[#059669] px-4 text-[13px] font-bold text-white shadow-sm transition hover:bg-[#047857] sm:inline-flex"
-            >
-              Create Your Website
-            </Link>
-
-            {/* Mobile Menu Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              aria-label="Open mobile navigation menu"
-              className="landing-icon-button md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-[#e2e8f0] text-[#0f172a] hover:bg-[#f1f5f9] transition"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Off-Canvas Drawer */}
-      <PublicMobileMenu
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        user={user}
-        primaryRoute={primaryRoute}
-        siteName={siteName}
-        logoUrl={logoUrl}
-        isLandingPage={false}
-      />
+      {/* ── GLOBAL HEADER NAVIGATION ─────────────────────────────────── */}
+      <PublicHeader />
 
       {/* ── MAIN CATALOG CONTENT ────────────────────────────────────── */}
       <main className="mx-auto max-w-7xl px-5 sm:px-6 py-12 lg:py-16">

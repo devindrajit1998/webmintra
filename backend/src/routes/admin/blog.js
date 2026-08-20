@@ -17,7 +17,21 @@ router.use(requireAuthenticatedUser, requireRole("admin"));
 router.get("/categories", async (req, res, next) => {
   try {
     const categories = await BlogCategory.find().sort({ sortOrder: 1, name: 1 }).lean();
-    return res.json({ categories });
+    // Count posts in each category
+    const categoryCounts = await BlogPost.aggregate([
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+    ]);
+    const countMap = categoryCounts.reduce((acc, curr) => {
+      if (curr._id) acc[String(curr._id)] = curr.count;
+      return acc;
+    }, {});
+
+    const categoriesWithCount = categories.map((cat) => ({
+      ...cat,
+      postCount: countMap[String(cat._id)] || 0,
+    }));
+
+    return res.json({ categories: categoriesWithCount });
   } catch (error) {
     return next(error);
   }
@@ -29,7 +43,7 @@ router.post("/categories", async (req, res, next) => {
     if (!isString(b.name, { max: 80 })) return res.status(400).json({ message: "name is required (max 80 chars)." });
     if (!isString(b.slug, { max: 80 }) || !/^[a-z0-9-]+$/.test(b.slug)) return res.status(400).json({ message: "slug must be lowercase alphanumeric with hyphens." });
 
-    if (await BlogCategory.exists({ slug: b.slug.toLowerCase() }))
+    if (await BlogCategory.exists({ slug: b.slug.toLowerCase().trim() }))
       return res.status(409).json({ message: "A category with this slug already exists." });
 
     const category = await BlogCategory.create({
@@ -50,7 +64,22 @@ router.patch("/categories/:catId", async (req, res, next) => {
   try {
     if (!isMongoId(req.params.catId)) return res.status(400).json({ message: "Invalid category ID." });
     const b = req.body ?? {};
-    const update = stripUndefined({ name: b.name?.trim(), description: b.description?.trim(), sortOrder: b.sortOrder, isActive: b.isActive });
+    
+    if (b.slug) {
+      const cleanSlug = b.slug.toLowerCase().trim();
+      const existing = await BlogCategory.findOne({ slug: cleanSlug, _id: { $ne: req.params.catId } });
+      if (existing) {
+        return res.status(409).json({ message: "A category with this slug already exists." });
+      }
+    }
+
+    const update = stripUndefined({
+      name: b.name?.trim(),
+      slug: b.slug?.toLowerCase()?.trim(),
+      description: b.description?.trim(),
+      sortOrder: b.sortOrder,
+      isActive: b.isActive,
+    });
     const category = await BlogCategory.findByIdAndUpdate(req.params.catId, { $set: update }, { new: true });
     if (!category) return res.status(404).json({ message: "Category not found." });
     return res.json({ category });
@@ -92,7 +121,6 @@ router.get("/posts", async (req, res, next) => {
         .limit(limit)
         .populate("author", "name email")
         .populate("category", "name slug")
-        .select("-content")
         .lean(),
       BlogPost.countDocuments(filter),
     ]);
@@ -167,8 +195,18 @@ router.patch("/posts/:postId", async (req, res, next) => {
     if (!isMongoId(req.params.postId)) return res.status(400).json({ message: "Invalid post ID." });
     const b = req.body ?? {};
     const status = POST_STATUSES.includes(b.status) ? b.status : undefined;
+    
+    if (b.slug) {
+      const slugClean = b.slug.toLowerCase().trim();
+      const existing = await BlogPost.findOne({ slug: slugClean, _id: { $ne: req.params.postId } });
+      if (existing) {
+        return res.status(409).json({ message: "A post with this slug already exists." });
+      }
+    }
+
     const update = stripUndefined({
       title: b.title?.trim(),
+      slug: b.slug?.toLowerCase()?.trim(),
       excerpt: b.excerpt?.trim(),
       content: b.content,
       coverImage: b.coverImage?.trim(),

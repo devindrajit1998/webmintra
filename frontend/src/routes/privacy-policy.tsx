@@ -16,7 +16,7 @@ export function PrivacyPolicyPage() {
   });
 
   const siteName = settings["site.name"] || "WebMintra";
-  const supportEmail = settings["site.supportEmail"] || "support@webmintra.com";
+  const supportEmail = settings["site.supportEmail"] || "support@webmintra.in";
 
   return (
     <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">

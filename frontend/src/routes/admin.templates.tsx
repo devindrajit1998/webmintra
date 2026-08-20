@@ -326,10 +326,11 @@ function AdminTemplatesPage() {
     if (!analysis?.pages?.length) return toast.error("No pages found in analysis");
 
     try {
+      const categoriesList = categoriesData?.categories || (Array.isArray(categoriesData) ? categoriesData : []);
       const [homePage, ...additionalPages] = analysis.pages;
       const formData = new FormData();
       formData.append("title", meta?.title || analysis.name || "Imported Template");
-      formData.append("category", meta?.category || categoriesData?.[0]?.name || "Landing Page");
+      formData.append("category", meta?.category || categoriesList?.[0]?.name || "Landing Page");
       formData.append("description", meta?.description || `Contains ${analysis.pages.length} page(s).`);
       if (meta?.thumbnailUrl) {
         formData.append("thumbnailUrl", meta.thumbnailUrl);
@@ -412,7 +413,7 @@ function AdminTemplatesPage() {
           </div>
           <div className="flex-1 overflow-y-auto bg-[#f8fafc]">
             <ImportWizard
-              categories={categoriesData || []}
+              categories={categoriesData?.categories || (Array.isArray(categoriesData) ? categoriesData : [])}
               onComplete={handleWizardComplete}
             />
           </div>

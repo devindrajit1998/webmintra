@@ -135,15 +135,26 @@ router.get("/blog", async (req, res) => {
 router.get("/blog/:slug", async (req, res) => {
   try {
     const { BlogPost } = await import("../models/Blog.js");
-    const post = await BlogPost.findOne({ slug: req.params.slug, status: "published" })
+    const slug = String(req.params.slug).toLowerCase().trim();
+    let post = await BlogPost.findOne({ slug, status: "published" })
       .populate("category", "name slug")
       .populate("author", "name email")
       .lean();
 
+    if (!post) {
+      // Check if draft post exists (for preview)
+      post = await BlogPost.findOne({ slug })
+        .populate("category", "name slug")
+        .populate("author", "name email")
+        .lean();
+    }
+
     if (!post) return res.status(404).json({ message: "Article not found" });
 
-    // increment view count
-    await BlogPost.updateOne({ _id: post._id }, { $inc: { viewCount: 1 } });
+    // increment view count if published
+    if (post.status === "published") {
+      await BlogPost.updateOne({ _id: post._id }, { $inc: { viewCount: 1 } });
+    }
     return res.json({ post });
   } catch (error) {
     console.error("Error fetching article:", error);

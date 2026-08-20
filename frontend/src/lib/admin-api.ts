@@ -163,7 +163,16 @@ export type BlogPostInput = {
   slug: string;
   excerpt: string;
   content: string;
-  status: "draft" | "published";
+  category?: string;
+  coverImage?: string;
+  tags?: string[];
+  status: "draft" | "published" | "scheduled" | "archived";
+  seo?: {
+    title?: string;
+    description?: string;
+    keywords?: string[];
+    ogImage?: string;
+  };
 };
 
 export const getBlogPosts = (params?: {
@@ -171,9 +180,55 @@ export const getBlogPosts = (params?: {
   limit?: number;
   status?: string;
   search?: string;
-}) => adminRequest<any>(`/blog/posts${buildQuery(params)}`);
-export const createBlogPost = (data: BlogPostInput) =>
-  adminRequest<any>("/blog/posts", { method: "POST", body: JSON.stringify(data) });
+  category?: string;
+  featured?: boolean;
+}) => adminRequest<{ posts: any[]; pagination: any }>(`/blog/posts${buildQuery(params)}`);
+
+export const getBlogPost = (id: string) =>
+  adminRequest<{ post: any }>(`/blog/posts/${id}`);
+
+export const getBlogCategories = () =>
+  adminRequest<{ categories: any[] }>("/blog/categories");
+
+export const createBlogCategory = (data: {
+  name: string;
+  slug: string;
+  description?: string;
+  sortOrder?: number;
+}) =>
+  adminRequest<{ category: any }>("/blog/categories", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateBlogCategory = (
+  id: string,
+  data: {
+    name?: string;
+    slug?: string;
+    description?: string;
+    sortOrder?: number;
+    isActive?: boolean;
+  }
+) =>
+  adminRequest<{ category: any }>(`/blog/categories/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const deleteBlogCategory = (id: string) =>
+  adminRequest<{ message: string }>(`/blog/categories/${id}`, {
+    method: "DELETE",
+  });
+
+export const createBlogPost = (data: any) =>
+  adminRequest<{ post: any }>("/blog/posts", { method: "POST", body: JSON.stringify(data) });
+
+export const updateBlogPost = (id: string, data: any) =>
+  adminRequest<{ post: any }>(`/blog/posts/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+
+export const deleteBlogPost = (id: string) =>
+  adminRequest<{ message: string }>(`/blog/posts/${id}`, { method: "DELETE" });
 
 export const getAnnouncements = (params?: {
   page?: number;

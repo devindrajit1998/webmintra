@@ -6,7 +6,7 @@ test("normalizes supported landing page SEO values", () => {
     assert.equal(normalizeSeoSetting("seo.defaultTitle", "  WebMintra Home  "), "WebMintra Home");
     assert.equal(normalizeSeoSetting("seo.allowIndexing", "false"), false);
     assert.equal(normalizeSeoSetting("seo.twitterHandle", "webmintra"), "@webmintra");
-    assert.equal(normalizeSeoSetting("seo.canonicalUrl", "https://webmintra.com"), "https://webmintra.com/");
+    assert.equal(normalizeSeoSetting("seo.canonicalUrl", "https://webmintra.in"), "https://webmintra.in/");
 });
 
 test("normalizes only provided keys in canonical key order", () => {

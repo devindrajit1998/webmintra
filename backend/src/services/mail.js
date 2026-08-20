@@ -24,7 +24,7 @@ function interpolate(template, variables = {}) {
   const globals = {
     appName: "WebMintra",
     year: new Date().getFullYear().toString(),
-    supportEmail: "support@webmintra.com",
+    supportEmail: "support@webmintra.in",
     dashboardUrl: process.env.FRONTEND_ORIGIN || "http://localhost:8080",
   };
   const allVars = { ...globals, ...variables };
@@ -84,7 +84,7 @@ export async function sendTemplatedEmail({ type, to, variables = {}, fallback })
 export async function sendOtpEmail({ email, name, code, purpose }) {
   const isReset = purpose === "password reset";
   const action = isReset ? "reset your password" : "verify your email address";
-  
+
   await sendTemplatedEmail({
     type: "otp",
     to: email,

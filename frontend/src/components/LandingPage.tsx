@@ -48,7 +48,7 @@ import {
   getPublicPlans,
   getPublicTestimonials,
 } from "@/lib/public-api";
-import { PublicMobileMenu } from "./PublicMobileMenu";
+import { PublicHeader } from "./PublicHeader";
 
 export function LandingPage() {
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -212,94 +212,8 @@ export function LandingPage() {
         Skip to content
       </a>
 
-      {/* ── 1. NAVBAR ────────────────────────────────────────────── */}
-      <header className="landing-nav-glass fixed top-0 left-0 right-0 z-50">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
-          {/* Logo */}
-          <a
-            href="#top"
-            aria-label="Webmintra home"
-            className="flex items-center gap-2.5 rounded-md"
-          >
-            <div className="relative flex h-8 w-8 items-center justify-center">
-              <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none">
-                <path
-                  d="M4 8L10 24L16 12L22 24L28 8"
-                  stroke="#ea580c"
-                  strokeWidth="3.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="16" cy="24" r="3" fill="#059669" />
-              </svg>
-            </div>
-            <span className="text-[22px] font-black tracking-tight text-[#0f172a] lowercase font-sans">
-              webmintra
-            </span>
-          </a>
-
-          {/* Nav Links */}
-          <nav
-            aria-label="Primary navigation"
-            className="hidden items-center gap-1 text-[13px] font-semibold text-[#475569] md:flex"
-          >
-            <a href="#product" className="landing-nav-link">
-              Product
-            </a>
-            <a href="#templates" className="landing-nav-link">
-              Templates
-            </a>
-            <a href="#solutions" className="landing-nav-link">
-              Solutions
-            </a>
-            <a href="#pricing" className="landing-nav-link">
-              Pricing
-            </a>
-            <a href="#faq" className="landing-nav-link">
-              Resources
-            </a>
-          </nav>
-
-          {/* Right Action CTAs */}
-          <div className="flex items-center gap-4">
-            <Link
-              to={user ? routeForRole(user.role) : "/sign-in"}
-              className="text-[14px] font-semibold text-[#475569] hover:text-[#0f172a] transition"
-            >
-              Login
-            </Link>
-            <Link
-              to={primaryRoute}
-              className="hidden h-10 items-center justify-center rounded-md bg-[#059669] px-5 text-[13.5px] font-bold text-white shadow-sm transition hover:bg-[#047857] active:scale-[0.98] sm:inline-flex"
-            >
-              Create Your Website
-            </Link>
-
-            {/* Mobile menu button */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-              aria-expanded={mobileMenuOpen}
-              className="landing-icon-button md:hidden"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-
-      </header>
-
-      {/* ── MOBILE OFF-CANVAS SLIDE-OVER DRAWER ───────────────────── */}
-      <PublicMobileMenu
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        user={user}
-        primaryRoute={primaryRoute}
-        siteName={siteName}
-        logoUrl={logoUrl}
-        isLandingPage={true}
-      />
+      {/* ── 1. GLOBAL NAVBAR ────────────────────────────────────── */}
+      <PublicHeader isLandingPage={true} />
 
       <main id="top">
         {/* ── 2. HERO SECTION ──────────────────────────────────────── */}
@@ -1377,19 +1291,31 @@ export function LandingPage() {
             
             {/* Brand column (2 spans on desktop) */}
             <div className="lg:col-span-2 pr-4 space-y-4">
-              <a href="#top" className="flex items-center gap-2">
-                <div className="relative flex h-7 w-7 items-center justify-center">
-                  <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none">
-                    <path
-                      d="M4 8L10 24L16 12L22 24L28 8"
-                      stroke="#ea580c"
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="16" cy="24" r="3" fill="#059669" />
-                  </svg>
-                </div>
+              <a
+                href="#top"
+                aria-label={`${isMounted ? siteName : "Webmintra"} home`}
+                className="flex items-center gap-2.5"
+              >
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt={isMounted ? siteName : "Webmintra"}
+                    className="h-8 max-w-[180px] object-contain"
+                  />
+                ) : (
+                  <div className="relative flex h-8 w-8 items-center justify-center">
+                    <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none">
+                      <path
+                        d="M4 8L10 24L16 12L22 24L28 8"
+                        stroke="#ea580c"
+                        strokeWidth="3.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <circle cx="16" cy="24" r="3" fill="#059669" />
+                    </svg>
+                  </div>
+                )}
                 <span className="text-xl font-black tracking-tight text-[#0f172a] lowercase">
                   {isMounted ? siteName : "webmintra"}
                 </span>

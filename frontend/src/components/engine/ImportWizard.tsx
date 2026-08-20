@@ -393,6 +393,13 @@ export function ImportReport({
   );
   const [metaThumbnailUrl, setMetaThumbnailUrl] = useState("");
 
+  // Sync meta category once categories load
+  useEffect(() => {
+    if (categories.length > 0 && (!metaCategory || metaCategory === "Landing Page")) {
+      setMetaCategory(categories[0].name);
+    }
+  }, [categories]);
+
   const fields = useMemo(() => {
     const list = page?.fields ?? [];
     if (!query) return list;

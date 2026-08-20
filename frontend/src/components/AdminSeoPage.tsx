@@ -112,12 +112,12 @@ export function AdminSeoPage() {
   }, [query.data]);
 
   const dirty = useMemo(() => JSON.stringify(form) !== JSON.stringify(saved), [form, saved]);
-  const canonical = form.canonicalUrl.trim() || "https://webmintra.com/";
+  const canonical = form.canonicalUrl.trim() || "https://webmintra.in/";
   const hostname = useMemo(() => {
     try {
       return new URL(canonical).hostname;
     } catch {
-      return "webmintra.com";
+      return "webmintra.in";
     }
   }, [canonical]);
   const mutation = useMutation({
@@ -236,7 +236,7 @@ export function AdminSeoPage() {
               <input
                 type="url"
                 value={form.canonicalUrl}
-                placeholder="https://webmintra.com/"
+                placeholder="https://webmintra.in/"
                 onChange={(e) => update("canonicalUrl", e.target.value)}
                 className={input(errors.canonicalUrl)}
               />
@@ -344,11 +344,10 @@ export function AdminSeoPage() {
             </div>
           </Preview>
           <div
-            className={`rounded-xl border px-4 py-3 text-xs font-semibold ${
-              form.allowIndexing
+            className={`rounded-xl border px-4 py-3 text-xs font-semibold ${form.allowIndexing
                 ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
                 : "border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]"
-            }`}
+              }`}
           >
             {form.allowIndexing ? "✓ Landing page can be indexed by search engines" : "⚠️ Landing page is set to noindex"}
           </div>
