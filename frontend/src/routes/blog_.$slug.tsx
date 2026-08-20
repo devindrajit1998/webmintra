@@ -33,7 +33,7 @@ export const Route = createFileRoute("/blog_/$slug")({
     const post = loaderData?.post;
     const settings = loaderData?.settings || {};
     const siteName = String(settings["site.name"] || "WebMintra");
-    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.com").replace(/\/$/, "");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(/\/$/, "");
     const pageUrl = `${canonicalBase}/blog/${params.slug}`;
 
     if (!post) {

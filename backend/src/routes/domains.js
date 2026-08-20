@@ -9,7 +9,7 @@ import { ownedDomainScope, ownedWebsiteScope, tenantScope } from "../lib/tenant-
 const router = Router();
 
 // ── Constants ────────────────────────────────────────────────────
-const CNAME_TARGET = "cname.webmintra.cloud";
+const CNAME_TARGET = "cname.webmintra.in";
 
 // Validates that a string is a syntactically valid domain/hostname
 const DOMAIN_REGEX = /^(?!:\/\/)([a-zA-Z0-9-_]+\.)*[a-zA-Z0-9-_]+\.[a-zA-Z]{2,}$/;

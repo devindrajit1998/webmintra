@@ -110,8 +110,8 @@ function WebsitesPage() {
 function WebsiteCard({ website }: { website: Website }) {
   const isPublished = website.status === "published";
   const BASE_DOMAIN = window.location.hostname.includes("localhost")
-    ? window.location.host
-    : "webmintra.cloud";
+    ? `${window.location.protocol}//${window.location.host}`
+    : "webmintra.in";
   const url = isPublished
     ? website.customDomain
       ? `https://${website.customDomain}`

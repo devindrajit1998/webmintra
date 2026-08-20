@@ -178,7 +178,7 @@ app.get("/sitemap.xml", async (req, res, next) => {
     const { Setting } = await import("./models/Setting.js");
     const { KBArticle } = await import("./models/KnowledgeBase.js").catch(() => ({ KBArticle: null }));
 
-    const host = req.get("x-forwarded-host") || req.get("host") || "webmintra.com";
+    const host = req.get("x-forwarded-host") || req.get("host") || "webmintra.in";
     const protocol = req.get("x-forwarded-proto") || req.protocol || "https";
     const baseUrl = `${protocol}://${host}`.replace(/\/$/, "");
 
@@ -256,7 +256,7 @@ app.get("/robots.txt", async (req, res, next) => {
     const allowSetting = await Setting.findOne({ key: "seo.allowIndexing" }).lean();
     const isIndexingAllowed = allowSetting?.value !== false && allowSetting?.value !== "false";
 
-    const host = req.get("x-forwarded-host") || req.get("host") || "webmintra.com";
+    const host = req.get("x-forwarded-host") || req.get("host") || "webmintra.in";
     const protocol = req.get("x-forwarded-proto") || req.protocol || "https";
     const siteOrigin = `${protocol}://${host}`.replace(/\/$/, "");
 

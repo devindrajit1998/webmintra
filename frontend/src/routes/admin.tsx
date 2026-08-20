@@ -100,12 +100,10 @@ function AdminLayout() {
 
   async function signOut() {
     try {
-      await apiFetch(
-        `${import.meta.env["VITE_API_URL"] ?? "http://localhost:5000/api"}/auth/logout`,
-        {
-          method: "POST",
-        },
-      );
+      const apiUrl = import.meta.env.VITE_API_URL || "";
+      await apiFetch(`${apiUrl}/auth/logout`, {
+        method: "POST",
+      });
     } finally {
       clearCsrfToken();
       clearSessionUser();

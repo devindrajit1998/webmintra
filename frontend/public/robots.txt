@@ -36,4 +36,4 @@ Disallow: /create-account
 Disallow: /accept-invitation
 
 # Reference to dynamic XML Sitemap
-Sitemap: https://webmintra.com/sitemap.xml
+Sitemap: https://webmintra.in/sitemap.xml

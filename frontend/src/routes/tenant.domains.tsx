@@ -186,7 +186,7 @@ function DomainsPage() {
                               <td className="px-4 py-2 font-mono text-cyan-400">
                                 {window.location.hostname.includes("localhost")
                                   ? `cname.${window.location.host}`
-                                  : "cname.webmintra.cloud"}
+                                  : "cname.webmintra.in"}
                               </td>
                             </tr>
                           </tbody>

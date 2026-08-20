@@ -5,9 +5,7 @@ export function PublicSiteViewer({ subdomain }: { subdomain: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // In dev, the API URL is typically http://localhost:5000/api
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
+    const apiUrl = import.meta.env.VITE_API_URL || "";
     // We construct the backend URL for the public site
     const targetUrl = `${apiUrl}/public/site/${subdomain}${window.location.pathname}${window.location.search}`;
 

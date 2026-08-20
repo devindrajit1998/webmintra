@@ -171,15 +171,37 @@ function RootApp() {
     }
   }, [settings]);
 
-  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
-  const isSubdomain = hostname
-    ? hostname.includes("localhost")
-      ? hostname.split(".")[0] !== "localhost" && hostname.split(".")[0] !== "app"
-      : hostname !== "webmintra.cloud" && hostname !== "app.webmintra.cloud"
-    : false;
+  const hostname = typeof window !== "undefined" ? window.location.hostname.toLowerCase() : "";
+  
+  // List of main root domains / subdomains that serve the WebMintra platform application (not a customer site)
+  const isMainPlatformHost = (host: string): boolean => {
+    if (!host || host === "localhost" || host === "127.0.0.1") return true;
+    if (
+      host.startsWith("app.") ||
+      host.startsWith("admin.") ||
+      host.startsWith("api.") ||
+      host.startsWith("dash.") ||
+      host.startsWith("staging.")
+    ) {
+      return true;
+    }
+    if (host.startsWith("www.")) {
+      const withoutWww = host.slice(4);
+      return (
+        withoutWww === "webmintra.in" ||
+        withoutWww === "localhost" ||
+        host.endsWith(".onrender.com") ||
+        host.endsWith(".vercel.app")
+      );
+    }
+    return host === "webmintra.in" || host.endsWith(".onrender.com") || host.endsWith(".vercel.app");
+  };
+
+  const isSubdomain = !isMainPlatformHost(hostname);
 
   if (isSubdomain) {
-    return <PublicSiteViewer subdomain={hostname.split(".")[0]} />;
+    const subdomain = hostname.split(".")[0];
+    return <PublicSiteViewer subdomain={subdomain} />;
   }
 
   return (
