@@ -13,7 +13,9 @@ import {
   Clock,
   Eye,
   X,
+  Menu,
 } from "lucide-react";
+import { PublicMobileMenu } from "@/components/PublicMobileMenu";
 
 export const Route = createFileRoute("/blog")({
   component: PublicBlogPage,
@@ -21,6 +23,7 @@ export const Route = createFileRoute("/blog")({
 });
 
 export function PublicBlogPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -51,84 +54,118 @@ export function PublicBlogPage() {
   const categories = data?.categories || [];
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-slate-200 font-sans selection:bg-cyan-500/30">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#07111f]/90 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-          <Link
-            to="/"
-            className="flex items-center gap-3 font-display text-lg font-bold text-white transition hover:opacity-80"
-          >
+    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+      {/* ── HEADER NAVIGATION ────────────────────────────────────────── */}
+      <header className="landing-nav-glass sticky top-0 z-40 w-full">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
+          {/* Brand Logo */}
+          <Link to="/" className="flex items-center gap-2.5 transition hover:opacity-90">
             {settings["brand.logoUrl"] ? (
-              <img src={settings["brand.logoUrl"]} alt="Logo" className="h-9 w-9 object-contain" />
+              <img src={settings["brand.logoUrl"]} alt={settings["site.name"] || "webmintra"} className="h-8 w-auto object-contain" />
             ) : (
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-cyan-500 text-white">
-                <span className="font-bold">{(settings["site.name"] || "W").charAt(0)}</span>
-              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
+                W
+              </div>
             )}
-            <span className="text-[22px] font-black tracking-tight leading-none bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase font-sans">
+            <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
               {settings["site.name"] || "webmintra"}
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="text-sm font-semibold text-slate-400 hover:text-white transition"
-            >
+          {/* Desktop Nav Links */}
+          <nav className="hidden items-center gap-7 text-[13.5px] font-medium text-[#475569] md:flex">
+            <Link to="/" className="landing-nav-link text-[#475569]">
               Home
             </Link>
-            <Link
-              to="/templates"
-              className="text-sm font-semibold text-slate-400 hover:text-white transition"
-            >
+            <Link to="/templates" className="landing-nav-link text-[#475569]">
               Templates
+            </Link>
+            <Link to="/blog" className="landing-nav-link text-[#0f172a] font-bold">
+              Blog
+            </Link>
+            <Link to="/help" className="landing-nav-link text-[#475569]">
+              Help Center
+            </Link>
+            <Link to="/contact" className="landing-nav-link text-[#475569]">
+              Contact
+            </Link>
+          </nav>
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-3">
+            <Link
+              to={user ? routeForRole(user.role) : "/sign-in"}
+              className="text-[13.5px] font-bold text-[#0f172a] hover:text-[#059669] transition px-2 py-1"
+            >
+              Log in
             </Link>
             <Link
               to={primaryRoute}
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-cyan-500 px-5 text-xs font-bold text-slate-950 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition hover:bg-cyan-400"
+              className="hidden h-9 items-center justify-center rounded-lg bg-[#059669] px-4 text-[13px] font-bold text-white shadow-sm transition hover:bg-[#047857] sm:inline-flex"
             >
-              Start Free Trial <ArrowRight className="h-3.5 w-3.5" />
+              Start Free Trial
             </Link>
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open mobile navigation menu"
+              className="landing-icon-button md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-[#e2e8f0] text-[#0f172a] hover:bg-[#f1f5f9] transition"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-12 lg:py-16">
+      {/* Mobile Off-Canvas Drawer */}
+      <PublicMobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        user={user}
+        primaryRoute={primaryRoute}
+        siteName={settings["site.name"] || "webmintra"}
+        logoUrl={settings["brand.logoUrl"]}
+        isLandingPage={false}
+      />
+
+      {/* ── MAIN CONTENT ────────────────────────────────────────────── */}
+      <main className="mx-auto max-w-7xl px-5 sm:px-6 py-12 lg:py-16">
         {/* Title Banner */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-bold text-cyan-300 backdrop-blur-md mb-4">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400" /> Articles & Advice
-          </span>
-          <h1 className="font-display text-4xl font-extrabold text-white sm:text-5xl tracking-tight">
+          <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11.5px] font-bold text-[#c2410c] shadow-2xs">
+            <span>🇮🇳</span>
+            <span>BUSINESS GROWTH ARTICLES & LOCAL SEO GUIDES</span>
+          </div>
+          <h1 className="text-[34px] sm:text-[44px] font-extrabold text-[#0f172a] leading-tight">
             Guides for Small Business Growth
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-slate-400">
-            Actionable strategies on local SEO, website design, and customer acquisition for Indian
-            business owners.
+          <p className="mt-3 text-sm sm:text-base text-[#475569] max-w-xl mx-auto">
+            Actionable strategies on Google Maps SEO, WhatsApp lead generation, and website growth for Indian entrepreneurs.
           </p>
         </div>
 
         {/* Search & Categories */}
         <div className="mb-10 flex flex-col sm:flex-row gap-4 justify-between items-center">
           <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94a3b8]" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search guides & tutorials..."
-              className="w-full rounded-full border border-white/10 bg-[#0c1827] pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none"
+              placeholder="Search guides & strategies..."
+              className="w-full rounded-xl border border-[#cbd5e1] bg-white pl-10 pr-4 py-2.5 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#059669] focus:outline-none shadow-2xs"
             />
           </div>
 
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`rounded-full px-4 py-2 text-xs font-bold transition ${
+              className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
                 selectedCategory === "all"
-                  ? "bg-cyan-500 text-slate-950 shadow-md"
-                  : "border border-white/10 bg-[#0c1827] text-slate-400 hover:text-white"
+                  ? "bg-[#059669] text-white shadow-xs"
+                  : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
               }`}
             >
               All Articles
@@ -137,10 +174,10 @@ export function PublicBlogPage() {
               <button
                 key={c._id}
                 onClick={() => setSelectedCategory(c.slug)}
-                className={`rounded-full px-4 py-2 text-xs font-bold transition ${
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
                   selectedCategory === c.slug
-                    ? "bg-cyan-500 text-slate-950 shadow-md"
-                    : "border border-white/10 bg-[#0c1827] text-slate-400 hover:text-white"
+                    ? "bg-[#059669] text-white shadow-xs"
+                    : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
                 }`}
               >
                 {c.name}
@@ -155,28 +192,28 @@ export function PublicBlogPage() {
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className="h-64 animate-pulse rounded-2xl border border-white/10 bg-[#0c1827] p-6"
+                className="h-64 animate-pulse rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs"
               />
             ))}
           </div>
         ) : posts.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-white/10 bg-[#091521] p-16 text-center">
-            <FileText className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white">No articles found</h3>
-            <p className="text-sm text-slate-400 mt-1">
-              Articles published from the Admin Blog section will appear here automatically.
+          <div className="rounded-3xl border border-dashed border-[#cbd5e1] bg-white p-16 text-center shadow-xs">
+            <FileText className="h-12 w-12 text-[#94a3b8] mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-[#0f172a]">No articles found</h3>
+            <p className="text-sm text-[#64748b] mt-1 max-w-md mx-auto">
+              Articles and growth guides will appear here as they are published.
             </p>
           </div>
         ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((post: any) => (
               <article
                 key={post._id}
-                className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-gradient-to-b from-[#0e1c2e] to-[#0a1523] p-5 transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] hover:-translate-y-1"
+                className="landing-template-card group flex flex-col justify-between p-5"
               >
                 <div>
                   {post.featuredImage && (
-                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-slate-900 mb-4">
+                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-[#f1f5f9] mb-4 border border-[#e2e8f0]">
                       <img
                         src={post.featuredImage}
                         alt={post.title}
@@ -185,34 +222,34 @@ export function PublicBlogPage() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+                  <div className="flex items-center gap-2 text-xs mb-2">
                     {post.category && (
-                      <span className="rounded-full bg-cyan-500/10 px-2.5 py-0.5 font-bold text-cyan-400 border border-cyan-500/20">
+                      <span className="rounded-md bg-[#ecfdf5] px-2.5 py-0.5 font-bold text-[#047857] border border-[#a7f3d0] text-[10px]">
                         {post.category.name}
                       </span>
                     )}
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
+                    <span className="text-[#cbd5e1]">•</span>
+                    <span className="flex items-center gap-1 text-[#64748b] text-[11px]">
                       <Clock className="h-3 w-3" /> {post.readingTimeMinutes || 3} min read
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition leading-snug">
+                  <h3 className="text-lg font-bold text-[#0f172a] group-hover:text-[#059669] transition leading-snug">
                     {post.title}
                   </h3>
 
-                  <p className="text-sm text-slate-400 mt-2 line-clamp-3 leading-relaxed">
+                  <p className="text-xs text-[#64748b] mt-2 line-clamp-3 leading-relaxed">
                     {post.excerpt || post.content?.replace(/<[^>]*>?/gm, "").slice(0, 140)}...
                   </p>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-slate-400">
-                    <User className="h-3.5 w-3.5 text-slate-500" />
+                <div className="mt-5 pt-3.5 border-t border-[#f1f5f9] flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-[#64748b]">
+                    <User className="h-3.5 w-3.5 text-[#94a3b8]" />
                     <span>{post.author?.name || "WebMintra Team"}</span>
                   </div>
 
-                  <span className="text-xs font-bold text-cyan-400 flex items-center gap-1 group-hover:translate-x-0.5 transition">
+                  <span className="text-xs font-bold text-[#059669] flex items-center gap-1 group-hover:translate-x-0.5 transition">
                     Read Article <ArrowRight className="h-3.5 w-3.5" />
                   </span>
                 </div>
@@ -221,6 +258,16 @@ export function PublicBlogPage() {
           </div>
         )}
       </main>
+
+      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
+      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
+        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© 2026 {settings["site.name"] || "webmintra"}. All rights reserved.</p>
+          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
+            <span>100% Data Stored in India</span> <span>🇮🇳</span>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

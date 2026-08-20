@@ -1,7 +1,7 @@
 import { apiFetch } from "./api-fetch";
 import type { EditorState } from "./template-engine/types";
 
-const API_URL = import.meta.env["VITE_API_URL"] ?? "http://localhost:3001/api";
+const API_URL = import.meta.env["VITE_API_URL"] ?? "http://localhost:5000/api";
 
 export type SessionUser = {
   name: string;

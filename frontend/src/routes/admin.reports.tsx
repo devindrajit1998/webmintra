@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { getReport } from "@/lib/admin-api";
-import { BarChart3, TrendingUp, Users, DollarSign, Download } from "lucide-react";
+import { BarChart3, TrendingUp, Users, IndianRupee, Download } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -169,7 +169,7 @@ function ReportsPage() {
       <div className="mb-6 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         {[
           { id: "overview", icon: BarChart3, label: "Overview" },
-          { id: "revenue", icon: DollarSign, label: "Revenue" },
+          { id: "revenue", icon: IndianRupee, label: "Revenue" },
           { id: "users", icon: Users, label: "Users" },
           { id: "retention", icon: TrendingUp, label: "Retention" },
         ].map((tab) => (

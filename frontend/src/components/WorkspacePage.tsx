@@ -70,7 +70,7 @@ export function WorkspacePage({ requiredRole }: { requiredRole: SessionUser["rol
   async function signOut() {
     try {
       await apiFetch(
-        `${import.meta.env["VITE_API_URL"] ?? "http://localhost:3001/api"}/auth/logout`,
+        `${import.meta.env["VITE_API_URL"] ?? "http://localhost:5000/api"}/auth/logout`,
         {
           method: "POST",
         },

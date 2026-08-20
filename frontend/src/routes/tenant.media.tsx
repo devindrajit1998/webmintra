@@ -75,7 +75,7 @@ function MediaPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const assets = assetsQuery.data?.assets ?? [];
+  const assets = useMemo(() => assetsQuery.data?.assets ?? [], [assetsQuery.data?.assets]);
   const visibleAssets = useMemo(() => {
     const term = search.trim().toLowerCase();
     return assets.filter((asset) => {

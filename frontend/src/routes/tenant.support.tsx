@@ -130,7 +130,7 @@ function SupportPage() {
     if (ticket) {
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 80);
     }
-  }, [ticket?.replies?.length, selectedId]);
+  }, [ticket, selectedId]);
 
   return (
     <div className="mx-auto flex flex-col gap-6">

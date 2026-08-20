@@ -115,113 +115,114 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#07111f] font-sans text-slate-200 selection:bg-[#06b6d4]/30">
-      <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#07111f]/80 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 sm:px-6">
+    <div className="landing-page min-h-screen overflow-x-hidden tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+      <header className="landing-nav-glass fixed top-0 z-50 w-full">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
           <Link
             to="/"
-            className="flex items-center gap-3 font-display text-lg font-bold text-white transition hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]"
+            className="flex items-center gap-2.5 transition hover:opacity-90"
           >
             {logoUrl ? (
               <img
                 src={logoUrl}
                 alt={siteName}
-                className="h-10 w-10 rounded-xl object-contain shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+                className="h-8 w-auto object-contain"
               />
             ) : (
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#06b6d4] text-[#083344] shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-                {siteName.charAt(0)}
-              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
+                W
+              </div>
             )}
-            {siteName}
+            <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
+              {siteName}
+            </span>
           </Link>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 py-2 text-sm font-semibold text-slate-300 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]"
+            className="inline-flex items-center gap-2 rounded-lg border border-[#cbd5e1] bg-white px-3.5 py-1.5 text-xs font-bold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0f172a]"
           >
-            <ArrowLeft className="h-4 w-4" /> <span className="hidden sm:inline">Back to home</span>
+            <ArrowLeft className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Back to home</span>
           </Link>
         </div>
       </header>
 
-      <main className="relative flex min-h-screen items-center px-5 pb-10 pt-28 sm:px-6 sm:pb-16 sm:pt-32">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-20">
+      <main className="relative flex min-h-screen items-center px-5 pb-10 pt-24 sm:px-6 sm:pb-16 sm:pt-28">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16">
           <aside className="hidden lg:block">
-            <p className="inline-flex items-center gap-2 rounded-full border border-[#06b6d4]/30 bg-[#06b6d4]/10 px-4 py-1.5 text-xs font-bold text-[#06b6d4]">
-              <ShieldCheck className="h-3.5 w-3.5" /> Secure website management
-            </p>
-            <h2 className="mt-7 max-w-xl font-display text-5xl font-bold leading-[1.1] text-white">
-              Your business website, always in your control.
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11.5px] font-bold text-[#c2410c] shadow-2xs">
+              <span className="text-sm">🇮🇳</span>
+              <span>100% SECURE INDIAN CLOUD</span>
+            </div>
+            <h2 className="text-[42px] font-extrabold leading-[1.12] text-[#0f172a] tracking-tight">
+              Your business website, <br />
+              <span className="text-[#059669]">always in your control.</span>
             </h2>
-            <p className="mt-6 max-w-lg text-lg leading-relaxed text-slate-400">
-              Edit content, preview every change, and publish when you are ready without waiting for
-              a developer.
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-[#475569]">
+              Edit content, preview every change, and publish when you are ready without waiting for a developer.
             </p>
-            <div className="mt-10 max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-[#0c1827] p-2 shadow-2xl">
-              <div className="flex h-11 items-center justify-between border-b border-white/5 px-3">
-                <div className="flex gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-500/80" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
+            <div className="tiranga-border-top mt-8 max-w-xl overflow-hidden rounded-2xl border border-[#cbd5e1] bg-white p-2.5 shadow-xl">
+              <div className="flex h-10 items-center justify-between border-b border-[#e2e8f0] px-3">
+                <div className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
                 </div>
-                <span className="text-xs text-slate-400">Your Website</span>
-                <span className="flex items-center gap-1.5 rounded bg-[#06b6d4]/20 px-2.5 py-1 text-[10px] font-bold text-[#06b6d4]">
+                <span className="text-xs font-mono font-bold text-[#64748b]">yourbusiness.in</span>
+                <span className="flex items-center gap-1.5 rounded-md bg-[#ecfdf5] px-2 py-0.5 text-[10px] font-bold text-[#059669] border border-[#a7f3d0]">
                   <FileEdit className="h-3 w-3" /> Edit
                 </span>
               </div>
-              <div className="relative h-52 overflow-hidden rounded-b-xl">
-                <img
-                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80"
-                  alt="Website editor preview"
-                  className="absolute inset-0 h-full w-full object-cover opacity-45"
-                />
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#07111f]/40 px-8 text-center">
-                  <h3 className="font-display text-2xl font-bold text-white">
-                    Grow your business with confidence
-                  </h3>
-                  <span className="mt-5 rounded-md bg-[#06b6d4] px-5 py-2 text-xs font-bold text-[#083344]">
-                    Learn More
+              <div className="relative h-48 overflow-hidden rounded-b-xl bg-[#fafcfa] p-5 flex flex-col justify-center items-center text-center">
+                <h3 className="text-xl font-extrabold text-[#0f172a]">
+                  Grow your business with confidence
+                </h3>
+                <p className="text-xs text-[#64748b] mt-1">
+                  Ready for customer bookings & instant WhatsApp enquiries
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <span className="rounded-lg bg-[#059669] px-4 py-1.5 text-xs font-bold text-white shadow-xs">
+                    Live Preview
                   </span>
                 </div>
               </div>
             </div>
-            <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-slate-400">
-              {["No coding", "No credit card", "Preview before publishing"].map((item) => (
-                <li key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#06b6d4]" /> {item}
+            <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-[#475569]">
+              {["✓ No coding", "✓ 14-day free trial", "✓ 100% Data Stored in India 🇮🇳"].map((item) => (
+                <li key={item} className="flex items-center gap-1">
+                  {item}
                 </li>
               ))}
             </ul>
           </aside>
 
           <section
-            className="fade-up mx-auto w-full max-w-md rounded-2xl border border-white/10 bg-[#0c1827] p-6 shadow-2xl sm:p-8"
+            className="tiranga-border-top mx-auto w-full max-w-md rounded-2xl border border-[#e2e8f0] bg-white p-7 sm:p-9 shadow-2xl"
             aria-labelledby={titleId}
             aria-describedby={descriptionId}
           >
-            <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#06b6d4]/15 text-[#06b6d4]">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
               <Mail className="h-5 w-5" />
             </div>
-            <p className="mt-5 text-sm font-bold text-[#06b6d4]">{text.eyebrow}</p>
-            <h1 id={titleId} className="mt-3 font-display text-3xl font-bold text-white">
+            <p className="mt-4 text-xs font-bold text-[#059669]">{text.eyebrow}</p>
+            <h1 id={titleId} className="mt-1.5 text-2xl sm:text-3xl font-extrabold text-[#0f172a]">
               {text.title}
             </h1>
-            <p id={descriptionId} className="mt-3 text-sm leading-relaxed text-slate-400">
+            <p id={descriptionId} className="mt-2 text-xs sm:text-sm leading-relaxed text-[#64748b]">
               {text.description}
             </p>
             {notice && (
               <div
-                className="mt-5 rounded-lg border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-relaxed text-slate-200"
+                className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs font-medium leading-relaxed text-amber-800"
                 role="status"
               >
                 {notice}
               </div>
             )}
 
-            <form className="mt-7 space-y-5" onSubmit={handleSubmit} noValidate>
-              <div className="space-y-2">
+            <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
+              <div className="space-y-1.5">
                 <label
-                  className="block text-sm font-bold text-slate-200"
+                  className="block text-xs font-bold text-[#0f172a]"
                   htmlFor="verification-code"
                 >
                   Verification code
@@ -243,15 +244,15 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
                       <InputOTPSlot
                         key={index}
                         index={index}
-                        className="h-12 w-11 text-base sm:w-12"
+                        className="h-11 w-11 text-base sm:w-12 border-[#cbd5e1] text-[#0f172a]"
                       />
                     ))}
                   </InputOTPGroup>
                 </InputOTP>
               </div>
               {purpose === "password-reset" && (
-                <div className="space-y-2">
-                  <label className="block text-sm font-bold text-slate-200" htmlFor="new-password">
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-[#0f172a]" htmlFor="new-password">
                     New password
                   </label>
                   <input
@@ -262,32 +263,32 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
                     minLength={12}
                     required
                     autoComplete="new-password"
-                    className="h-12 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20"
+                    className="h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] outline-none transition placeholder:text-[#94a3b8] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] shadow-2xs"
                   />
-                  <p className="text-xs text-slate-500">Use at least 12 characters.</p>
+                  <p className="text-[10.5px] text-[#94a3b8]">Use at least 12 characters.</p>
                 </div>
               )}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#06b6d4] px-5 text-sm font-bold text-[#083344] shadow-[0_0_20px_rgba(6,182,212,0.25)] transition hover:bg-[#22d3ee] hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#67e8f9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1827] disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-sm font-bold text-white shadow-md transition hover:bg-[#047857] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
               >
                 {isSubmitting ? "Please wait..." : text.action}
                 {!isSubmitting && <ArrowRight className="h-4 w-4" />}
               </button>
             </form>
 
-            <div className="mt-5 flex flex-col items-center gap-3 border-t border-white/5 pt-5 text-sm">
+            <div className="mt-6 flex flex-col items-center gap-3 border-t border-[#f1f5f9] pt-5 text-xs text-[#64748b]">
               <button
                 type="button"
                 onClick={handleResend}
-                className="inline-flex items-center gap-2 font-bold text-[#06b6d4] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]"
+                className="inline-flex items-center gap-1.5 font-bold text-[#059669] hover:underline"
               >
-                <RefreshCw className="h-4 w-4" /> Resend code
+                <RefreshCw className="h-3.5 w-3.5" /> Resend code
               </button>
               <Link
                 to={text.backTo}
-                className="font-semibold text-slate-400 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06b6d4]"
+                className="font-bold text-[#64748b] hover:text-[#0f172a] hover:underline"
               >
                 {text.backLabel}
               </Link>

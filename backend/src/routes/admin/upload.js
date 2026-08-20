@@ -3,6 +3,8 @@ import multer from "multer";
 import { imagekit } from "../../lib/imagekit.js";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
 
+const router = Router();
+
 const ALLOWED_MIME_TYPES = [
   "image/jpeg",
   "image/png",
@@ -41,10 +43,10 @@ router.post("/", upload.single("file"), async (req, res) => {
       folder: "/webmintra",
     });
 
-    res.status(200).json({ 
-      message: "File uploaded successfully", 
+    res.status(200).json({
+      message: "File uploaded successfully",
       url: response.url,
-      fileId: response.fileId
+      fileId: response.fileId,
     });
   } catch (error) {
     console.error("Error uploading to ImageKit:", error);

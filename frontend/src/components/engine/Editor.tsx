@@ -150,13 +150,16 @@ export function Editor({
   );
 
   const editOf = (id: string): ElementEdit => state.edits[page.id]?.[id] ?? {};
-  const patch = (id: string, p: ElementEdit) => {
-    preservePreviewScroll();
-    const pageEdits = { ...(state.edits[page.id] ?? {}) };
-    const prev = pageEdits[id] ?? {};
-    pageEdits[id] = { ...prev, ...p, style: { ...(prev.style ?? {}), ...(p.style ?? {}) } };
-    commit({ ...state, edits: { ...state.edits, [page.id]: pageEdits } });
-  };
+  const patch = useCallback(
+    (id: string, p: ElementEdit) => {
+      preservePreviewScroll();
+      const pageEdits = { ...(state.edits[page.id] ?? {}) };
+      const prev = pageEdits[id] ?? {};
+      pageEdits[id] = { ...prev, ...p, style: { ...(prev.style ?? {}), ...(p.style ?? {}) } };
+      commit({ ...state, edits: { ...state.edits, [page.id]: pageEdits } });
+    },
+    [commit, page.id, state],
+  );
   const replaceAsset = (url: string, src: string) => {
     preservePreviewScroll();
     const edits = { ...state.edits };

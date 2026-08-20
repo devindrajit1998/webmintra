@@ -19,37 +19,38 @@ export function PrivacyPolicyPage() {
   const supportEmail = settings["site.supportEmail"] || "support@webmintra.com";
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-slate-200 font-sans">
-      <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#07111f]/90 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+      {/* ── HEADER NAVIGATION ────────────────────────────────────────── */}
+      <header className="landing-nav-glass sticky top-0 z-40 w-full">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
           <Link
             to="/"
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition"
+            className="flex items-center gap-2 text-xs font-bold text-[#475569] hover:text-[#0f172a] transition"
           >
             <ArrowLeft className="h-4 w-4" /> Back to Home
           </Link>
-          <span className="text-[20px] font-black tracking-tight bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase">
+          <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
             {siteName}
           </span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-12 lg:py-16">
-        <div className="rounded-3xl border border-white/10 bg-[#0c1827] p-8 sm:p-12 shadow-2xl space-y-8">
+      {/* ── MAIN CONTENT ────────────────────────────────────────────── */}
+      <main className="mx-auto max-w-4xl px-5 sm:px-6 py-12 lg:py-16">
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 sm:p-12 shadow-sm space-y-8">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3.5 py-1 text-xs font-bold text-cyan-300 mb-3">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11px] font-bold text-[#c2410c] shadow-2xs">
               <Lock className="h-3.5 w-3.5" /> Legal Documentation
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Privacy Policy</h1>
-            <p className="text-xs text-slate-400 mt-2">
-              Last Updated: August 2026 • Compliant with Indian IT Act, 2000 & Digital Personal Data
-              Protection Act
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0f172a]">Privacy Policy</h1>
+            <p className="text-xs text-[#64748b] mt-2">
+              Last Updated: August 2026 • Compliant with Indian IT Act, 2000 & Digital Personal Data Protection (DPDP) Act
             </p>
           </div>
 
-          <div className="space-y-6 text-sm text-slate-300 leading-relaxed">
+          <div className="space-y-6 text-sm text-[#475569] leading-relaxed">
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">1. Overview</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">1. Overview</h2>
               <p>
                 {siteName} (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;platform&rdquo;) values
                 your privacy and is committed to protecting the personal data of our users, website
@@ -59,61 +60,56 @@ export function PrivacyPolicyPage() {
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">2. Information We Collect</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">2. Information We Collect</h2>
               <p>We collect information necessary to provide and secure our services, including:</p>
-              <ul className="list-disc pl-5 space-y-1 text-slate-400">
+              <ul className="list-disc pl-5 space-y-1 text-[#64748b]">
                 <li>
-                  <strong className="text-slate-200">Account Data:</strong> Name, business name,
+                  <strong className="text-[#0f172a]">Account Data:</strong> Name, business name,
                   email address, phone number, and password credentials.
                 </li>
                 <li>
-                  <strong className="text-slate-200">Website Content:</strong> Text, images, logos,
+                  <strong className="text-[#0f172a]">Website Content:</strong> Text, images, logos,
                   business hours, and pricing lists uploaded to your created sites.
                 </li>
                 <li>
-                  <strong className="text-slate-200">Lead & Form Submissions:</strong> Enquiries
-                  submitted by visitors on your published websites are stored securely for your
-                  access.
+                  <strong className="text-[#0f172a]">Lead & Form Submissions:</strong> Enquiries
+                  submitted by visitors on your published websites are stored securely for your access and routed to WhatsApp.
                 </li>
                 <li>
-                  <strong className="text-slate-200">Billing Data:</strong> Transaction references
-                  and subscription IDs processed through secure payment gateway partners (e.g.
-                  Razorpay). We never store raw credit card numbers.
+                  <strong className="text-[#0f172a]">Billing Data:</strong> Transaction references
+                  and subscription IDs processed through RBI-approved Indian payment gateways (e.g. Razorpay, UPI). We never store raw card numbers.
                 </li>
               </ul>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">3. How We Use Your Data</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">3. How We Use Your Data</h2>
               <p>Your information is used exclusively to:</p>
-              <ul className="list-disc pl-5 space-y-1 text-slate-400">
+              <ul className="list-disc pl-5 space-y-1 text-[#64748b]">
                 <li>
                   Host and deliver high-speed, secure websites with automatic SSL certification.
                 </li>
                 <li>
-                  Notify you immediately when prospective customers submit contact and booking
-                  requests.
+                  Notify you immediately when prospective customers submit contact and booking requests.
                 </li>
-                <li>Provide customer support, onboarding assistance, and service updates.</li>
+                <li>Provide customer support, GST invoices, onboarding assistance, and service updates.</li>
               </ul>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">4. Data Ownership & Security</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">4. Data Ownership & Security</h2>
               <p>
-                You retain 100% ownership of your business content, images, and visitor lead
-                submissions. All data in transit is encrypted using 256-bit SSL/TLS encryption.
+                You retain 100% ownership of your business content, images, and visitor lead submissions. All data in transit is encrypted using 256-bit SSL/TLS encryption and stored on secure Indian cloud infrastructure.
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">5. Contact Information</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">5. Contact Information</h2>
               <p>
-                For questions regarding this policy or data deletion requests, email our data
-                protection team at{" "}
+                For questions regarding this policy or data deletion requests, email our data protection officer at{" "}
                 <a
                   href={`mailto:${supportEmail}`}
-                  className="text-cyan-400 underline font-semibold"
+                  className="text-[#059669] underline font-bold"
                 >
                   {supportEmail}
                 </a>
@@ -123,6 +119,16 @@ export function PrivacyPolicyPage() {
           </div>
         </div>
       </main>
+
+      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
+      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
+        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© 2026 {siteName}. All rights reserved.</p>
+          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
+            <span>100% Data Stored in India</span> <span>🇮🇳</span>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

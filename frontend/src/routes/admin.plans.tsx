@@ -153,14 +153,9 @@ type PlanForm = {
   seoFeatures: SeoFeatures;
 };
 
-const SEO_TIER_FEATURES = {
+const SEO_TIER_FEATURES: Record<"basic" | "advance" | "premium", SeoFeatures> = {
   basic: {
-    ...Object.fromEntries(
-      SEO_FEATURES.map(([key, , kind]) => [
-        key,
-        kind === "boolean" ? false : Array.isArray(kind) ? kind[0] : "basic",
-      ]),
-    ),
+    ...DEFAULT_SEO_FEATURES,
     pageTitle: true,
     metaDescription: true,
     searchKeywords: true,
@@ -171,12 +166,7 @@ const SEO_TIER_FEATURES = {
     seoSettingsPerPage: "limited",
   },
   advance: {
-    ...Object.fromEntries(
-      SEO_FEATURES.map(([key, , kind]) => [
-        key,
-        kind === "boolean" ? false : Array.isArray(kind) ? kind[0] : "basic",
-      ]),
-    ),
+    ...DEFAULT_SEO_FEATURES,
     // Basic features
     pageTitle: true,
     metaDescription: true,
@@ -203,12 +193,7 @@ const SEO_TIER_FEATURES = {
     seoSettingsPerPage: "enabled",
   },
   premium: {
-    ...Object.fromEntries(
-      SEO_FEATURES.map(([key, , kind]) => [
-        key,
-        kind === "boolean" ? false : Array.isArray(kind) ? kind[0] : "basic",
-      ]),
-    ),
+    ...DEFAULT_SEO_FEATURES,
     // Basic + Advance features
     pageTitle: true,
     metaDescription: true,
@@ -367,14 +352,14 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
   const isArchived = plan.status === "archived";
 
   return (
-    <div
-      className={`relative flex flex-col rounded-xl border bg-[#0b1826] transition-all ${isArchived ? "border-slate-800/40 opacity-50" : "border-slate-800 hover:border-slate-700"}`}
+    <article
+      className={`relative flex min-w-0 flex-col overflow-hidden rounded-lg border bg-white shadow-sm transition-all ${isArchived ? "border-slate-200 opacity-60" : "border-slate-200 hover:border-slate-300 hover:shadow-md"}`}
     >
       {/* Header */}
-      <div className="flex items-start justify-between p-5 pb-4 border-b border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-display text-lg font-bold text-slate-200">
+      <div className="flex min-h-[84px] items-start justify-between gap-3 border-b border-slate-200 p-5 pb-4">
+        <div className="min-w-0">
+          <div className="mb-1 flex items-center gap-2">
+            <h3 className="truncate font-display text-lg font-bold text-slate-950">
               {plan.displayName || (plan.slug === "pro" ? "Business" : plan.name)}
             </h3>
             {plan.isPublic ? (
@@ -383,7 +368,7 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
               <EyeOff className="h-3.5 w-3.5 text-slate-600" />
             )}
           </div>
-          <p className="text-xs text-slate-500 font-mono">/{plan.slug}</p>
+          <p className="truncate font-mono text-xs text-slate-500">/{plan.slug}</p>
           {plan.description && (
             <p className="mt-2 text-xs text-slate-400 leading-relaxed">{plan.description}</p>
           )}
@@ -396,21 +381,21 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
       </div>
 
       {/* Pricing */}
-      <div className="px-5 py-4 border-b border-slate-800">
-        <div className="flex gap-4">
+      <div className="min-h-[84px] border-b border-slate-200 px-5 py-4">
+        <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
           {plan.pricing?.monthly !== null && (
             <div>
-              <p className="font-display text-2xl font-bold text-white">
-                ₹{plan.pricing?.monthly}
-                <span className="ml-1 text-xs font-normal text-slate-500">/ mo</span>
+              <p className="font-display text-2xl font-bold text-slate-950">
+                ₹{Number(plan.pricing?.monthly ?? 0).toLocaleString("en-IN")}
+                <span className="ml-1 text-xs font-normal text-slate-500">/mo</span>
               </p>
             </div>
           )}
           {plan.pricing?.yearly !== null && (
             <div>
-              <p className="font-display text-2xl font-bold text-white">
-                ₹{plan.pricing?.yearly}
-                <span className="ml-1 text-xs font-normal text-slate-500">/ yr</span>
+              <p className="font-display text-2xl font-bold text-slate-950">
+                ₹{Number(plan.pricing?.yearly ?? 0).toLocaleString("en-IN")}
+                <span className="ml-1 text-xs font-normal text-slate-500">/yr</span>
               </p>
             </div>
           )}
@@ -424,7 +409,7 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
       </div>
 
       {/* Limits */}
-      <div className="px-5 py-3 space-y-1.5 border-b border-slate-800 flex-1">
+      <div className="flex-1 space-y-2 border-b border-slate-200 px-5 py-4">
         <LimitBadge icon={Globe} label={`${fmt(lim.websites, "Websites")}`} />
         <LimitBadge icon={FileText} label={`${fmt(lim.pagesPerWebsite, "Pages/site")}`} />
         <LimitBadge icon={Database} label={`${fmt(lim.storageMb, "MB Storage")}`} />
@@ -439,7 +424,7 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
       </div>
 
       {/* Feature badges */}
-      <div className="px-5 py-3 flex flex-wrap gap-1.5 border-b border-slate-800">
+      <div className="flex min-h-[62px] flex-wrap content-start gap-1.5 border-b border-slate-200 px-5 py-3">
         {feat.customDomain && <FeatureBadge label="Custom Domains" />}
         {feat.removeBranding && <FeatureBadge label="White Label" />}
         {feat.apiAccess && <FeatureBadge label="API Access" />}
@@ -453,20 +438,21 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
       {/* Footer */}
       <div className="p-3">
         <button
+          type="button"
           onClick={() => onEdit(plan)}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-800 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-700"
+          className="flex h-9 w-full items-center justify-center gap-2 rounded-md border border-slate-300 bg-white text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400 hover:bg-slate-50 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           <Edit className="h-4 w-4" /> Edit Plan
         </button>
       </div>
-    </div>
+    </article>
   );
 }
 
 function LimitBadge({ icon: Icon, label }: { icon: any; label: string }) {
   return (
-    <div className="flex items-center gap-2 text-xs text-slate-400">
-      <Icon className="h-3 w-3 text-slate-600 shrink-0" />
+    <div className="flex items-center gap-2 text-xs text-slate-600">
+      <Icon className="h-3.5 w-3.5 shrink-0 text-slate-400" />
       <span>{label}</span>
     </div>
   );
@@ -475,10 +461,10 @@ function LimitBadge({ icon: Icon, label }: { icon: any; label: string }) {
 function FeatureBadge({ label, color = "emerald" }: { label: string; color?: "emerald" | "blue" }) {
   const cls =
     color === "blue"
-      ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-      : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+      ? "border-blue-200 bg-blue-50 text-blue-700"
+      : "border-emerald-200 bg-emerald-50 text-emerald-700";
   return (
-    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${cls}`}>
+    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cls}`}>
       {label}
     </span>
   );
@@ -499,20 +485,20 @@ function PlanFormDrawer({
   const [form, setForm] = useState<PlanForm>(
     initial
       ? {
-          name: initial.name,
-          slug: initial.slug,
-          description: initial.description ?? "",
-          pricing: {
-            monthly: initial.pricing?.monthly ?? 499,
-            yearly: initial.pricing?.yearly ?? 4990,
-          },
-          trialDays: initial.trialDays ?? 0,
-          isPublic: initial.isPublic ?? true,
-          sortOrder: initial.sortOrder ?? 0,
-          limits: { ...DEFAULT_LIMITS, ...initial.limits },
-          features: { ...DEFAULT_FEATURES, ...initial.features },
-          seoFeatures: { ...DEFAULT_SEO_FEATURES, ...initial.seoFeatures },
-        }
+        name: initial.name,
+        slug: initial.slug,
+        description: initial.description ?? "",
+        pricing: {
+          monthly: initial.pricing?.monthly ?? 499,
+          yearly: initial.pricing?.yearly ?? 4990,
+        },
+        trialDays: initial.trialDays ?? 0,
+        isPublic: initial.isPublic ?? true,
+        sortOrder: initial.sortOrder ?? 0,
+        limits: { ...DEFAULT_LIMITS, ...initial.limits },
+        features: { ...DEFAULT_FEATURES, ...initial.features },
+        seoFeatures: { ...DEFAULT_SEO_FEATURES, ...initial.seoFeatures },
+      }
       : { ...EMPTY_FORM },
   );
 
@@ -884,11 +870,10 @@ function PlanFormDrawer({
                 {/* Basic SEO */}
                 <div
                   onClick={() => setTier("basic")}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
-                    seoTier === "basic"
-                      ? "border-cyan-500 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500"
-                      : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
-                  }`}
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${seoTier === "basic"
+                    ? "border-cyan-500 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500"
+                    : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
@@ -923,11 +908,10 @@ function PlanFormDrawer({
                 {/* Advance SEO */}
                 <div
                   onClick={() => setTier("advance")}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
-                    seoTier === "advance"
-                      ? "border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500"
-                      : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
-                  }`}
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${seoTier === "advance"
+                    ? "border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500"
+                    : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
@@ -973,11 +957,10 @@ function PlanFormDrawer({
                 {/* Premium SEO */}
                 <div
                   onClick={() => setTier("premium")}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${
-                    seoTier === "premium"
-                      ? "border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-1 ring-amber-500"
-                      : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
-                  }`}
+                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${seoTier === "premium"
+                    ? "border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-1 ring-amber-500"
+                    : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
@@ -1179,7 +1162,7 @@ function PlansPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="mx-auto w-full max-w-[1600px]">
       {/* Page Header */}
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
@@ -1188,7 +1171,7 @@ function PlansPage() {
             Define pricing tiers with granular limits and feature access.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 flex-wrap items-center gap-3">
           <button
             onClick={() => setShowArchived(!showArchived)}
             className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition ${showArchived ? "border-slate-600 bg-slate-800 text-slate-300" : "border-slate-700 text-slate-500 hover:text-slate-300"}`}
@@ -1212,14 +1195,14 @@ function PlansPage() {
           <p className="text-sm text-slate-500">Loading plans…</p>
         </div>
       ) : plans.length ? (
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid items-stretch gap-5 md:grid-cols-2 2xl:grid-cols-3">
           {plans.map((plan: any) => (
             <PlanCard key={plan._id} plan={plan} onEdit={openEdit} />
           ))}
           {/* Create new CTA card */}
           <button
             onClick={openCreate}
-            className="flex min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-slate-800 text-slate-500 transition hover:border-slate-600 hover:text-slate-300"
+            className="flex min-h-[240px] flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-slate-300 bg-white/40 text-slate-500 transition hover:border-emerald-400 hover:bg-emerald-50/50 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
           >
             <Plus className="h-8 w-8" />
             <span className="text-sm font-medium">New Plan</span>

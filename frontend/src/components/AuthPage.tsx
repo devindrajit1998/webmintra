@@ -127,36 +127,32 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#07111f] font-sans text-slate-200 selection:bg-cyan-500/30">
-      {/* Subtle Background Glows */}
-      <div className="pointer-events-none absolute left-1/4 top-1/4 -z-10 -translate-x-1/2 -translate-y-1/2 opacity-25 blur-[140px]">
-        <div className="h-[450px] w-[450px] rounded-full bg-gradient-to-tr from-cyan-500 via-blue-600 to-emerald-500" />
-      </div>
-      <div className="pointer-events-none absolute right-10 bottom-10 -z-10 opacity-20 blur-[130px]">
-        <div className="h-[380px] w-[380px] rounded-full bg-cyan-600" />
-      </div>
+    <div className="landing-page relative min-h-screen overflow-hidden tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+      {/* Ambient Tiranga Glows */}
+      <div className="pointer-events-none absolute -top-16 -left-16 h-[440px] w-[440px] rounded-full bg-[#ea580c]/[0.08] blur-[120px]" />
+      <div className="pointer-events-none absolute -bottom-16 -right-16 h-[440px] w-[440px] rounded-full bg-[#059669]/[0.09] blur-[120px]" />
 
       {/* Header */}
-      <header className="fixed top-0 z-50 w-full border-b border-white/5 bg-[#07111f]/85 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+      <header className="landing-nav-glass fixed top-0 z-50 w-full">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
           <Link
             to="/"
-            className="flex items-center gap-3 font-display text-lg font-bold text-white transition hover:opacity-90"
+            className="flex items-center gap-2.5 transition hover:opacity-90"
           >
             {isMounted && logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-9 w-9 object-contain" />
+              <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
             ) : (
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-cyan-500 text-white">
-                <span className="font-bold">{(isMounted ? siteName : "W").charAt(0)}</span>
-              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
+                W
+              </div>
             )}
-            <span className="text-[22px] font-black tracking-tight leading-none bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase font-sans">
+            <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
               {isMounted ? siteName : "webmintra"}
             </span>
           </Link>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+            className="inline-flex items-center gap-2 rounded-lg border border-[#cbd5e1] bg-white px-3.5 py-1.5 text-xs font-bold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0f172a]"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> <span>Back to home</span>
           </Link>
@@ -164,80 +160,81 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
       </header>
 
       {/* Main Content Area */}
-      <main className="relative flex min-h-screen items-center px-6 pb-12 pt-28 sm:pb-16 sm:pt-32">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
+      <main className="relative flex min-h-screen items-center px-5 sm:px-6 pb-12 pt-24 sm:pb-16 sm:pt-28">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
           {/* Left: Product Hero Showcase */}
           <aside className="hidden lg:block">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-bold text-cyan-300 backdrop-blur-md mb-6">
-              <ShieldCheck className="h-3.5 w-3.5 text-cyan-400" /> Secure Cloud Workspace
-            </span>
-            <h2 className="font-display text-5xl font-extrabold leading-[1.15] text-white tracking-tight">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11.5px] font-bold text-[#c2410c] shadow-2xs">
+              <span className="text-sm">🇮🇳</span>
+              <span>TRUSTED BY 10,000+ INDIAN BUSINESSES</span>
+            </div>
+            <h2 className="text-[42px] font-extrabold leading-[1.12] text-[#0f172a] tracking-tight">
               Your business website, <br />
-              <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+              <span className="text-[#059669]">
                 always in your control.
               </span>
             </h2>
-            <p className="mt-6 max-w-lg text-base leading-relaxed text-slate-400">
-              Edit pricing, photos, and timings anytime with simple point-and-click tools. Preview
-              every change before publishing.
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-[#475569]">
+              Edit pricing, photos, and timings anytime with simple point-and-click tools. Direct WhatsApp lead alerts and UPI readiness included.
             </p>
 
             {/* Interactive Browser Canvas Mockup */}
-            <div className="mt-10 max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#0e1c2e] to-[#0a1523] p-2.5 shadow-2xl">
-              <div className="flex h-11 items-center justify-between border-b border-white/5 px-4">
-                <div className="flex gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
+            <div className="tiranga-border-top mt-8 max-w-xl overflow-hidden rounded-2xl border border-[#cbd5e1] bg-white p-2.5 shadow-xl">
+              <div className="flex h-10 items-center justify-between border-b border-[#e2e8f0] px-3">
+                <div className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#10b981]" />
                 </div>
-                <span className="text-xs font-mono font-medium text-slate-400">
-                  https://yourbusiness.in
+                <span className="text-xs font-mono font-bold text-[#64748b]">
+                  smilecaredental.in
                 </span>
-                <span className="flex items-center gap-1.5 rounded-md bg-cyan-500/20 px-2.5 py-1 text-[10px] font-bold text-cyan-300 border border-cyan-500/30">
+                <span className="flex items-center gap-1.5 rounded-md bg-[#ecfdf5] px-2 py-0.5 text-[10px] font-bold text-[#059669] border border-[#a7f3d0]">
                   <FileEdit className="h-3 w-3" /> Live Editor
                 </span>
               </div>
 
-              <div className="relative h-56 overflow-hidden rounded-b-xl bg-[#09131e] p-6 flex flex-col justify-between">
+              <div className="relative h-56 overflow-hidden rounded-b-xl bg-[#fafcfa] p-5 flex flex-col justify-between border-t border-[#f1f5f9]">
                 <div className="flex justify-between items-center">
-                  <div className="h-5 w-24 rounded bg-cyan-500/20 animate-pulse" />
-                  <div className="flex gap-2">
-                    <div className="h-4 w-12 rounded bg-slate-800" />
-                    <div className="h-4 w-12 rounded bg-slate-800" />
+                  <div className="text-[10px] font-bold text-[#059669] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">
+                    GREATER KAILASH, DELHI
+                  </div>
+                  <div className="flex gap-1.5 text-[9px] font-semibold text-[#64748b]">
+                    <span>Home</span> · <span>Services</span> · <span>Doctors</span>
                   </div>
                 </div>
 
-                <div className="text-center py-4">
-                  <span className="inline-block rounded border border-cyan-500/40 bg-cyan-500/10 px-3 py-0.5 text-[10px] font-bold text-cyan-300 mb-2">
+                <div className="text-center py-2">
+                  <span className="inline-block rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-0.5 text-[10px] font-bold text-[#c2410c] mb-1.5">
                     Visual Point & Click
                   </span>
-                  <h3 className="font-display text-2xl font-extrabold text-white">
-                    Grow your business with confidence
+                  <h3 className="text-xl font-extrabold text-[#0f172a]">
+                    SmileCare Dental Clinic
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Ready for appointment bookings & lead generation
+                  <p className="text-xs text-[#64748b] mt-0.5">
+                    Modern pain-free dentistry with instant WhatsApp booking
                   </p>
                 </div>
 
                 <div className="flex justify-center gap-3">
-                  <span className="rounded-lg bg-cyan-500 px-4 py-1.5 text-xs font-bold text-slate-950 shadow-md">
-                    Book Appointment
+                  <span className="rounded-lg bg-[#25D366] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs flex items-center gap-1">
+                    <span>💬</span> WhatsApp Book
                   </span>
-                  <span className="rounded-lg border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold text-slate-300">
-                    Our Services
+                  <span className="rounded-lg border border-[#cbd5e1] bg-white px-3.5 py-1.5 text-xs font-bold text-[#0f172a] shadow-2xs">
+                    View Pricing
                   </span>
                 </div>
               </div>
             </div>
 
-            <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-slate-400">
+            <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-[#475569]">
               {[
                 "✓ No coding required",
-                "✓ 15-day free trial",
-                "✓ Custom domain ready",
-                "✓ Free cloud hosting",
+                "✓ 14-day free trial",
+                "✓ Free .in domain",
+                "✓ 100% Data Stored in India 🇮🇳",
               ].map((item) => (
-                <li key={item} className="text-slate-300">
+                <li key={item} className="flex items-center gap-1">
                   {item}
                 </li>
               ))}
@@ -246,33 +243,33 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 
           {/* Right: Auth Card */}
           <section
-            className="mx-auto w-full max-w-md rounded-3xl border border-white/10 bg-gradient-to-b from-[#0e1c2e] to-[#0a1523] p-8 shadow-[0_0_50px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-10"
+            className="tiranga-border-top mx-auto w-full max-w-md rounded-2xl border border-[#e2e8f0] bg-white p-7 sm:p-9 shadow-2xl backdrop-blur-xl"
             aria-labelledby={titleId}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="rounded-full bg-cyan-500/10 px-3 py-1 text-[11px] font-bold text-cyan-400 border border-cyan-500/20">
-                {mode === "forgot-password" ? "Security Help" : `${siteName} Workspace`}
+              <span className="rounded-full bg-[#ecfdf5] px-3 py-1 text-[11px] font-bold text-[#059669] border border-[#a7f3d0]">
+                {mode === "forgot-password" ? "Security Help" : `🇮🇳 ${siteName} Workspace`}
               </span>
             </div>
 
             <h1
               id={titleId}
-              className="mt-4 font-display text-3xl font-extrabold text-white tracking-tight"
+              className="mt-4 text-2xl sm:text-3xl font-extrabold text-[#0f172a] tracking-tight"
             >
               {text.title}
             </h1>
-            <p className="mt-2 text-sm text-slate-400 leading-relaxed">{text.description}</p>
+            <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">{text.description}</p>
 
             {notice && (
               <div
-                className="mt-6 rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs font-medium leading-relaxed text-rose-300"
+                className="mt-5 rounded-xl border border-rose-200 bg-rose-50 p-3.5 text-xs font-medium leading-relaxed text-rose-700"
                 role="status"
               >
                 {notice}
               </div>
             )}
 
-            <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
+            <form className="mt-5 space-y-4" onSubmit={handleSubmit} noValidate>
               {mode === "create-account" && (
                 <Field
                   label="Your Full Name"
@@ -316,12 +313,12 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               )}
 
               {mode === "sign-in" && (
-                <div className="flex justify-end pt-1">
+                <div className="flex justify-end pt-0.5">
                   <Link
                     to="/forgot-password"
-                    className="text-xs font-bold text-cyan-400 hover:text-cyan-300 transition"
+                    className="text-xs font-bold text-[#059669] hover:underline transition"
                   >
-                    Forgot your password?
+                    Forgot password?
                   </Link>
                 </div>
               )}
@@ -329,20 +326,20 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan-500 px-5 text-sm font-bold text-slate-950 shadow-[0_0_25px_rgba(6,182,212,0.35)] transition hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+                className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-sm font-bold text-white shadow-md transition hover:bg-[#047857] focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
               >
                 {isSubmitting ? "Please wait..." : text.action}
                 {!isSubmitting && <ArrowRight className="h-4 w-4" />}
               </button>
             </form>
 
-            <p className="mt-6 border-t border-white/5 pt-6 text-center text-xs text-slate-400">
+            <p className="mt-6 border-t border-[#f1f5f9] pt-5 text-center text-xs text-[#64748b]">
               {mode === "sign-in" && (
                 <>
                   New to {siteName}?{" "}
                   <Link
                     to="/create-account"
-                    className="font-bold text-cyan-400 hover:text-cyan-300 underline-offset-4 hover:underline"
+                    className="font-bold text-[#059669] hover:underline"
                   >
                     Create a free account
                   </Link>
@@ -353,7 +350,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
                   Already have an account?{" "}
                   <Link
                     to="/sign-in"
-                    className="font-bold text-cyan-400 hover:text-cyan-300 underline-offset-4 hover:underline"
+                    className="font-bold text-[#059669] hover:underline"
                   >
                     Sign in here
                   </Link>
@@ -364,7 +361,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
                   Remembered your password?{" "}
                   <Link
                     to="/sign-in"
-                    className="font-bold text-cyan-400 hover:text-cyan-300 underline-offset-4 hover:underline"
+                    className="font-bold text-[#059669] hover:underline"
                   >
                     Return to sign in
                   </Link>
@@ -387,19 +384,19 @@ function Field({
   const generatedId = useId();
   const inputId = id ?? generatedId;
   return (
-    <div className="space-y-1.5">
-      <label className="block text-xs font-semibold text-slate-300" htmlFor={inputId}>
+    <div className="space-y-1">
+      <label className="block text-xs font-bold text-[#0f172a]" htmlFor={inputId}>
         {label}
       </label>
       <div className="relative">
         <input
           id={inputId}
-          className="h-11 w-full rounded-xl border border-white/10 bg-[#07111f] px-3.5 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 shadow-inner"
+          className="h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition focus:border-[#059669] focus:ring-1 focus:ring-[#059669] shadow-2xs"
           required
           {...props}
         />
         {Icon && (
-          <Icon className="pointer-events-none absolute right-3.5 top-3.5 h-4 w-4 text-slate-500" />
+          <Icon className="pointer-events-none absolute right-3 top-3 h-4 w-4 text-[#94a3b8]" />
         )}
       </div>
     </div>
@@ -418,8 +415,8 @@ function PasswordField({
   onShowChange: (show: boolean) => void;
 }) {
   return (
-    <div className="space-y-1.5">
-      <label className="block text-xs font-semibold text-slate-300" htmlFor={id}>
+    <div className="space-y-1">
+      <label className="block text-xs font-bold text-[#0f172a]" htmlFor={id}>
         {label}
       </label>
       <div className="relative">
@@ -427,7 +424,7 @@ function PasswordField({
           id={id}
           type={show ? "text" : "password"}
           data-password
-          className="h-11 w-full rounded-xl border border-white/10 bg-[#07111f] px-3.5 pr-11 text-sm text-white placeholder:text-slate-500 outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 shadow-inner"
+          className="h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 pr-10 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none transition focus:border-[#059669] focus:ring-1 focus:ring-[#059669] shadow-2xs"
           required
           minLength={6}
           {...props}
@@ -435,13 +432,13 @@ function PasswordField({
         <button
           type="button"
           onClick={() => onShowChange(!show)}
-          className="absolute right-1 top-1 grid h-9 w-9 place-items-center rounded-lg text-slate-400 transition hover:text-white"
+          className="absolute right-1 top-0.5 grid h-9 w-9 place-items-center rounded-lg text-[#94a3b8] transition hover:text-[#0f172a]"
           aria-label={show ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
         >
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </button>
       </div>
-      <p className="text-[11px] text-slate-500">At least {props.minLength ?? 6} characters.</p>
+      <p className="text-[10.5px] text-[#94a3b8]">At least {props.minLength ?? 6} characters.</p>
     </div>
   );
 }

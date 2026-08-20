@@ -164,25 +164,28 @@ export function AdminSeoPage() {
   if (query.isLoading)
     return (
       <div className="grid min-h-[50vh] place-items-center">
-        <Loader2 className="h-7 w-7 animate-spin text-cyan-400" />
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-[#ea580c]" />
+          <p className="text-xs font-medium text-[#64748b]">Loading search settings...</p>
+        </div>
       </div>
     );
   if (query.isError)
     return (
-      <div className="rounded border border-red-500/30 bg-red-500/10 p-5 text-sm text-red-300">
+      <div className="rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-5 text-sm font-medium text-[#c2410c]">
         Unable to load SEO settings.
       </div>
     );
 
   return (
     <form onSubmit={submit} className="mx-auto w-full pb-24">
-      <header className="mb-6 flex flex-col gap-4 border-b border-slate-800 pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <header className="mb-6 flex flex-col gap-4 border-b border-[#e2e8f0] pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-cyan-400">
+          <p className="mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#059669]">
             <SearchCheck className="h-4 w-4" /> Public website
           </p>
-          <h1 className="font-display text-2xl font-bold">Search Optimization</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Search Optimization</h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
             Control how the WebMintra landing page appears in search and social results.
           </p>
         </div>
@@ -190,14 +193,14 @@ export function AdminSeoPage() {
           href="/"
           target="_blank"
           rel="noreferrer"
-          className="inline-flex h-9 items-center gap-2 self-start rounded border border-slate-700 px-3 text-xs font-semibold text-slate-300 hover:bg-slate-800"
+          className="inline-flex h-9 items-center gap-2 self-start rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#475569] shadow-2xs transition hover:border-[#059669] hover:bg-[#ecfdf5] hover:text-[#047857]"
         >
           View landing page <ExternalLink className="h-3.5 w-3.5" />
         </a>
       </header>
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_400px]">
         <div className="space-y-6">
-          <Panel icon={<SearchCheck className="h-4 w-4" />} title="Search result">
+          <Panel icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />} title="Search result">
             <Field label="Search title" count={`${form.title.length}/70`} error={errors.title}>
               <input
                 value={form.title}
@@ -238,21 +241,21 @@ export function AdminSeoPage() {
                 className={input(errors.canonicalUrl)}
               />
             </Field>
-            <div className="flex items-center justify-between gap-4 rounded border border-slate-700 bg-slate-900/60 p-4">
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
               <div>
-                <p className="text-sm font-semibold">Search indexing</p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="text-xs font-bold text-[#0b192c]">Search indexing</p>
+                <p className="mt-0.5 text-xs text-[#64748b]">
                   Allow search engines to index and follow the landing page.
                 </p>
               </div>
               <Switch
                 checked={form.allowIndexing}
                 onCheckedChange={(value) => update("allowIndexing", value)}
-                className="data-[state=checked]:bg-emerald-500"
+                className="data-[state=checked]:bg-[#059669]"
               />
             </div>
           </Panel>
-          <Panel icon={<Share2 className="h-4 w-4" />} title="Social sharing">
+          <Panel icon={<Share2 className="h-4 w-4 text-[#ea580c]" />} title="Social sharing">
             <ImageField
               label="Social preview image"
               value={form.socialImageUrl}
@@ -278,7 +281,7 @@ export function AdminSeoPage() {
               />
             </Field>
           </Panel>
-          <Panel icon={<SearchCheck className="h-4 w-4" />} title="Organization data">
+          <Panel icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />} title="Organization data">
             <Field label="Organization name" error={errors.organizationName}>
               <input
                 value={form.organizationName}
@@ -304,19 +307,19 @@ export function AdminSeoPage() {
               <p className="text-xs text-[#202124]">
                 {form.organizationName || "WebMintra"}
                 <br />
-                <span className="text-[11px]">{canonical}</span>
+                <span className="text-[11px] text-[#5f6368]">{canonical}</span>
               </p>
-              <p className="mt-2 line-clamp-2 text-xl text-[#1a0dab]">
+              <p className="mt-2 line-clamp-2 text-lg font-medium text-[#1a0dab] hover:underline cursor-pointer">
                 {form.title || "Landing page title"}
               </p>
-              <p className="mt-1 line-clamp-3 text-sm leading-5 text-[#4d5156]">
+              <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-[#4d5156]">
                 {form.description || "Your landing page description will appear here."}
               </p>
             </div>
           </Preview>
           <Preview title="Social preview">
-            <div className="m-4 overflow-hidden rounded border border-slate-700 bg-slate-950">
-              <div className="aspect-[1.91/1] bg-slate-900">
+            <div className="m-4 overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-2xs">
+              <div className="aspect-[1.91/1] bg-[#f1f5f9]">
                 {form.socialImageUrl ? (
                   <img
                     src={form.socialImageUrl}
@@ -325,44 +328,48 @@ export function AdminSeoPage() {
                   />
                 ) : (
                   <div className="grid h-full place-items-center">
-                    <ImageIcon className="h-10 w-10 text-slate-700" />
+                    <ImageIcon className="h-10 w-10 text-[#94a3b8]" />
                   </div>
                 )}
               </div>
-              <div className="border-t border-slate-800 p-4">
-                <p className="text-[10px] uppercase text-slate-500">{hostname}</p>
-                <p className="mt-1 line-clamp-2 text-sm font-semibold">
+              <div className="border-t border-[#e2e8f0] bg-white p-4">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">{hostname}</p>
+                <p className="mt-1 line-clamp-2 text-sm font-bold text-[#0b192c]">
                   {form.title || "Landing page title"}
                 </p>
-                <p className="mt-1 line-clamp-2 text-xs text-slate-400">
+                <p className="mt-1 line-clamp-2 text-xs text-[#64748b]">
                   {form.description || "Your landing page description will appear here."}
                 </p>
               </div>
             </div>
           </Preview>
           <div
-            className={`rounded border px-4 py-3 text-xs ${form.allowIndexing ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-300" : "border-amber-500/20 bg-amber-500/10 text-amber-300"}`}
+            className={`rounded-xl border px-4 py-3 text-xs font-semibold ${
+              form.allowIndexing
+                ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
+                : "border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]"
+            }`}
           >
-            {form.allowIndexing ? "Landing page can be indexed" : "Landing page is set to noindex"}
+            {form.allowIndexing ? "✓ Landing page can be indexed by search engines" : "⚠️ Landing page is set to noindex"}
           </div>
         </aside>
       </div>
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-800 bg-[#091521]/95 p-3 backdrop-blur lg:left-64">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#e2e8f0] bg-white/95 p-3.5 backdrop-blur shadow-lg lg:left-64">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <p className="text-xs text-slate-500">
-            {dirty ? "Unsaved SEO changes" : "All changes saved"}
+          <p className="text-xs font-semibold text-[#64748b]">
+            {dirty ? "You have unsaved SEO changes" : "All changes saved"}
           </p>
           <button
             type="submit"
             disabled={!dirty || mutation.isPending || uploading !== null}
-            className="inline-flex h-10 items-center gap-2 rounded bg-emerald-500 px-5 text-sm font-semibold text-emerald-950 disabled:opacity-50"
+            className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#059669] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#059669]"
           >
             {mutation.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Save className="h-4 w-4" />
             )}{" "}
-            {mutation.isPending ? "Saving" : "Save SEO"}
+            {mutation.isPending ? "Saving..." : "Save SEO Settings"}
           </button>
         </div>
       </div>
@@ -372,10 +379,10 @@ export function AdminSeoPage() {
 
 function Panel({ icon, title, children }: { icon: ReactNode; title: string; children: ReactNode }) {
   return (
-    <section className="overflow-hidden rounded border border-slate-800 bg-[#0b1826]">
-      <header className="flex items-center gap-2 border-b border-slate-800 bg-slate-900/40 px-5 py-4">
+    <section className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-xs">
+      <header className="flex items-center gap-2 border-b border-[#e2e8f0] bg-[#f8fafc] px-5 py-3.5">
         {icon}
-        <h2 className="text-sm font-semibold">{title}</h2>
+        <h2 className="text-xs font-bold uppercase tracking-wider text-[#475569]">{title}</h2>
       </header>
       <div className="grid gap-5 p-5">{children}</div>
     </section>
@@ -383,8 +390,8 @@ function Panel({ icon, title, children }: { icon: ReactNode; title: string; chil
 }
 function Preview({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="overflow-hidden rounded border border-slate-800 bg-[#0b1826]">
-      <header className="border-b border-slate-800 px-4 py-3 text-xs font-semibold uppercase text-slate-400">
+    <section className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-xs">
+      <header className="border-b border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#475569]">
         {title}
       </header>
       {children}
@@ -404,12 +411,12 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 flex justify-between text-xs font-medium text-slate-300">
+      <span className="mb-1.5 flex justify-between text-xs font-bold text-[#475569]">
         <span>{label}</span>
-        {count && <span className="font-mono text-[10px] text-slate-500">{count}</span>}
+        {count && <span className="font-mono text-[10px] text-[#94a3b8]">{count}</span>}
       </span>
       {children}
-      {error && <span className="mt-1.5 block text-xs text-red-400">{error}</span>}
+      {error && <span className="mt-1.5 block text-xs font-semibold text-[#c2410c]">{error}</span>}
     </label>
   );
 }
@@ -434,12 +441,12 @@ function ImageField({
     <Field label={label} error={error}>
       <div className="flex items-start gap-3">
         <div
-          className={`${compact ? "h-16 w-16" : "h-20 w-32"} grid shrink-0 place-items-center overflow-hidden rounded border border-slate-700 bg-slate-900`}
+          className={`${compact ? "h-16 w-16" : "h-20 w-32"} grid shrink-0 place-items-center overflow-hidden rounded-xl border border-[#cbd5e1] bg-[#f8fafc]`}
         >
           {value ? (
-            <img src={value} alt="" className="h-full w-full object-contain" />
+            <img src={value} alt="" className="h-full w-full object-contain p-1" />
           ) : (
-            <ImageIcon className="h-5 w-5 text-slate-600" />
+            <ImageIcon className="h-6 w-6 text-[#94a3b8]" />
           )}
         </div>
         <div className="min-w-0 flex-1 space-y-2">
@@ -450,7 +457,7 @@ function ImageField({
             onChange={(e) => onChange(e.target.value)}
             className={input(error)}
           />
-          <label className="inline-flex h-8 cursor-pointer items-center gap-2 rounded border border-slate-700 px-3 text-xs font-medium hover:bg-slate-800">
+          <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#475569] shadow-2xs transition hover:border-[#a7f3d0] hover:bg-[#ecfdf5] hover:text-[#047857]">
             <input
               type="file"
               accept="image/*"
@@ -462,11 +469,11 @@ function ImageField({
               }}
             />
             {busy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-[#ea580c]" />
             ) : (
-              <Upload className="h-3.5 w-3.5" />
+              <Upload className="h-3.5 w-3.5 text-[#ea580c]" />
             )}{" "}
-            Upload
+            Upload Image
           </label>
         </div>
       </div>
@@ -474,5 +481,6 @@ function ImageField({
   );
 }
 function input(error?: string) {
-  return `w-full rounded border bg-slate-950 px-3 py-2.5 text-sm outline-none placeholder:text-slate-600 focus:ring-1 ${error ? "border-red-500 focus:ring-red-500/30" : "border-slate-700 focus:border-cyan-500 focus:ring-cyan-500/30"}`;
+  return `w-full rounded-lg border bg-white px-3 py-2 text-xs font-medium text-[#0b192c] outline-none shadow-2xs transition placeholder:text-[#94a3b8] ${error ? "border-[#f87171] focus:border-[#ef4444] focus:ring-2 focus:ring-[#ef4444]/15" : "border-[#cbd5e1] focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"}`;
 }
+

@@ -34,6 +34,7 @@ import {
   FileCode2,
   Plus,
   Sparkles,
+  FileText,
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -58,6 +59,31 @@ import {
 
 export const Route = createFileRoute("/admin/templates")({
   component: AdminTemplatesPage,
+  errorComponent: ({ error, reset }) => (
+    <div className="mx-auto max-w-xl py-20 text-center">
+      <div className="rounded-2xl border border-[#fed7aa] bg-[#fff7ed] p-8 shadow-xs">
+        <h2 className="text-lg font-bold text-[#0b192c]">Something went wrong loading this template</h2>
+        <p className="mt-2 text-xs font-medium text-[#64748b]">
+          {error?.message || "An error occurred while parsing or rendering the template."}
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => reset()}
+            className="rounded-lg bg-[#059669] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#047857]"
+          >
+            Try again
+          </button>
+          <a
+            href="/admin/templates"
+            className="rounded-lg border border-[#cbd5e1] bg-white px-4 py-2 text-xs font-semibold text-[#475569] transition hover:bg-[#f8fafc]"
+          >
+            Back to Templates
+          </a>
+        </div>
+      </div>
+    </div>
+  ),
 });
 
 function AdminTemplatesPage() {
@@ -296,51 +322,58 @@ function AdminTemplatesPage() {
     }
   }
 
-  function handleWizardComplete(analysis: TemplateAnalysis) {
-    if (!analysis.pages.length) return toast.error("No pages found in analysis");
+  function handleWizardComplete(analysis: TemplateAnalysis, meta?: any) {
+    if (!analysis?.pages?.length) return toast.error("No pages found in analysis");
 
-    const [homePage, ...additionalPages] = analysis.pages;
-    const formData = new FormData();
-    formData.append("title", analysis.name || "Imported Template");
-    formData.append("category", "Imported");
-    formData.append("description", `Contains ${analysis.pages.length} pages.`);
-    formData.append("htmlContent", homePage.html);
-    formData.append(
-      "pages",
-      JSON.stringify(
-        additionalPages.map((page) => ({
-          name: page.name,
-          htmlContent: page.html,
-        })),
-      ),
-    );
-    formData.append("pageCount", String(analysis.pages.length));
-    formData.append("stats", JSON.stringify(analysis.stats));
-    const errors = analysis.issues.filter((i) => i.severity === "error").length;
-    formData.append("issuesCount", String(errors));
+    try {
+      const [homePage, ...additionalPages] = analysis.pages;
+      const formData = new FormData();
+      formData.append("title", meta?.title || analysis.name || "Imported Template");
+      formData.append("category", meta?.category || categoriesData?.[0]?.name || "Landing Page");
+      formData.append("description", meta?.description || `Contains ${analysis.pages.length} page(s).`);
+      if (meta?.thumbnailUrl) {
+        formData.append("thumbnailUrl", meta.thumbnailUrl);
+      }
+      formData.append("htmlContent", homePage.html || "");
+      formData.append(
+        "pages",
+        JSON.stringify(
+          additionalPages.map((page) => ({
+            name: page.name,
+            htmlContent: page.html,
+          })),
+        ),
+      );
+      formData.append("pageCount", String(analysis.pages.length));
+      formData.append("stats", JSON.stringify(analysis.stats || {}));
+      const errors = (analysis.issues || []).filter((i) => i.severity === "error").length;
+      formData.append("issuesCount", String(errors));
 
-    importMutation.mutate(formData);
+      importMutation.mutate(formData);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to process template for import");
+    }
   }
 
   return (
     <div className="mx-auto max-w-[1600px]">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">Template Catalog</h1>
-          <p className="mt-1 text-xs text-slate-500">
+          <h1 className="text-2xl font-black tracking-tight text-[#0f172a]">Template Catalog</h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
             Import and manage templates for your tenants.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsCategoriesManagerOpen(true)}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-slate-800 px-4 text-sm font-semibold text-white transition hover:bg-slate-700"
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-[#cbd5e1] bg-white px-4 text-xs font-bold text-[#334155] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0f172a]"
           >
             Manage Categories
           </button>
           <button
             onClick={() => setIsImportOpen(!isImportOpen)}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-cyan-500 px-4 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400"
+            className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#059669] px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#047857] active:scale-95"
           >
             {isImportOpen ? (
               "Close"
@@ -358,45 +391,49 @@ function AdminTemplatesPage() {
       )}
 
       {isImportOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-300">
-          <div className="flex justify-between items-center px-6 py-4 border-b border-slate-800/80 bg-[#0b1826]/90 backdrop-blur">
-            <div>
-              <h2 className="text-white font-display font-bold text-lg flex items-center gap-2">
-                <Upload className="h-5 w-5 text-cyan-400" /> Import Template Wizard
-              </h2>
-              <p className="text-slate-400 text-xs mt-0.5">
-                Upload HTML files and assets. WebMintra's engine will automatically extract editable
-                fields.
-              </p>
+        <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/60 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-200">
+          <div className="border-b border-[#e2e8f0] bg-white shadow-xs">
+            <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4 sm:px-10">
+              <div>
+                <h2 className="text-[#0b192c] font-display font-bold text-lg flex items-center gap-2">
+                  <Upload className="h-5 w-5 text-[#ea580c]" /> Import Template Wizard
+                </h2>
+                <p className="text-[#64748b] text-xs mt-0.5">
+                  Upload HTML files and assets. WebMintra's engine will automatically extract editable fields.
+                </p>
+              </div>
+              <button
+                onClick={() => setIsImportOpen(false)}
+                className="text-[#64748b] hover:text-[#0b192c] bg-[#f8fafc] hover:bg-[#f1f5f9] border border-[#e2e8f0] transition p-2 rounded-lg shadow-2xs"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
-            <button
-              onClick={() => setIsImportOpen(false)}
-              className="text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 transition p-2 rounded-full"
-            >
-              <X className="h-5 w-5" />
-            </button>
           </div>
-          <div className="flex-1 overflow-y-auto bg-gradient-to-b from-[#0b1826] to-slate-950">
-            <ImportWizard onComplete={handleWizardComplete} />
+          <div className="flex-1 overflow-y-auto bg-[#f8fafc]">
+            <ImportWizard
+              categories={categoriesData || []}
+              onComplete={handleWizardComplete}
+            />
           </div>
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
-          <div className="col-span-full py-10 text-center text-slate-500">
-            <div className="flex flex-col items-center justify-center gap-3 py-8">
-              <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
-              <p className="text-sm text-slate-500">Loading templates...</p>
+          <div className="col-span-full py-16 text-center text-[#64748b]">
+            <div className="flex flex-col items-center justify-center gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
+              <p className="text-sm font-medium text-[#64748b]">Loading templates...</p>
             </div>
           </div>
         ) : data?.templates?.length ? (
           data.templates.map((template: any) => (
             <div
               key={template._id}
-              className="group flex flex-col rounded-xl border border-slate-800 bg-[#0b1826] overflow-hidden transition-all duration-300 hover:border-cyan-500/40 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] hover:-translate-y-1"
+              className="group flex flex-col rounded-2xl border border-[#e2e8f0] bg-white overflow-hidden shadow-xs transition-all duration-300 hover:shadow-md hover:border-[#cbd5e1] hover:-translate-y-1"
             >
-              <div className="aspect-[16/9] bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border-b border-slate-800 relative overflow-hidden">
+              <div className="aspect-[16/9] bg-[#f8fafc] flex items-center justify-center border-b border-[#e2e8f0] relative overflow-hidden">
                 {template.thumbnailUrl ? (
                   <img
                     src={template.thumbnailUrl}
@@ -414,14 +451,14 @@ function AdminTemplatesPage() {
                     />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1826]/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                 <div className="absolute top-3 left-3 z-10">
                   {template.isActive === false ? (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 backdrop-blur-md shadow-md">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-800 backdrop-blur-md shadow-xs">
                       <EyeOff className="h-3 w-3" /> Archived
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-300 backdrop-blur-md shadow-md">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 backdrop-blur-md shadow-xs">
                       <CheckCircle2 className="h-3 w-3" /> Live (Onboarding)
                     </span>
                   )}
@@ -429,35 +466,35 @@ function AdminTemplatesPage() {
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <div className="flex justify-between items-start mb-2 gap-2">
-                  <h3 className="font-semibold text-slate-200 line-clamp-1">{template.title}</h3>
-                  <span className="rounded bg-cyan-500/10 px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider text-cyan-400 shrink-0">
+                  <h3 className="font-bold text-base text-[#0f172a] line-clamp-1 group-hover:text-[#059669] transition-colors">{template.title}</h3>
+                  <span className="rounded-full border border-emerald-200 bg-[#ecfdf5] px-2.5 py-0.5 text-[10px] uppercase font-bold tracking-wider text-[#047857] shrink-0">
                     {template.category}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mb-4 line-clamp-2 min-h-[32px]">
+                <p className="text-xs font-medium text-[#64748b] mb-4 line-clamp-2 min-h-[32px]">
                   {template.description || "No description provided."}
                 </p>
 
                 {template.stats && (
-                  <div className="mb-4 flex flex-wrap gap-2 text-[10px] font-mono text-slate-400">
-                    <span className="bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50">
+                  <div className="mb-4 flex flex-wrap gap-2 text-[11px] font-medium text-[#475569]">
+                    <span className="bg-[#f8fafc] text-[#334155] border border-[#e2e8f0] px-2.5 py-1 rounded-md text-[11px] font-bold">
                       {template.stats["Editable fields"] || 0} fields
                     </span>
-                    <span className="bg-slate-800/50 px-2 py-1 rounded border border-slate-700/50">
+                    <span className="bg-[#f8fafc] text-[#334155] border border-[#e2e8f0] px-2.5 py-1 rounded-md text-[11px] font-bold">
                       {template.stats["Forms"] || 0} forms
                     </span>
                     {template.issuesCount > 0 && (
-                      <span className="bg-rose-500/10 text-rose-400 px-2 py-1 rounded border border-rose-500/20">
+                      <span className="bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-md text-[11px] font-bold">
                         {template.issuesCount} errors
                       </span>
                     )}
                   </div>
                 )}
 
-                <div className="mt-auto flex flex-col gap-2 pt-2 border-t border-slate-800/70">
+                <div className="mt-auto flex flex-col gap-2.5 pt-3 border-t border-[#e2e8f0]">
                   <button
                     onClick={() => openVisualEdit(template)}
-                    className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/15 py-2 text-xs font-semibold text-cyan-300 transition hover:bg-cyan-500 hover:text-slate-950"
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#059669] py-2 text-xs font-bold text-white shadow-xs transition hover:bg-[#047857] active:scale-98"
                   >
                     <Sparkles className="h-3.5 w-3.5" /> Edit Inline (Visual)
                   </button>
@@ -465,14 +502,14 @@ function AdminTemplatesPage() {
                   <div className="grid grid-cols-4 gap-1.5">
                     <button
                       onClick={() => openEdit(template)}
-                      className="flex items-center justify-center gap-1 rounded-lg border border-slate-700 bg-slate-800/50 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                      className="flex items-center justify-center gap-1 rounded-lg border border-[#cbd5e1] bg-white py-1.5 text-xs font-bold text-[#334155] hover:bg-[#f8fafc] hover:text-[#0f172a] shadow-2xs transition"
                       title="Edit HTML Source Code"
                     >
                       <Pencil className="h-3.5 w-3.5" /> Code
                     </button>
                     <button
                       onClick={() => setPreviewTemplate(template)}
-                      className="flex items-center justify-center gap-1 rounded-lg border border-slate-700 bg-slate-800/30 py-1.5 text-xs font-semibold text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                      className="flex items-center justify-center gap-1 rounded-lg border border-[#cbd5e1] bg-white py-1.5 text-xs font-bold text-[#334155] hover:bg-[#f8fafc] hover:text-[#0f172a] shadow-2xs transition"
                       title="Preview Template"
                     >
                       <Eye className="h-3.5 w-3.5" /> Preview
@@ -483,11 +520,10 @@ function AdminTemplatesPage() {
                         toggleStatusMutation.mutate(template._id);
                       }}
                       disabled={toggleStatusMutation.isPending}
-                      className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 text-xs font-semibold transition ${
-                        template.isActive === false
-                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
-                          : "border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20"
-                      }`}
+                      className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 text-xs font-bold transition ${template.isActive === false
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                          : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                        }`}
                       title={
                         template.isActive === false
                           ? "Restore to Onboarding"
@@ -509,7 +545,7 @@ function AdminTemplatesPage() {
                         e.stopPropagation();
                         setDeleteTemplateId(template._id);
                       }}
-                      className="flex items-center justify-center gap-1 rounded-lg border border-rose-500/30 bg-rose-500/10 py-1.5 text-xs font-semibold text-rose-400 transition hover:bg-rose-500 hover:text-white"
+                      className="flex items-center justify-center gap-1 rounded-lg border border-rose-200 bg-rose-50 py-1.5 text-xs font-bold text-rose-700 hover:bg-rose-100 transition"
                       title="Delete Template"
                     >
                       <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -520,15 +556,15 @@ function AdminTemplatesPage() {
             </div>
           ))
         ) : (
-          <div className="col-span-full py-20 text-center text-slate-500 rounded-xl border border-dashed border-slate-700">
-            <LayoutTemplate className="mx-auto h-8 w-8 mb-2 opacity-50" />
-            <p>No templates imported yet.</p>
+          <div className="col-span-full py-20 text-center text-[#64748b] rounded-2xl border border-dashed border-[#cbd5e1] bg-white">
+            <LayoutTemplate className="mx-auto h-8 w-8 mb-2 text-[#94a3b8]" />
+            <p className="font-medium text-sm">No templates imported yet.</p>
           </div>
         )}
       </div>
 
       {inlineVisualTemplate && templateAnalysis && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-background animate-in fade-in duration-200">
+        <div className="admin-template-editor fixed inset-0 z-[100] flex flex-col bg-background animate-in fade-in duration-200">
           <InlineVisualEditor
             analysis={templateAnalysis}
             onExit={() => {
@@ -581,20 +617,25 @@ function AdminTemplatesPage() {
                   </div>
 
                   {pagesList.length > 1 && (
-                    <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
-                      {pagesList.map((p) => (
-                        <button
-                          key={p.name}
-                          onClick={() => setPreviewActivePage(p.name)}
-                          className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
-                            previewActivePage === p.name
-                              ? "bg-cyan-500 text-slate-950 shadow-sm"
-                              : "text-slate-400 hover:text-white"
-                          }`}
-                        >
-                          {p.name}
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-700 shadow-inner">
+                      {pagesList.map((p) => {
+                        const isActive = previewActivePage === p.name;
+                        return (
+                          <button
+                            key={p.name}
+                            type="button"
+                            onClick={() => setPreviewActivePage(p.name)}
+                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${isActive
+                                ? "bg-cyan-500 text-slate-950 font-bold shadow-sm"
+                                : "text-slate-200 hover:text-white hover:bg-slate-800"
+                              }`}
+                            style={{ color: isActive ? "#020617" : "#cbd5e1" }}
+                          >
+                            <FileText className="h-3.5 w-3.5 opacity-80" />
+                            <span>{p.name}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -851,11 +892,10 @@ function AdminTemplatesPage() {
                   <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
                     <button
                       onClick={() => setActivePage("index.html")}
-                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
-                        activePage === "index.html"
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${activePage === "index.html"
                           ? "bg-cyan-500 text-slate-950 shadow-sm"
                           : "text-slate-400 hover:text-white"
-                      }`}
+                        }`}
                     >
                       index.html
                     </button>
@@ -863,11 +903,10 @@ function AdminTemplatesPage() {
                       <button
                         key={p.name}
                         onClick={() => setActivePage(p.name)}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
-                          activePage === p.name
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${activePage === p.name
                             ? "bg-cyan-500 text-slate-950 shadow-sm"
                             : "text-slate-400 hover:text-white"
-                        }`}
+                          }`}
                       >
                         {p.name}
                       </button>
@@ -1056,15 +1095,15 @@ function AdminTemplatesPage() {
 
           {/* Add Page Modal Dialog */}
           {addPagePrompt && (
-            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-2xl animate-in zoom-in-95">
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="w-full max-w-sm rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl animate-in zoom-in-95">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-cyan-400" /> Add New Page
+                  <h3 className="text-base font-bold text-[#0b192c] flex items-center gap-2">
+                    <Plus className="h-4 w-4 text-[#ea580c]" /> Add New Page
                   </h3>
                   <button
                     onClick={() => setAddPagePrompt(false)}
-                    className="text-slate-400 hover:text-white transition"
+                    className="text-[#64748b] hover:text-[#0b192c] transition"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -1072,7 +1111,7 @@ function AdminTemplatesPage() {
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 block mb-1.5">
+                    <label className="text-xs font-bold text-[#475569] block mb-1.5">
                       Page Name
                     </label>
                     <input
@@ -1082,12 +1121,12 @@ function AdminTemplatesPage() {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") submitAddPage();
                       }}
-                      placeholder="about.html, contact.html, services.html"
-                      className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none"
+                      placeholder="e.g. services.html"
+                      className="w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3.5 py-2 text-xs font-medium text-[#0b192c] placeholder:text-[#94a3b8] focus:border-[#ea580c] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#ea580c]/10"
                     />
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-[11px] text-[#64748b] mt-1.5">
                       Will automatically append{" "}
-                      <span className="font-mono text-cyan-400">.html</span> if omitted.
+                      <span className="font-mono font-semibold text-[#ea580c]">.html</span> if omitted.
                     </p>
                   </div>
                 </div>
@@ -1096,14 +1135,14 @@ function AdminTemplatesPage() {
                   <button
                     type="button"
                     onClick={() => setAddPagePrompt(false)}
-                    className="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                    className="h-9 rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-semibold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0b192c]"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={submitAddPage}
-                    className="px-4 py-2 rounded-lg text-xs font-semibold text-cyan-950 bg-cyan-500 hover:bg-cyan-400 transition shadow"
+                    className="inline-flex h-9 items-center rounded-xl bg-[#059669] px-4 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857]"
                   >
                     Create Page
                   </button>
@@ -1114,12 +1153,20 @@ function AdminTemplatesPage() {
 
           {/* Delete Page Confirmation Dialog */}
           {deletePagePrompt && (
-            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-2xl animate-in zoom-in-95">
-                <h3 className="text-base font-bold text-white mb-2">Delete Page</h3>
-                <p className="text-xs text-slate-400 mb-6">
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="w-full max-w-sm rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl animate-in zoom-in-95">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="grid h-9 w-9 place-items-center rounded-xl border border-[#fecdd3] bg-[#fff1f2] text-[#e11d48]">
+                    <Trash2 className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-[#0b192c]">Delete Page</h3>
+                    <p className="text-[11px] font-medium text-[#64748b]">Remove from template</p>
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-[#475569] mb-6 leading-relaxed">
                   Are you sure you want to delete{" "}
-                  <span className="font-semibold text-slate-200 font-mono">
+                  <span className="font-bold text-[#0b192c] font-mono">
                     "{deletePagePrompt}"
                   </span>
                   ? Any unsaved edits for this page will be discarded.
@@ -1128,14 +1175,14 @@ function AdminTemplatesPage() {
                   <button
                     type="button"
                     onClick={() => setDeletePagePrompt(null)}
-                    className="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                    className="h-9 rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-semibold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc]"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={confirmDeletePage}
-                    className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-rose-500 hover:bg-rose-600 transition"
+                    className="h-9 rounded-xl bg-[#e11d48] px-4 text-xs font-bold text-white shadow-sm transition hover:bg-[#be123c]"
                   >
                     Delete Page
                   </button>
@@ -1146,15 +1193,15 @@ function AdminTemplatesPage() {
 
           {/* Rename Page Modal Dialog */}
           {renamePagePrompt && (
-            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="w-full max-w-sm rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-2xl animate-in zoom-in-95">
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="w-full max-w-sm rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl animate-in zoom-in-95">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
-                    <Pencil className="h-4 w-4 text-cyan-400" /> Rename Page
+                  <h3 className="text-base font-bold text-[#0b192c] flex items-center gap-2">
+                    <Pencil className="h-4 w-4 text-[#ea580c]" /> Rename Page
                   </h3>
                   <button
                     onClick={() => setRenamePagePrompt(null)}
-                    className="text-slate-400 hover:text-white transition"
+                    className="text-[#64748b] hover:text-[#0b192c] transition"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -1162,7 +1209,7 @@ function AdminTemplatesPage() {
 
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs font-medium text-slate-300 block mb-1.5">
+                    <label className="text-xs font-bold text-[#475569] block mb-1.5">
                       New Page Name
                     </label>
                     <input
@@ -1173,11 +1220,11 @@ function AdminTemplatesPage() {
                         if (e.key === "Enter") submitRenamePage();
                       }}
                       placeholder="e.g. portfolio.html"
-                      className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none"
+                      className="w-full rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3.5 py-2 text-xs font-medium text-[#0b192c] placeholder:text-[#94a3b8] focus:border-[#ea580c] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#ea580c]/10"
                     />
-                    <p className="text-[11px] text-slate-500 mt-1">
+                    <p className="text-[11px] text-[#64748b] mt-1.5">
                       Will automatically append{" "}
-                      <span className="font-mono text-cyan-400">.html</span> if omitted.
+                      <span className="font-mono font-semibold text-[#ea580c]">.html</span> if omitted.
                     </p>
                   </div>
                 </div>
@@ -1186,14 +1233,14 @@ function AdminTemplatesPage() {
                   <button
                     type="button"
                     onClick={() => setRenamePagePrompt(null)}
-                    className="px-3.5 py-2 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                    className="h-9 rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-semibold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc]"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={submitRenamePage}
-                    className="px-4 py-2 rounded-lg text-xs font-semibold text-cyan-950 bg-cyan-500 hover:bg-cyan-400 transition shadow"
+                    className="inline-flex h-9 items-center rounded-xl bg-[#059669] px-4 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857]"
                   >
                     Save Name
                   </button>
@@ -1208,23 +1255,33 @@ function AdminTemplatesPage() {
         open={!!deleteTemplateId}
         onOpenChange={(open) => !open && setDeleteTemplateId(null)}
       >
-        <AlertDialogContent className="border-slate-800 bg-[#0b1826] text-slate-200">
+        <AlertDialogContent className="max-w-md rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Template</AlertDialogTitle>
-            <AlertDialogDescription className="text-slate-400">
-              Are you sure you want to delete this template? This action cannot be undone.
+            <div className="flex items-center gap-3 mb-1">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#fecdd3] bg-[#fff1f2] text-[#e11d48]">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div>
+                <AlertDialogTitle className="text-base font-bold text-[#0b192c]">
+                  Delete Template
+                </AlertDialogTitle>
+                <p className="text-[11px] font-medium text-[#64748b]">This action cannot be undone</p>
+              </div>
+            </div>
+            <AlertDialogDescription className="text-xs font-medium text-[#475569] leading-relaxed pt-2">
+              Are you sure you want to delete this template from the catalog? Tenants currently using this template won't be disrupted, but it will no longer be available for new sites.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white">
+          <AlertDialogFooter className="mt-4 flex gap-2 sm:justify-end">
+            <AlertDialogCancel className="h-9 rounded-xl border border-[#cbd5e1] bg-white px-4 text-xs font-semibold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0b192c]">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDelete}
-              className="bg-rose-500 text-white hover:bg-rose-600"
+              className="inline-flex h-9 items-center rounded-xl bg-[#e11d48] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#be123c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d48]"
             >
-              {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-              Delete
+              {deleteMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
+              Delete Template
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

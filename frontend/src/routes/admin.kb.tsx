@@ -42,15 +42,16 @@ function KnowledgeBasePage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="mx-auto w-full max-w-[1600px]">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">Knowledge Base</h1>
-          <p className="mt-1 text-xs text-slate-500">Manage help articles and documentation.</p>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Knowledge Base</h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">Manage help articles and documentation.</p>
         </div>
         <button
+          type="button"
           onClick={() => setIsCreateOpen(!isCreateOpen)}
-          className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400"
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#047857] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2"
         >
           <Plus className="h-4 w-4" /> Create Article
         </button>
@@ -59,56 +60,56 @@ function KnowledgeBasePage() {
       {isCreateOpen && (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 rounded-xl border border-slate-800 bg-[#0b1826] p-5"
+          className="mb-6 rounded-lg border border-[#fed7aa] bg-white p-5 shadow-sm"
         >
-          <h2 className="font-display text-lg font-bold mb-4">Create New Article</h2>
+          <h2 className="mb-4 font-display text-lg font-bold text-[#0b192c]">Create New Article</h2>
           <div className="grid gap-4 md:grid-cols-3">
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-[#475569]">
               Title
               <input
                 required
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+                className="mt-1 h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0b192c]"
                 placeholder="Article Title"
               />
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-[#475569]">
               Slug
               <input
                 required
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+                className="mt-1 h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0b192c]"
                 placeholder="article-url-slug"
               />
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-[#475569]">
               Category
               <input
                 required
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+                className="mt-1 h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0b192c]"
                 placeholder="e.g. Billing, Getting Started"
               />
             </label>
-            <label className="col-span-full text-xs font-medium text-slate-300">
+            <label className="col-span-full text-xs font-semibold text-[#475569]">
               Content
               <textarea
                 required
                 value={form.content}
                 onChange={(e) => setForm({ ...form, content: e.target.value })}
-                className="mt-1 h-64 w-full rounded-lg border border-slate-700 bg-slate-900 p-3 text-sm font-mono"
+                className="mt-1 h-64 w-full rounded-lg border border-[#cbd5e1] bg-white p-3 font-mono text-sm text-[#0b192c]"
                 placeholder="# Markdown content here..."
               />
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-[#475569]">
               Status
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm"
+                className="mt-1 h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0b192c]"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -119,14 +120,14 @@ function KnowledgeBasePage() {
             <button
               type="button"
               onClick={() => setIsCreateOpen(false)}
-              className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-white"
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-[#64748b] transition hover:bg-slate-50 hover:text-[#0b192c]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex items-center justify-center gap-2 rounded-lg bg-[#ea580c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c2410c] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2"
             >
               {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {createMutation.isPending ? "Saving..." : "Save Article"}
@@ -135,8 +136,8 @@ function KnowledgeBasePage() {
         </form>
       )}
 
-      <div className="rounded-xl border border-slate-800 bg-[#0b1826]">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 p-4">
+      <div className="overflow-hidden rounded-lg border border-[#e2e8f0] bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e2e8f0] p-4">
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <div className="relative flex-1 sm:w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
@@ -147,7 +148,7 @@ function KnowledgeBasePage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900/60 pl-9 pr-4 text-xs focus:border-cyan-400 focus:outline-none"
+                className="h-9 w-full rounded-lg border border-[#cbd5e1] bg-white pl-9 pr-4 text-xs text-[#0b192c] focus:border-[#059669] focus:outline-none focus:ring-2 focus:ring-[#059669]/15"
               />
             </div>
             <div className="relative">
@@ -157,7 +158,7 @@ function KnowledgeBasePage() {
                   setStatus(e.target.value);
                   setPage(1);
                 }}
-                className="h-9 appearance-none rounded-lg border border-slate-700 bg-slate-900/60 pl-9 pr-8 text-xs focus:border-cyan-400 focus:outline-none"
+                className="h-9 appearance-none rounded-lg border border-[#cbd5e1] bg-white pl-9 pr-8 text-xs text-[#0b192c] focus:border-[#059669] focus:outline-none focus:ring-2 focus:ring-[#059669]/15"
               >
                 <option value="">All statuses</option>
                 <option value="published">Published</option>
@@ -170,7 +171,7 @@ function KnowledgeBasePage() {
 
         <div className="overflow-x-auto">
           <table className="w-full min-w-[800px] text-left text-sm">
-            <thead className="bg-slate-900/50 text-[11px] uppercase tracking-wider text-slate-500">
+            <thead className="bg-[#f8fafc] text-[11px] uppercase tracking-wider text-[#64748b]">
               <tr>
                 <th className="px-6 py-4 font-medium">Article</th>
                 <th className="px-6 py-4 font-medium">Category</th>
@@ -179,38 +180,37 @@ function KnowledgeBasePage() {
                 <th className="px-6 py-4 text-right font-medium">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/70">
+            <tbody className="divide-y divide-[#e2e8f0]">
               {isLoading ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-10 text-center text-slate-500">
                     <div className="flex flex-col items-center justify-center gap-3">
-                      <Loader2 className="h-6 w-6 animate-spin text-cyan-500" />
+                      <Loader2 className="h-6 w-6 animate-spin text-[#ea580c]" />
                       <p className="text-sm text-slate-500">Loading articles...</p>
                     </div>
                   </td>
                 </tr>
               ) : data?.articles?.length ? (
                 data.articles.map((article: any) => (
-                  <tr key={article.id} className="transition-colors hover:bg-slate-800/20">
+                  <tr key={article.id} className="transition-colors hover:bg-[#fff7ed]/60">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <BookOpen className="h-4 w-4 text-slate-400" />
+                        <BookOpen className="h-4 w-4 text-[#ea580c]" />
                         <div>
-                          <p className="font-medium text-slate-200">{article.title}</p>
+                          <p className="font-medium text-[#0b192c]">{article.title}</p>
                           <p className="text-[10px] text-slate-500">/{article.slug}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-300">
+                    <td className="px-6 py-4 text-[#0b192c]">
                       {article.category?.name || "Uncategorized"}
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${
-                          article.status === "published"
-                            ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-400"
-                            : "border-amber-500/20 bg-amber-500/10 text-amber-400"
-                        }`}
+                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${article.status === "published"
+                            ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
+                            : "border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]"
+                          }`}
                       >
                         {article.status}
                       </span>
@@ -218,10 +218,10 @@ function KnowledgeBasePage() {
                     <td className="px-6 py-4 text-xs text-slate-400">{article.viewCount || 0}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button className="text-slate-400 hover:text-emerald-400" title="Edit">
+                        <button className="text-[#64748b] transition hover:text-[#059669]" title="Edit">
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button className="text-slate-400 hover:text-rose-400" title="Delete">
+                        <button className="text-[#64748b] transition hover:text-[#c2410c]" title="Delete">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

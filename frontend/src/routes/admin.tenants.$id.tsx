@@ -93,13 +93,13 @@ function TenantDetailsPage() {
   if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
       </div>
     );
   }
 
   if (!data?.tenant) {
-    return <div className="p-8 text-center text-slate-400">Tenant not found.</div>;
+    return <div className="p-8 text-center text-[#64748b]">Tenant not found.</div>;
   }
 
   const { tenant, websites, domains, recentActivity } = data;
@@ -114,16 +114,16 @@ function TenantDetailsPage() {
       <div className="flex items-center gap-4">
         <Link
           to="/admin/tenants"
-          className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          className="rounded-lg p-2 text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">
+          <h1 className="text-2xl font-black tracking-tight text-[#0f172a]">
             {tenant.business?.name || tenant.name}
           </h1>
-          <p className="mt-1 text-xs text-slate-500">
-            {tenant.email} Â· Joined {new Date(tenant.createdAt).toLocaleDateString()}
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
+            {tenant.email} &bull; Joined {new Date(tenant.createdAt).toLocaleDateString()}
           </p>
         </div>
         <div className="ml-auto">
@@ -134,7 +134,7 @@ function TenantDetailsPage() {
               }
             }}
             disabled={impersonateMutation.isPending}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-amber-500/10 px-4 text-sm font-semibold text-amber-400 transition hover:bg-amber-500/20 disabled:opacity-50"
+            className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#fff7ed] border border-[#fed7aa] px-4 text-xs font-bold text-[#c2410c] transition hover:bg-[#ffedd5] disabled:opacity-50"
           >
             <LogIn className="h-4 w-4" /> Impersonate
           </button>
@@ -142,17 +142,17 @@ function TenantDetailsPage() {
       </div>
 
       {data.deletionRequest ? (
-        <section className="rounded-xl border border-rose-500/30 bg-rose-500/5 p-5">
+        <section className="rounded-xl border border-rose-200 bg-rose-50 p-5">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
-              <h2 className="font-display text-lg font-bold text-rose-300">
+              <h2 className="text-base font-bold text-rose-800">
                 Account deletion requested
               </h2>
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-[#475569]">
                 Requested {new Date(data.deletionRequest.requestedAt).toLocaleString()}
               </p>
               {data.deletionRequest.reason ? (
-                <p className="mt-2 text-sm text-slate-300">Reason: {data.deletionRequest.reason}</p>
+                <p className="mt-2 text-sm text-[#334155]">Reason: {data.deletionRequest.reason}</p>
               ) : null}
             </div>
             <div className="flex gap-2">
@@ -164,7 +164,7 @@ function TenantDetailsPage() {
                     reviewDeletionMutation.mutate("reject");
                   }
                 }}
-                className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-slate-800 disabled:opacity-50"
+                className="rounded-lg border border-[#cbd5e1] bg-white px-4 py-2 text-xs font-bold text-[#475569] hover:bg-[#f1f5f9] disabled:opacity-50"
               >
                 Reject
               </button>
@@ -180,7 +180,7 @@ function TenantDetailsPage() {
                     reviewDeletionMutation.mutate("approve");
                   }
                 }}
-                className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-500 disabled:opacity-50"
+                className="rounded-lg bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-700 disabled:opacity-50"
               >
                 Approve & Delete
               </button>
@@ -194,29 +194,29 @@ function TenantDetailsPage() {
         <div className="lg:col-span-2">
           <form
             onSubmit={handleSubmit}
-            className="rounded-xl border border-slate-800 bg-[#0b1826] p-6"
+            className="rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-xs"
           >
-            <div className="mb-6 flex items-center gap-2 border-b border-slate-800 pb-4">
-              <UserIcon className="h-5 w-5 text-cyan-400" />
-              <h2 className="font-display text-lg font-bold">Profile Details</h2>
+            <div className="mb-6 flex items-center gap-2 border-b border-[#e2e8f0] pb-4">
+              <UserIcon className="h-5 w-5 text-[#059669]" />
+              <h2 className="text-base font-bold text-[#0f172a]">Profile Details</h2>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
                   Owner Information
                 </h3>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">Full Name</span>
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">Full Name</span>
                   <input
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Email Address
                   </span>
                   <input
@@ -224,27 +224,27 @@ function TenantDetailsPage() {
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Phone Number
                   </span>
                   <input
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Subscription Plan
                   </span>
                   <select
                     value={form.plan}
                     onChange={(e) => setForm({ ...form, plan: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   >
                     <option value="starter">Starter</option>
                     <option value="growth">Growth</option>
@@ -254,58 +254,58 @@ function TenantDetailsPage() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
                   Business Information
                 </h3>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Business Name
                   </span>
                   <input
                     value={form.businessName}
                     onChange={(e) => setForm({ ...form, businessName: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Business Phone
                   </span>
                   <input
                     value={form.businessPhone}
                     onChange={(e) => setForm({ ...form, businessPhone: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Business Address
                   </span>
                   <input
                     value={form.businessAddress}
                     onChange={(e) => setForm({ ...form, businessAddress: e.target.value })}
-                    className="h-10 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="h-10 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-slate-400">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475569]">
                     Description
                   </span>
                   <textarea
                     value={form.businessDescription}
                     onChange={(e) => setForm({ ...form, businessDescription: e.target.value })}
                     rows={3}
-                    className="w-full rounded-lg border border-slate-700 bg-slate-900/50 p-3 text-sm focus:border-cyan-400 focus:outline-none"
+                    className="w-full rounded-lg border border-[#cbd5e1] bg-white p-3 text-sm text-[#0f172a] focus:border-[#059669] focus:ring-1 focus:ring-[#059669] outline-none"
                   />
                 </label>
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end border-t border-slate-800 pt-6">
+            <div className="mt-6 flex justify-end border-t border-[#e2e8f0] pt-6">
               <button
                 type="submit"
                 disabled={editMutation.isPending}
-                className="inline-flex h-9 items-center gap-2 rounded-lg bg-cyan-500 px-4 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400 disabled:opacity-50"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#059669] px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#047857] disabled:opacity-50"
               >
                 {editMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -320,15 +320,15 @@ function TenantDetailsPage() {
 
         {/* Sidebar Data */}
         <div className="space-y-6">
-          <div className="rounded-xl border border-slate-800 bg-[#0b1826] p-6">
-            <div className="mb-4 flex items-center gap-2 border-b border-slate-800 pb-4">
-              <Globe2 className="h-5 w-5 text-emerald-400" />
-              <h2 className="font-display text-lg font-bold">Websites & Domains</h2>
+          <div className="rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
+            <div className="mb-4 flex items-center gap-2 border-b border-[#e2e8f0] pb-4">
+              <Globe2 className="h-5 w-5 text-[#059669]" />
+              <h2 className="text-base font-bold text-[#0f172a]">Websites & Domains</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
                   Websites ({websites?.length || 0})
                 </h3>
                 {websites?.length > 0 ? (
@@ -336,25 +336,25 @@ function TenantDetailsPage() {
                     {websites.map((w: any) => (
                       <li
                         key={w.id}
-                        className="rounded-lg border border-slate-700/50 bg-slate-900/30 p-2 text-sm flex items-center justify-between"
+                        className="rounded-lg border border-[#e2e8f0] bg-[#fafcfb] p-3 text-sm flex items-center justify-between"
                       >
                         <div>
-                          <div className="font-medium">{w.name}</div>
-                          <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+                          <div className="font-bold text-[#0f172a]">{w.name}</div>
+                          <div className="mt-1 flex items-center gap-2 text-xs text-[#64748b]">
                             <span
-                              className={`h-1.5 w-1.5 rounded-full ${w.status === "published" ? "bg-emerald-400" : "bg-amber-400"}`}
+                              className={`h-1.5 w-1.5 rounded-full ${w.status === "published" ? "bg-[#059669]" : "bg-amber-500"}`}
                             />
-                            {w.status}
+                            <span className="capitalize">{w.status}</span>
                           </div>
                         </div>
                         {w.templateName && (
                           <div className="text-right flex flex-col items-end gap-1.5">
-                            <span className="inline-flex items-center rounded-md border border-slate-700 bg-slate-800/50 px-2 py-0.5 text-[10px] font-medium text-slate-300">
+                            <span className="inline-flex items-center rounded-md border border-[#fed7aa] bg-[#fff7ed] px-2 py-0.5 text-[10px] font-bold text-[#c2410c]">
                               Template: {w.templateName}
                             </span>
                             <a
                               href={`/admin/websites_/${w.id}/builder`}
-                              className="inline-flex items-center gap-1 rounded border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold text-cyan-400 hover:bg-cyan-500 hover:text-slate-950 transition"
+                              className="inline-flex items-center gap-1 rounded-md border border-[#059669]/30 bg-[#ecfdf5] px-2 py-0.5 text-[10px] font-bold text-[#047857] hover:bg-[#059669] hover:text-white transition"
                             >
                               Edit Inline
                             </a>
@@ -364,12 +364,12 @@ function TenantDetailsPage() {
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-xs text-slate-500">No websites created yet.</p>
+                  <p className="text-xs text-[#64748b]">No websites created yet.</p>
                 )}
               </div>
 
               <div>
-                <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                <h3 className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
                   Domains ({domains?.length || 0})
                 </h3>
                 {domains?.length > 0 ? (
@@ -377,38 +377,38 @@ function TenantDetailsPage() {
                     {domains.map((d: any) => (
                       <li
                         key={d.id}
-                        className="rounded-lg border border-slate-700/50 bg-slate-900/30 p-2 text-sm flex items-center justify-between"
+                        className="rounded-lg border border-[#e2e8f0] bg-[#fafcfb] p-3 text-sm flex items-center justify-between"
                       >
-                        <span className="font-medium text-slate-300">{d.domain}</span>
-                        <span className="text-[10px] uppercase text-emerald-400">{d.status}</span>
+                        <span className="font-bold text-[#0f172a]">{d.domain}</span>
+                        <span className="text-[10px] font-bold uppercase text-[#059669] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">{d.status}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-xs text-slate-500">No custom domains connected.</p>
+                  <p className="text-xs text-[#64748b]">No custom domains connected.</p>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-800 bg-[#0b1826] p-6">
-            <div className="mb-4 flex items-center gap-2 border-b border-slate-800 pb-4">
-              <Activity className="h-5 w-5 text-violet-400" />
-              <h2 className="font-display text-lg font-bold">Recent Activity</h2>
+          <div className="rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
+            <div className="mb-4 flex items-center gap-2 border-b border-[#e2e8f0] pb-4">
+              <Activity className="h-5 w-5 text-violet-600" />
+              <h2 className="text-base font-bold text-[#0f172a]">Recent Activity</h2>
             </div>
             {recentActivity?.length > 0 ? (
               <div className="space-y-4">
                 {recentActivity.map((act: any) => (
-                  <div key={act.id} className="border-l-2 border-slate-700 pl-3">
-                    <p className="text-xs text-slate-300">{act.description}</p>
-                    <p className="mt-1 text-[10px] text-slate-500">
+                  <div key={act.id} className="border-l-2 border-[#059669] pl-3">
+                    <p className="text-xs font-medium text-[#334155]">{act.description}</p>
+                    <p className="mt-1 text-[10px] text-[#64748b]">
                       {new Date(act.createdAt).toLocaleString()}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500">No recent activity.</p>
+              <p className="text-xs text-[#64748b]">No recent activity.</p>
             )}
           </div>
         </div>

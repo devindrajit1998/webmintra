@@ -56,24 +56,24 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
   const verified = metrics?.verifiedUsers ?? 0;
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-slate-100">
+    <div className="landing-page min-h-screen bg-[#f8fafc] text-[#0f172a] font-sans">
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-800 bg-[#091521] px-3 py-5 transition-transform lg:translate-x-0 ${menuOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-[#e2e8f0] bg-white px-3 py-5 transition-transform lg:translate-x-0 ${menuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"}`}
       >
         <div className="mb-8 flex items-center justify-between px-2">
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-400 font-display text-lg font-black text-slate-950">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm shrink-0">
               W
-            </span>
+            </div>
             <div>
-              <p className="font-display text-sm font-bold">WebMintra</p>
-              <p className="text-[10px] text-slate-500">Admin Panel</p>
+              <p className="font-extrabold text-base text-[#0f172a] lowercase">webmintra</p>
+              <p className="text-[10px] font-bold text-[#ea580c]">🇮🇳 Admin Central</p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => setMenuOpen(false)}
-            className="rounded p-1 text-slate-400 lg:hidden"
+            className="rounded p-1 text-[#64748b] hover:text-[#0f172a] lg:hidden"
             aria-label="Close navigation"
           >
             <X className="h-5 w-5" />
@@ -86,7 +86,7 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
         <button
           type="button"
           onClick={onSignOut}
-          className="mt-auto flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-slate-400 transition hover:bg-slate-800 hover:text-white"
+          className="mt-auto flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-[#64748b] transition hover:bg-rose-50 hover:text-rose-600"
         >
           <LogOut className="h-4 w-4" />
           Sign out
@@ -97,134 +97,134 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
           type="button"
           aria-label="Close navigation overlay"
           onClick={() => setMenuOpen(false)}
-          className="fixed inset-0 z-30 bg-slate-950/70 lg:hidden"
+          className="fixed inset-0 z-30 bg-[#0f172a]/40 backdrop-blur-xs lg:hidden"
         />
       ) : null}
 
       <main className="min-h-screen lg:pl-64">
-        <header className="flex min-h-16 items-center gap-4 border-b border-slate-800 bg-[#091521]/80 px-4 backdrop-blur sm:px-6">
+        <header className="flex min-h-16 items-center gap-4 border-b border-[#e2e8f0] bg-white/90 px-4 backdrop-blur-md sm:px-6 sticky top-0 z-20">
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            className="rounded-lg border border-slate-700 p-2 text-slate-300 lg:hidden"
+            className="rounded-lg border border-[#cbd5e1] p-2 text-[#475569] lg:hidden"
             aria-label="Open navigation"
           >
             <Menu className="h-4 w-4" />
           </button>
           <div className="hidden flex-1 md:block">
             <label className="relative block max-w-sm">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
               <input
                 aria-label="Search dashboard"
-                placeholder="Search anything..."
-                className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900/60 pl-9 pr-10 text-xs text-slate-100 outline-none transition focus:border-cyan-400"
+                placeholder="Search anything across India..."
+                className="h-9 w-full rounded-xl border border-[#cbd5e1] bg-white pl-9 pr-10 text-xs text-[#0f172a] outline-none transition focus:border-[#059669] focus:ring-1 focus:ring-[#059669]"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-600">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-[#94a3b8]">
                 ⌘K
               </span>
             </label>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <IconButton label="Notifications" icon={<Bell className="h-4 w-4" />} badge="4" />
-            <IconButton label="Help" icon={<CircleHelp className="h-4 w-4" />} />
-            <div className="ml-2 flex items-center gap-2 border-l border-slate-700 pl-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-700 text-xs font-bold">
+            <IconButton label="Notifications" icon={<Bell className="h-4 w-4 text-[#475569]" />} badge="4" />
+            <IconButton label="Help" icon={<CircleHelp className="h-4 w-4 text-[#475569]" />} />
+            <div className="ml-2 flex items-center gap-2.5 border-l border-[#e2e8f0] pl-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#059669] text-xs font-bold text-white shadow-xs">
                 {user.name.slice(0, 1).toUpperCase()}
               </span>
               <div className="hidden sm:block">
-                <p className="text-xs font-semibold">{user.name}</p>
-                <p className="text-[10px] text-slate-500">Administrator</p>
+                <p className="text-xs font-extrabold text-[#0f172a]">{user.name}</p>
+                <p className="text-[10px] font-semibold text-[#64748b]">Administrator</p>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="mx-auto max-w-[1600px] p-4 sm:p-6">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div className="mx-auto max-w-[1600px] p-4 sm:p-6 space-y-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="font-display text-2xl font-bold tracking-tight">Dashboard</h1>
-              <p className="mt-1 text-xs text-slate-500">
-                Welcome back, {user.name}. Here&apos;s what&apos;s happening with your platform
-                today.
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">Admin Overview</h1>
+              <p className="mt-1 text-xs sm:text-sm text-[#64748b]">
+                Welcome back, {user.name}. Here&apos;s what&apos;s happening with your Indian business network today.
               </p>
             </div>
             <button
               type="button"
-              className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs font-medium text-slate-300"
+              className="inline-flex h-9 items-center gap-2 rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-xs font-bold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc]"
             >
-              <Activity className="h-4 w-4" />
-              This week
+              <Activity className="h-4 w-4 text-[#059669]" />
+              This Week
             </button>
           </div>
           {error ? (
-            <p className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700">
               {error}
             </p>
           ) : null}
 
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard
-              label="Total users"
+              label="Total Users"
               value={totalUsers}
-              note="Platform accounts"
-              icon={<Users />}
+              note="Platform-wide accounts"
+              icon={<Users className="h-4 w-4" />}
               color="emerald"
             />
             <StatCard
-              label="Total tenants"
+              label="Active Tenants"
               value={tenants}
-              note="Business owners"
-              icon={<Users />}
+              note="Indian business owners"
+              icon={<Users className="h-4 w-4" />}
               color="blue"
             />
             <StatCard
-              label="Verified accounts"
+              label="Verified Accounts"
               value={verified}
-              note="Email verified"
-              icon={<ShieldCheck />}
+              note="Email & OTP verified"
+              icon={<ShieldCheck className="h-4 w-4" />}
               color="violet"
             />
             <StatCard
-              label="Administrators"
+              label="Super Administrators"
               value={metrics?.administrators ?? 0}
               note="Platform operators"
-              icon={<ShieldCheck />}
+              icon={<ShieldCheck className="h-4 w-4" />}
               color="amber"
             />
           </section>
 
-          <section className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,1fr)]">
-            <article className="rounded-xl border border-slate-800 bg-[#0b1826] p-5">
+          <section className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,1fr)]">
+            <article className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-sm font-semibold">Platform growth</h2>
-                  <p className="mt-3 font-display text-3xl font-bold">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Platform Growth</span>
+                  <p className="mt-2 text-3xl font-extrabold text-[#0b192c]">
                     {totalUsers.toLocaleString()}
                   </p>
-                  <p className="mt-1 text-xs text-emerald-400">Live total registered accounts</p>
+                  <p className="mt-1 text-xs font-semibold text-[#059669]">Live total registered accounts</p>
                 </div>
                 <select
                   aria-label="Growth period"
-                  className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] text-slate-300"
+                  className="rounded-lg border border-[#cbd5e1] bg-white px-2.5 py-1 text-xs font-bold text-[#475569] shadow-2xs"
                 >
                   <option>This week</option>
+                  <option>This month</option>
                 </select>
               </div>
               <GrowthChart />
             </article>
-            <article className="rounded-xl border border-slate-800 bg-[#0b1826] p-5">
-              <h2 className="text-sm font-semibold">Account status</h2>
-              <div className="mt-6 flex items-center gap-6">
+            <article className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm flex flex-col justify-between">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Account Status</h2>
+              <div className="mt-4 flex flex-col sm:flex-row items-center gap-6 justify-around">
                 <Donut value={totalUsers ? Math.round((verified / totalUsers) * 100) : 0} />
-                <div className="space-y-3 text-xs">
-                  <Legend color="bg-emerald-400" label="Verified" value={verified} />
+                <div className="space-y-3 text-xs w-full sm:w-auto">
+                  <Legend color="bg-[#059669]" label="Verified" value={verified} />
                   <Legend
-                    color="bg-amber-400"
+                    color="bg-[#ea580c]"
                     label="Awaiting verification"
                     value={Math.max(totalUsers - verified, 0)}
                   />
                   <Legend
-                    color="bg-violet-400"
+                    color="bg-[#3b82f6]"
                     label="Administrators"
                     value={metrics?.administrators ?? 0}
                   />
@@ -233,51 +233,55 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
             </article>
           </section>
 
-          <section className="mt-4 grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.8fr)]">
-            <article className="overflow-hidden rounded-xl border border-slate-800 bg-[#0b1826]">
-              <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+          <section className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.8fr)]">
+            <article className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-sm">
+              <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-4">
                 <div>
-                  <h2 className="text-sm font-semibold">Recent tenants</h2>
-                  <p className="mt-1 text-xs text-slate-500">Latest accounts from the platform</p>
+                  <h2 className="text-sm font-extrabold text-[#0b192c]">Recent Tenants</h2>
+                  <p className="mt-0.5 text-xs text-[#64748b]">Latest accounts from the platform</p>
                 </div>
-                <a href="/admin-tenants" className="text-xs text-cyan-400">
-                  View all
+                <a href="/admin-tenants" className="text-xs font-bold text-[#059669] hover:underline">
+                  View all →
                 </a>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[580px] text-left text-xs">
-                  <thead className="border-b border-slate-800 text-[10px] uppercase tracking-wider text-slate-500">
+                  <thead className="border-b border-[#f1f5f9] bg-[#f8fafc] text-[10.5px] uppercase tracking-wider text-[#64748b]">
                     <tr>
-                      <th className="px-5 py-3 font-medium">Tenant</th>
-                      <th className="px-4 py-3 font-medium">Role</th>
-                      <th className="px-4 py-3 font-medium">Status</th>
-                      <th className="px-5 py-3 text-right font-medium">Joined</th>
+                      <th className="px-6 py-3 font-bold">Tenant</th>
+                      <th className="px-4 py-3 font-bold">Role</th>
+                      <th className="px-4 py-3 font-bold">Status</th>
+                      <th className="px-6 py-3 text-right font-bold">Joined</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-[#f1f5f9]">
                     {dashboard?.recentUsers.length ? (
                       dashboard.recentUsers.map((recent) => (
                         <tr
                           key={recent.email}
-                          className="border-b border-slate-800/70 last:border-0"
+                          className="hover:bg-[#f8fafc] transition"
                         >
-                          <td className="px-5 py-3">
-                            <p className="font-medium text-slate-200">{recent.name}</p>
-                            <p className="mt-1 text-[11px] text-slate-500">{recent.email}</p>
+                          <td className="px-6 py-3.5">
+                            <p className="font-bold text-[#0f172a]">{recent.name}</p>
+                            <p className="text-[11px] text-[#64748b]">{recent.email}</p>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="rounded bg-violet-500/15 px-2 py-1 text-[10px] capitalize text-violet-300">
+                          <td className="px-4 py-3.5">
+                            <span className="rounded-md bg-[#f1f5f9] px-2 py-0.5 text-[10.5px] font-bold capitalize text-[#475569] border border-[#e2e8f0]">
                               {recent.role}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-3.5">
                             <span
-                              className={`rounded px-2 py-1 text-[10px] ${recent.isEmailVerified ? "bg-emerald-500/15 text-emerald-300" : "bg-amber-500/15 text-amber-300"}`}
+                              className={`rounded-md px-2 py-0.5 text-[10.5px] font-bold border ${
+                                recent.isEmailVerified
+                                  ? "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]"
+                                  : "bg-[#fff7ed] text-[#c2410c] border-[#fed7aa]"
+                              }`}
                             >
-                              {recent.isEmailVerified ? "Verified" : "Pending"}
+                              {recent.isEmailVerified ? "✓ Verified" : "Pending"}
                             </span>
                           </td>
-                          <td className="px-5 py-3 text-right text-slate-500">
+                          <td className="px-6 py-3.5 text-right font-medium text-[#64748b]">
                             {new Intl.DateTimeFormat(undefined, {
                               month: "short",
                               day: "numeric",
@@ -287,7 +291,7 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={4} className="px-5 py-10 text-center text-slate-500">
+                        <td colSpan={4} className="px-6 py-10 text-center text-[#64748b]">
                           Loading recent account activity…
                         </td>
                       </tr>
@@ -296,39 +300,39 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
                 </table>
               </div>
             </article>
-            <aside className="rounded-xl border border-slate-800 bg-[#0b1826] p-5">
-              <div className="flex items-center justify-between">
-                <h2 className="text-sm font-semibold">Quick actions</h2>
-                <PanelLeftClose className="h-4 w-4 text-slate-500" />
+            <aside className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-[#f1f5f9] pb-3.5">
+                <h2 className="text-sm font-extrabold text-[#0b192c]">Quick Actions</h2>
+                <PanelLeftClose className="h-4 w-4 text-[#94a3b8]" />
               </div>
-              <div className="mt-4 space-y-2">
+              <div className="mt-4 space-y-2.5">
                 <a
                   href="/admin-tenants"
-                  className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/50 p-3 transition hover:border-slate-600"
+                  className="flex items-center gap-3 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 transition hover:border-[#cbd5e1] hover:bg-white hover:shadow-xs"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-md bg-cyan-400/10 text-cyan-300">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
                     <Users className="h-4 w-4" />
                   </span>
                   <span>
-                    <span className="block text-xs font-medium text-slate-200">Invite tenant</span>
-                    <span className="mt-0.5 block text-[10px] text-slate-500">
-                      Provision a secure workspace invitation
+                    <span className="block text-xs font-bold text-[#0f172a]">Invite Tenant</span>
+                    <span className="mt-0.5 block text-[10.5px] text-[#64748b]">
+                      Provision a secure workspace
                     </span>
                   </span>
                 </a>
                 <QuickAction
-                  icon={<Boxes />}
-                  title="Add template"
+                  icon={<Boxes className="h-4 w-4" />}
+                  title="Add Template"
                   detail="Upload or create a template"
                 />
                 <QuickAction
-                  icon={<Tags />}
-                  title="Create coupon"
+                  icon={<Tags className="h-4 w-4" />}
+                  title="Create Coupon"
                   detail="Add a subscription coupon"
                 />
                 <QuickAction
-                  icon={<Settings />}
-                  title="System settings"
+                  icon={<Settings className="h-4 w-4" />}
+                  title="System Settings"
                   detail="Configure platform settings"
                 />
               </div>
@@ -353,8 +357,8 @@ function SidebarGroup({
   }>;
 }) {
   return (
-    <section className="mb-5">
-      <p className="mb-2 px-3 text-[9px] font-bold uppercase tracking-[0.16em] text-slate-600">
+    <section className="mb-4">
+      <p className="mb-1.5 px-3 text-[9px] font-bold uppercase tracking-[0.16em] text-[#94a3b8]">
         {label}
       </p>
       <div className="space-y-0.5">
@@ -363,18 +367,26 @@ function SidebarGroup({
             <a
               href={to}
               key={itemLabel}
-              className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs transition ${active ? "bg-emerald-500/15 text-emerald-300" : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"}`}
+              className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
+                active
+                  ? "bg-[#ecfdf5] text-[#047857] font-bold border-l-4 border-[#ea580c] shadow-2xs"
+                  : "text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+              }`}
             >
-              <Icon className="h-3.5 w-3.5" />
+              <Icon className="h-4 w-4" />
               {itemLabel}
             </a>
           ) : (
             <button
               type="button"
               key={itemLabel}
-              className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-xs transition ${active ? "bg-emerald-500/15 text-emerald-300" : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"}`}
+              className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
+                active
+                  ? "bg-[#ecfdf5] text-[#047857] font-bold border-l-4 border-[#ea580c] shadow-2xs"
+                  : "text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+              }`}
             >
-              <Icon className="h-3.5 w-3.5" />
+              <Icon className="h-4 w-4" />
               {itemLabel}
             </button>
           ),
@@ -396,11 +408,11 @@ function IconButton({
     <button
       type="button"
       aria-label={label}
-      className="relative rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+      className="relative rounded-xl p-2 text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
     >
       {icon}
       {badge ? (
-        <span className="absolute -right-0.5 -top-0.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-emerald-400 px-1 text-[8px] font-bold text-slate-950">
+        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#ea580c] px-1 text-[8px] font-bold text-white shadow-2xs">
           {badge}
         </span>
       ) : null}
@@ -421,23 +433,23 @@ function StatCard({
   color: "emerald" | "blue" | "violet" | "amber";
 }) {
   const styles = {
-    emerald: "bg-emerald-400/15 text-emerald-300",
-    blue: "bg-sky-400/15 text-sky-300",
-    violet: "bg-violet-400/15 text-violet-300",
-    amber: "bg-amber-400/15 text-amber-300",
+    emerald: "bg-[#ecfdf5] text-[#047857] border-[#a7f3d0]",
+    blue: "bg-[#eff6ff] text-[#1d4ed8] border-[#bfdbfe]",
+    violet: "bg-[#f5f3ff] text-[#7c3aed] border-[#ddd6fe]",
+    amber: "bg-[#fffbeb] text-[#b45309] border-[#fde68a]",
   };
   return (
-    <article className="rounded-xl border border-slate-800 bg-[#0b1826] p-4">
-      <div className="flex items-center gap-3">
-        <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${styles[color]}`}>
+    <article className="tiranga-border-top rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
+      <div className="flex items-center gap-3.5">
+        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${styles[color]}`}>
           {icon}
         </span>
         <div>
-          <p className="text-[11px] text-slate-500">{label}</p>
-          <p className="mt-0.5 font-display text-2xl font-bold">{value.toLocaleString()}</p>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">{label}</p>
+          <p className="mt-0.5 text-2xl font-extrabold text-[#0b192c]">{value.toLocaleString()}</p>
         </div>
       </div>
-      <p className="mt-3 text-[10px] text-slate-500">{note}</p>
+      <p className="mt-3 text-[11px] font-medium text-[#64748b]">{note}</p>
     </article>
   );
 }

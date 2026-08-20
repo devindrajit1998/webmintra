@@ -22,8 +22,11 @@ import {
   Layers,
   Globe,
   Zap,
+  Menu,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
+import { PublicMobileMenu } from "@/components/PublicMobileMenu";
 
 export const Route = createFileRoute("/templates")({
   component: PublicTemplatesCatalogPage,
@@ -31,6 +34,7 @@ export const Route = createFileRoute("/templates")({
 });
 
 export function PublicTemplatesCatalogPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [previewId, setPreviewId] = useState<string | null>(null);
@@ -49,6 +53,9 @@ export function PublicTemplatesCatalogPage() {
     queryFn: getPublicSettings,
     staleTime: 1000 * 60 * 5,
   });
+
+  const siteName = settings["site.name"] || "webmintra";
+  const logoUrl = settings["brand.logoUrl"];
 
   const { data: categories = [] } = useQuery({
     queryKey: ["publicTemplateCategories"],
@@ -87,89 +94,124 @@ export function PublicTemplatesCatalogPage() {
   const allCategories = ["All", ...categories];
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-slate-200 font-sans selection:bg-cyan-500/30">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#07111f]/90 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
-          <Link
-            to="/"
-            className="flex items-center gap-3 font-display text-lg font-bold text-white transition hover:opacity-80"
-          >
-            {settings["brand.logoUrl"] ? (
-              <img src={settings["brand.logoUrl"]} alt="Logo" className="h-9 w-9 object-contain" />
+    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+      {/* ── HEADER NAVIGATION ────────────────────────────────────────── */}
+      <header className="landing-nav-glass sticky top-0 z-40 w-full">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
+          {/* Brand Logo */}
+          <Link to="/" className="flex items-center gap-2.5 transition hover:opacity-90">
+            {logoUrl ? (
+              <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
             ) : (
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-cyan-500 text-white">
-                <span className="font-bold">{(settings["site.name"] || "W").charAt(0)}</span>
-              </span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
+                W
+              </div>
             )}
-            <span className="text-[22px] font-black tracking-tight leading-none bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase font-sans">
-              {settings["site.name"] || "webmintra"}
+            <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
+              {siteName}
             </span>
           </Link>
 
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="text-sm font-semibold text-slate-400 hover:text-white transition hidden sm:inline-block"
-            >
+          {/* Desktop Nav Links */}
+          <nav className="hidden items-center gap-7 text-[13.5px] font-medium text-[#475569] md:flex">
+            <Link to="/" className="landing-nav-link text-[#475569]">
               Home
             </Link>
+            <Link to="/templates" className="landing-nav-link text-[#0f172a] font-bold">
+              Templates
+            </Link>
+            <Link to="/blog" className="landing-nav-link text-[#475569]">
+              Blog
+            </Link>
+            <Link to="/help" className="landing-nav-link text-[#475569]">
+              Help Center
+            </Link>
+            <Link to="/contact" className="landing-nav-link text-[#475569]">
+              Contact
+            </Link>
+          </nav>
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-3">
             <Link
               to={user ? routeForRole(user.role) : "/sign-in"}
-              className="text-sm font-semibold text-slate-300 hover:text-white transition"
+              className="text-[13.5px] font-bold text-[#0f172a] hover:text-[#059669] transition px-2 py-1"
             >
-              Sign In
+              Log in
             </Link>
             <Link
               to={primaryRoute}
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-cyan-500 px-5 text-xs font-bold text-slate-950 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition hover:bg-cyan-400"
+              className="hidden h-9 items-center justify-center rounded-lg bg-[#059669] px-4 text-[13px] font-bold text-white shadow-sm transition hover:bg-[#047857] sm:inline-flex"
             >
-              Start Free Trial <ArrowRight className="h-3.5 w-3.5" />
+              Create Your Website
             </Link>
+
+            {/* Mobile Menu Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open mobile navigation menu"
+              className="landing-icon-button md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-[#e2e8f0] text-[#0f172a] hover:bg-[#f1f5f9] transition"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 py-12 lg:py-16">
+      {/* Mobile Off-Canvas Drawer */}
+      <PublicMobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        user={user}
+        primaryRoute={primaryRoute}
+        siteName={siteName}
+        logoUrl={logoUrl}
+        isLandingPage={false}
+      />
+
+      {/* ── MAIN CATALOG CONTENT ────────────────────────────────────── */}
+      <main className="mx-auto max-w-7xl px-5 sm:px-6 py-12 lg:py-16">
         {/* Title Banner */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-bold text-cyan-300 backdrop-blur-md mb-4">
-            <Sparkles className="h-3.5 w-3.5 text-cyan-400" /> Template Catalog
-          </span>
-          <h1 className="font-display text-4xl font-extrabold text-white sm:text-5xl tracking-tight">
+          <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11.5px] font-bold text-[#c2410c] shadow-2xs">
+            <span>🇮🇳</span>
+            <span>READY-TO-LAUNCH BUSINESS TEMPLATES</span>
+          </div>
+          <h1 className="text-[34px] sm:text-[44px] font-extrabold text-[#0f172a] leading-tight">
             Choose Your Business Website
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-slate-400">
-            Engineered for high local conversion, fast load speed, and easy editing without coding.
+          <p className="mt-3 text-sm sm:text-base text-[#475569] max-w-xl mx-auto">
+            Engineered for high local conversion with direct WhatsApp lead routing, instant UPI checkout, and fast Indian edge hosting.
           </p>
         </div>
 
         {/* Search & Category Filter Bar */}
-        <div className="mb-10 space-y-6">
+        <div className="mb-10 space-y-5">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
             {/* Search Input */}
             <div className="relative w-full sm:w-96">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94a3b8]" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by category, clinic, gym, cafe..."
-                className="w-full rounded-full border border-white/10 bg-[#0c1827] pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none shadow-sm"
+                placeholder="Search clinic, gym, cafe, salon, CA..."
+                className="w-full rounded-xl border border-[#cbd5e1] bg-white pl-10 pr-9 py-2.5 text-sm text-[#0f172a] placeholder:text-[#94a3b8] focus:border-[#059669] focus:outline-none shadow-xs"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#0f172a]"
                 >
                   <X className="h-4 w-4" />
                 </button>
               )}
             </div>
 
-            <p className="text-xs text-slate-400 font-medium">
-              Showing <span className="text-white font-bold">{filteredTemplates.length}</span>{" "}
-              active template{filteredTemplates.length === 1 ? "" : "s"}
+            <p className="text-xs text-[#64748b] font-medium">
+              Showing <span className="text-[#0f172a] font-bold">{filteredTemplates.length}</span>{" "}
+              business template{filteredTemplates.length === 1 ? "" : "s"}
             </p>
           </div>
 
@@ -179,10 +221,10 @@ export function PublicTemplatesCatalogPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`whitespace-nowrap rounded-full px-4 py-2 text-xs font-bold transition-all ${
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
                   selectedCategory.toLowerCase() === cat.toLowerCase()
-                    ? "bg-cyan-500 text-slate-950 shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                    : "border border-white/10 bg-[#0c1827] text-slate-400 hover:text-white hover:border-white/20"
+                    ? "bg-[#059669] text-white shadow-xs"
+                    : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:border-[#cbd5e1]"
                 }`}
               >
                 {cat}
@@ -197,28 +239,27 @@ export function PublicTemplatesCatalogPage() {
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className="animate-pulse rounded-2xl border border-white/10 bg-[#0c1827] p-4"
+                className="animate-pulse rounded-2xl border border-[#e2e8f0] bg-white p-4"
               >
-                <div className="aspect-[16/10] w-full rounded-xl bg-slate-800" />
-                <div className="mt-4 h-5 w-3/4 rounded bg-slate-800" />
-                <div className="mt-2 h-4 w-1/2 rounded bg-slate-800" />
+                <div className="aspect-[16/10] w-full rounded-xl bg-[#f1f5f9]" />
+                <div className="mt-4 h-5 w-3/4 rounded bg-[#f1f5f9]" />
+                <div className="mt-2 h-4 w-1/2 rounded bg-[#f1f5f9]" />
               </div>
             ))}
           </div>
         ) : filteredTemplates.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-white/10 bg-[#091521] p-16 text-center">
-            <Layers className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white">No matching templates found</h3>
-            <p className="text-sm text-slate-400 mt-1 max-w-md mx-auto">
-              Try adjusting your category filter or search keywords to explore available business
-              designs.
+          <div className="rounded-3xl border border-dashed border-[#cbd5e1] bg-white p-16 text-center shadow-xs">
+            <Layers className="h-12 w-12 text-[#94a3b8] mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-[#0f172a]">No matching templates found</h3>
+            <p className="text-sm text-[#64748b] mt-1 max-w-md mx-auto">
+              Try adjusting your category filter or search keywords to explore available business designs.
             </p>
             <button
               onClick={() => {
                 setSelectedCategory("All");
                 setSearchQuery("");
               }}
-              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-5 py-2.5 text-xs font-bold text-slate-950 hover:bg-cyan-400"
+              className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#059669] px-5 py-2.5 text-xs font-bold text-white hover:bg-[#047857]"
             >
               Reset Filters
             </button>
@@ -228,66 +269,83 @@ export function PublicTemplatesCatalogPage() {
             {filteredTemplates.map((t: any) => (
               <div
                 key={t._id || t.id}
-                className="group flex flex-col justify-between rounded-2xl border border-white/10 bg-gradient-to-b from-[#0e1c2e] to-[#0a1523] p-4 transition-all duration-300 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] hover:-translate-y-1.5"
+                className="landing-template-card group flex flex-col justify-between p-4"
               >
                 <div>
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-900 border border-white/5">
-                    <img
-                      src={
-                        t.thumbnailUrl ||
-                        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80"
-                      }
-                      alt={t.title}
-                      className="h-full w-full object-cover object-top transition duration-700 group-hover:scale-105"
-                    />
-
-                    {/* Top Tag Badges */}
-                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                      <span className="rounded-full bg-slate-950/85 backdrop-blur-md px-3 py-1 text-[10px] font-black uppercase tracking-wider text-cyan-400 border border-cyan-500/30">
-                        {t.category || "General"}
+                  {/* Miniature Browser Chrome */}
+                  <div className="landing-mini-browser aspect-[16/10] relative">
+                    <div className="h-5 bg-[#f1f5f9] border-b border-[#e2e8f0] px-2.5 flex items-center gap-1.5">
+                      <div className="h-2 w-2 rounded-full bg-[#ef4444]" />
+                      <div className="h-2 w-2 rounded-full bg-[#f59e0b]" />
+                      <div className="h-2 w-2 rounded-full bg-[#10b981]" />
+                      <span className="text-[9px] font-mono text-[#94a3b8] ml-2">
+                        {t.category ? `${t.category.toLowerCase()}.in` : "business.in"}
                       </span>
-                      {t.pageCount > 1 && (
-                        <span className="rounded-full bg-slate-950/85 backdrop-blur-md px-2.5 py-1 text-[10px] font-bold text-slate-300 border border-white/10">
-                          {t.pageCount} Pages
-                        </span>
-                      )}
                     </div>
 
-                    {/* Interactive Actions Overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-slate-950/65 backdrop-blur-[2px]">
-                      <button
-                        onClick={() => {
-                          setPreviewId(t._id || t.id);
-                          setPreviewActivePage("index.html");
-                          setPreviewDevice("desktop");
-                        }}
-                        className="rounded-full bg-cyan-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg transition hover:bg-cyan-400 flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" /> Live Preview
-                      </button>
-                      <Link
-                        to={primaryRoute}
-                        className="rounded-full bg-emerald-500 px-4 py-2.5 text-xs font-bold text-slate-950 shadow-lg transition hover:bg-emerald-400 flex items-center gap-1.5"
-                      >
-                        Use Template <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
+                    <div className="h-[calc(100%-20px)] w-full overflow-hidden relative">
+                      <img
+                        src={
+                          t.thumbnailUrl ||
+                          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80"
+                        }
+                        alt={t.title}
+                        className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-105"
+                      />
+
+                      {/* Top Tag Badges */}
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                        <span className="rounded-md bg-black/60 backdrop-blur-xs px-2.5 py-0.5 text-[9px] font-bold text-white shadow-xs">
+                          {t.category || "General"}
+                        </span>
+                        {t.pageCount > 1 && (
+                          <span className="rounded-md bg-white/90 px-2 py-0.5 text-[9px] font-bold text-[#0f172a] shadow-xs">
+                            {t.pageCount} Pages
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Interactive Actions Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center gap-2.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100 bg-black/45 backdrop-blur-[2px]">
+                        <button
+                          onClick={() => {
+                            setPreviewId(t._id || t.id);
+                            setPreviewActivePage("index.html");
+                            setPreviewDevice("desktop");
+                          }}
+                          className="rounded-lg bg-white px-3.5 py-2 text-xs font-bold text-[#0f172a] shadow-md transition hover:bg-[#f8fafc] flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Eye className="h-3.5 w-3.5 text-[#ea580c]" /> Preview
+                        </button>
+                        <Link
+                          to={primaryRoute}
+                          className="rounded-lg bg-[#059669] px-3.5 py-2 text-xs font-bold text-white shadow-md transition hover:bg-[#047857] flex items-center gap-1.5"
+                        >
+                          Use Template <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
 
                   <div className="pt-4 pb-2">
-                    <h3 className="text-lg font-bold text-white group-hover:text-cyan-400 transition truncate">
-                      {t.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 line-clamp-2 mt-1.5 leading-relaxed">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-base font-bold text-[#0f172a] group-hover:text-[#059669] transition truncate">
+                        {t.title}
+                      </h3>
+                      <span className="text-[10px] font-bold text-amber-600 flex items-center gap-0.5">
+                        ⭐ 4.9
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#64748b] line-clamp-2 mt-1 leading-relaxed">
                       {t.description ||
-                        `Modern, responsive website layout designed specifically for ${t.category || "businesses"}.`}
+                        `Tailored layout with WhatsApp leads & service rates for ${t.category || "local businesses"}.`}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3.5 border-t border-white/5 flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-emerald-400 flex items-center gap-1">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Live Ready
+                <div className="mt-3 pt-3 border-t border-[#f1f5f9] flex items-center justify-between">
+                  <span className="text-[11px] font-medium text-[#059669] flex items-center gap-1">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> WhatsApp & UPI Ready
                   </span>
 
                   <button
@@ -296,9 +354,9 @@ export function PublicTemplatesCatalogPage() {
                       setPreviewActivePage("index.html");
                       setPreviewDevice("desktop");
                     }}
-                    className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
+                    className="text-xs font-bold text-[#059669] hover:underline flex items-center gap-1 cursor-pointer"
                   >
-                    Interactive Preview <Eye className="h-3 w-3" />
+                    View Live <Eye className="h-3 w-3" />
                   </button>
                 </div>
               </div>
@@ -307,7 +365,7 @@ export function PublicTemplatesCatalogPage() {
         )}
       </main>
 
-      {/* FULLSCREEN MULTI-PAGE PREVIEW MODAL */}
+      {/* ── FULLSCREEN MULTI-PAGE PREVIEW MODAL ──────────────────────── */}
       {previewId &&
         fullPreviewTemplate &&
         (() => {
@@ -339,14 +397,14 @@ export function PublicTemplatesCatalogPage() {
           const previewHtml = activePageObj?.content ? activePageObj.content + injectedScript : "";
 
           return (
-            <div className="fixed inset-0 z-50 flex flex-col bg-slate-950/95 p-4 sm:p-6 backdrop-blur-md animate-in fade-in duration-200">
+            <div className="fixed inset-0 z-[80] flex flex-col bg-slate-950/90 p-4 sm:p-6 backdrop-blur-md animate-in fade-in duration-200">
               {/* Preview Header */}
               <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
                 <div className="flex items-center gap-4">
                   <div>
                     <h2 className="text-white font-bold text-lg">{fullPreviewTemplate.title}</h2>
-                    <p className="text-slate-400 text-xs flex items-center gap-2">
-                      <span className="text-cyan-400 font-semibold">
+                    <p className="text-slate-300 text-xs flex items-center gap-2">
+                      <span className="text-[#a7f3d0] font-semibold">
                         {fullPreviewTemplate.category}
                       </span>
                       <span>•</span>
@@ -355,44 +413,50 @@ export function PublicTemplatesCatalogPage() {
                   </div>
 
                   {pagesList.length > 1 && (
-                    <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
-                      {pagesList.map((p) => (
-                        <button
-                          key={p.name}
-                          onClick={() => setPreviewActivePage(p.name)}
-                          className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
-                            previewActivePage === p.name
-                              ? "bg-cyan-500 text-slate-950 shadow-sm"
-                              : "text-slate-400 hover:text-white"
-                          }`}
-                        >
-                          {p.name}
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-700 shadow-inner">
+                      {pagesList.map((p) => {
+                        const isActive = previewActivePage === p.name;
+                        return (
+                          <button
+                            key={p.name}
+                            type="button"
+                            onClick={() => setPreviewActivePage(p.name)}
+                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                              isActive
+                                ? "bg-[#059669] text-white shadow-sm border border-emerald-400/30"
+                                : "text-slate-200 hover:text-white hover:bg-slate-800"
+                            }`}
+                            style={{ color: isActive ? "#ffffff" : "#cbd5e1" }}
+                          >
+                            <FileText className="h-3.5 w-3.5 opacity-80" />
+                            <span>{p.name}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
 
                 {/* Viewport Device Controls & Action CTA */}
                 <div className="flex items-center gap-3">
-                  <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-800">
+                  <div className="flex bg-slate-900 rounded-lg p-1 border border-slate-700">
                     <button
                       onClick={() => setPreviewDevice("desktop")}
-                      className={`p-1.5 rounded-md transition-all ${previewDevice === "desktop" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      className={`p-1.5 rounded-md transition-all ${previewDevice === "desktop" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"}`}
                       title="Desktop View"
                     >
                       <Monitor className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setPreviewDevice("tablet")}
-                      className={`p-1.5 rounded-md transition-all ${previewDevice === "tablet" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      className={`p-1.5 rounded-md transition-all ${previewDevice === "tablet" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"}`}
                       title="Tablet View"
                     >
                       <Tablet className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setPreviewDevice("mobile")}
-                      className={`p-1.5 rounded-md transition-all ${previewDevice === "mobile" ? "bg-slate-800 text-white shadow-sm" : "text-slate-500 hover:text-slate-300"}`}
+                      className={`p-1.5 rounded-md transition-all ${previewDevice === "mobile" ? "bg-slate-800 text-white shadow-sm" : "text-slate-400 hover:text-slate-200"}`}
                       title="Mobile View"
                     >
                       <Smartphone className="h-4 w-4" />
@@ -401,7 +465,7 @@ export function PublicTemplatesCatalogPage() {
 
                   <Link
                     to={primaryRoute}
-                    className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-bold text-slate-950 hover:bg-emerald-400 transition shadow-md flex items-center gap-1.5"
+                    className="rounded-lg bg-[#059669] px-4 py-2 text-xs font-bold text-white hover:bg-[#047857] transition shadow-md flex items-center gap-1.5"
                   >
                     Use This Template <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -411,7 +475,7 @@ export function PublicTemplatesCatalogPage() {
                       setPreviewId(null);
                       setPreviewActivePage("index.html");
                     }}
-                    className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition p-2 rounded-full cursor-pointer"
+                    className="text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition p-2 rounded-full cursor-pointer"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -455,6 +519,16 @@ export function PublicTemplatesCatalogPage() {
             </div>
           );
         })()}
+
+      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
+      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
+        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© 2026 {siteName}. All rights reserved.</p>
+          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
+            <span>100% Data Stored in India</span> <span>🇮🇳</span>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

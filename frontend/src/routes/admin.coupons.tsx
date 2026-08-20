@@ -59,7 +59,7 @@ function CouponsPage() {
   }
 
   return (
-    <div className="w-full">
+    <div className="mx-auto w-full max-w-[1600px]">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-tight">Coupons & Discounts</h1>
@@ -69,7 +69,7 @@ function CouponsPage() {
         </div>
         <button
           onClick={() => setIsCreateOpen(!isCreateOpen)}
-          className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400"
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#059669] px-4 text-sm font-semibold text-white transition hover:bg-[#047857] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2"
         >
           <Plus className="h-4 w-4" /> Create Coupon
         </button>
@@ -78,18 +78,18 @@ function CouponsPage() {
       {isCreateOpen && (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 rounded-xl border border-slate-800 bg-[#0b1826] p-5 relative"
+          className="relative mb-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
         >
           <button
             type="button"
             onClick={() => setIsCreateOpen(false)}
-            className="absolute right-4 top-4 text-slate-500 hover:text-slate-300"
+            className="absolute right-4 top-4 text-slate-400 transition hover:text-slate-700"
           >
             <X className="h-5 w-5" />
           </button>
           <h2 className="font-display text-lg font-bold mb-4">Create New Coupon</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-slate-600">
               Code
               <input
                 required
@@ -99,7 +99,7 @@ function CouponsPage() {
                 placeholder="e.g. SUMMER20"
               />
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-slate-600">
               Type
               <select
                 value={form.discountType}
@@ -110,7 +110,7 @@ function CouponsPage() {
                 <option value="flat">Flat Amount</option>
               </select>
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-slate-600">
               Discount Value
               <input
                 required
@@ -123,7 +123,7 @@ function CouponsPage() {
                 placeholder="20"
               />
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-slate-600">
               Billing Cycle
               <select
                 value={form.intervalType}
@@ -135,7 +135,7 @@ function CouponsPage() {
                 <option value="yearly">Yearly Only</option>
               </select>
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-slate-600">
               Max Uses
               <input
                 required
@@ -147,13 +147,13 @@ function CouponsPage() {
                 placeholder="100"
               />
             </label>
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-semibold text-slate-600">
               Expires At
               <input
                 type="datetime-local"
                 value={form.expiresAt}
                 onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
-                className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm [color-scheme:dark]"
+                className="mt-1 h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 [color-scheme:light]"
               />
             </label>
           </div>
@@ -161,7 +161,7 @@ function CouponsPage() {
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex items-center justify-center gap-2 rounded-lg bg-[#ea580c] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#c2410c] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2"
             >
               {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
               {createMutation.isPending ? "Creating..." : "Create Coupon"}
@@ -188,59 +188,58 @@ function CouponsPage() {
             return (
               <div
                 key={coupon.id || coupon._id}
-                className="relative flex flex-col rounded-xl border border-slate-800 bg-[#0b1826] p-6 transition-colors hover:border-slate-700"
+                className="relative flex min-w-0 flex-col overflow-hidden rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition hover:border-[#059669]/40 hover:shadow-md"
               >
-                <div className="flex items-start justify-between">
+                <div className="-mx-6 -mt-6 mb-1 flex items-start justify-between border-t-4 border-[#ea580c] px-6 pt-5">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-900 border border-slate-700">
-                      <Tag className="h-4 w-4 text-cyan-400" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md border border-[#fed7aa] bg-[#fff7ed]">
+                      <Tag className="h-4 w-4 text-[#ea580c]" />
                     </div>
                     <div>
-                      <h3 className="font-display font-bold text-slate-200 font-mono text-lg">
+                      <h3 className="font-display font-mono text-lg font-bold text-[#0b192c]">
                         {coupon.code}
                       </h3>
                     </div>
                   </div>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
-                      status === "active"
-                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                        : "bg-slate-800 text-slate-400 border border-slate-700"
-                    }`}
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${status === "active"
+                      ? "border border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
+                      : "border border-slate-200 bg-slate-100 text-slate-600"
+                      }`}
                   >
                     {status}
                   </span>
                 </div>
 
-                <div className="mt-5 border-b border-slate-800/60 pb-5">
-                  <p className="font-display text-4xl font-black text-white">
+                <div className="mt-5 border-b border-slate-200 pb-5">
+                  <p className="font-display text-4xl font-black text-[#0b192c]">
                     {coupon.discountType === "percent"
                       ? `${coupon.discountValue}%`
                       : `₹${coupon.discountValue}`}{" "}
-                    <span className="text-sm font-normal text-slate-500">off</span>
+                    <span className="text-sm font-semibold text-slate-500">off</span>
                   </p>
                   {coupon.applicableIntervals && coupon.applicableIntervals.length > 0 && (
-                    <p className="mt-1 text-xs text-cyan-400 capitalize">
+                    <p className="mt-1 text-xs font-semibold capitalize text-[#047857]">
                       {coupon.applicableIntervals.join(" & ")} plans only
                     </p>
                   )}
                 </div>
 
                 <div className="mt-4 flex-1 space-y-3 text-sm">
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-600">
                     <span className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-slate-500" /> Usage
+                      <Users className="h-4 w-4 text-slate-400" /> Usage
                     </span>
-                    <span className="font-medium text-slate-200">
+                    <span className="font-medium text-[#0b192c]">
                       {coupon.usedCount} / {coupon.maxUses}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-slate-400">
+                  <div className="flex items-center justify-between text-slate-600">
                     <span className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-slate-500" /> Expires
+                      <Calendar className="h-4 w-4 text-slate-400" /> Expires
                     </span>
                     <span
-                      className={`font-medium ${isExpired ? "text-rose-400" : "text-slate-200"}`}
+                      className={`font-medium ${isExpired ? "text-rose-600" : "text-[#0b192c]"}`}
                     >
                       {new Date(coupon.expiresAt).toLocaleDateString()}
                     </span>
@@ -250,11 +249,11 @@ function CouponsPage() {
             );
           })
         ) : (
-          <div className="col-span-full rounded-xl border border-dashed border-slate-700 p-12 text-center">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-800/50 mb-4">
-              <Tag className="h-6 w-6 text-slate-400" />
+          <div className="col-span-full rounded-lg border border-dashed border-[#a7f3d0] bg-white p-12 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-[#fed7aa] bg-[#fff7ed]">
+              <Tag className="h-6 w-6 text-[#ea580c]" />
             </div>
-            <h3 className="font-display text-lg font-bold text-slate-300">No coupons found</h3>
+            <h3 className="font-display text-lg font-bold text-[#0b192c]">No coupons found</h3>
             <p className="mt-1 text-sm text-slate-500">
               Create discount codes to offer promotions to tenants.
             </p>

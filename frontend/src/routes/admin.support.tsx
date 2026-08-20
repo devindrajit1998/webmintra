@@ -343,7 +343,7 @@ function ConversationPanel({ ticketId, onUpdated }: { ticketId: string; onUpdate
     if (ticket) {
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
     }
-  }, [ticket?.replies?.length, ticketId]);
+  }, [ticket, ticketId]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

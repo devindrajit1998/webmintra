@@ -86,27 +86,35 @@ function SettingsPage() {
 
   if (isLoading)
     return (
-      <div className="p-10 text-center text-slate-500">
-        <div className="flex flex-col items-center justify-center gap-3 py-8">
-          <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
-          <p className="text-sm text-slate-500">Loading settings...</p>
+      <div className="p-10 text-center text-[#64748b]">
+        <div className="flex flex-col items-center justify-center gap-3 py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-[#ea580c]" />
+          <p className="text-xs font-medium text-[#64748b]">Loading settings...</p>
         </div>
       </div>
     );
 
   const viewTabs = (
-    <div className="mb-6 inline-flex rounded border border-slate-800 bg-slate-950 p-1">
+    <div className="mb-6 inline-flex rounded-xl border border-[#e2e8f0] bg-white p-1 shadow-2xs">
       <button
         type="button"
         onClick={() => setActiveView("seo")}
-        className={`inline-flex h-9 items-center gap-2 rounded px-4 text-xs font-semibold ${activeView === "seo" ? "bg-cyan-500/15 text-cyan-300" : "text-slate-400 hover:text-slate-200"}`}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "seo"
+            ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
+            : "text-[#64748b] hover:text-[#0b192c]"
+        }`}
       >
         <SearchCheck className="h-4 w-4" /> Search Optimization
       </button>
       <button
         type="button"
         onClick={() => setActiveView("platform")}
-        className={`inline-flex h-9 items-center gap-2 rounded px-4 text-xs font-semibold ${activeView === "platform" ? "bg-cyan-500/15 text-cyan-300" : "text-slate-400 hover:text-slate-200"}`}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "platform"
+            ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
+            : "text-[#64748b] hover:text-[#0b192c]"
+        }`}
       >
         <SettingsIcon className="h-4 w-4" /> Platform Settings
       </button>
@@ -115,7 +123,7 @@ function SettingsPage() {
 
   if (activeView === "seo")
     return (
-      <div>
+      <div className="mx-auto w-full max-w-[1600px]">
         {viewTabs}
         <AdminSeoPage />
       </div>
@@ -131,51 +139,53 @@ function SettingsPage() {
   });
 
   return (
-    <div className="w-full">
+    <div className="mx-auto w-full max-w-[1600px]">
       {viewTabs}
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">Platform Settings</h1>
-          <p className="mt-1 text-xs text-slate-500">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Platform Settings</h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
             Configure global platform behavior and defaults.
           </p>
         </div>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-8">
+      <form onSubmit={handleSave} className="space-y-6 pb-20">
         {Object.entries(groups).map(([groupName, settings]) => (
           <div
             key={groupName}
-            className="rounded-xl border border-slate-800 bg-[#0b1826] overflow-hidden"
+            className="rounded-xl border border-[#e2e8f0] bg-white shadow-xs overflow-hidden"
           >
-            <div className="border-b border-slate-800 bg-slate-900/50 p-4 flex items-center gap-2">
-              <SettingsIcon className="h-4 w-4 text-slate-400" />
-              <h2 className="font-semibold text-slate-200 capitalize">{groupName} Settings</h2>
+            <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-5 py-3.5 flex items-center gap-2">
+              <SettingsIcon className="h-4 w-4 text-[#ea580c]" />
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#475569] capitalize">
+                {groupName} Settings
+              </h2>
             </div>
             <div className="p-6 grid gap-6">
               {settings.map((setting) => (
                 <div
                   key={setting.key}
-                  className="flex flex-col gap-2 border-b border-slate-800/50 pb-6 last:border-0 last:pb-0"
+                  className="flex flex-col gap-2 border-b border-[#e2e8f0] pb-6 last:border-0 last:pb-0"
                 >
-                  <div className="flex justify-between items-start gap-4">
+                  <div className="flex justify-between items-start gap-6">
                     <div className="flex-1">
-                      <label htmlFor={setting.key} className="font-medium text-slate-200 block">
+                      <label htmlFor={setting.key} className="text-xs font-bold text-[#0b192c] block">
                         {setting.key
                           .split(".")
                           .pop()
                           ?.replace(/([A-Z])/g, " $1")
                           .replace(/^./, (str: string) => str.toUpperCase())}
                       </label>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-[#64748b] mt-1">
                         {setting.description || "Configuration value for the platform."}
                       </p>
                     </div>
-                    <div className="w-64 shrink-0">
+                    <div className="w-72 shrink-0">
                       {setting.type === "image" ? (
                         <div className="flex flex-col gap-3">
                           {formData[setting.key] ? (
-                            <div className="relative h-16 w-16 overflow-hidden rounded-lg border border-slate-700 bg-slate-800">
+                            <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-[#cbd5e1] bg-[#f8fafc]">
                               <img
                                 src={formData[setting.key]}
                                 alt=""
@@ -183,8 +193,8 @@ function SettingsPage() {
                               />
                             </div>
                           ) : (
-                            <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-700 bg-slate-900/50">
-                              <ImageIcon className="h-6 w-6 text-slate-600" />
+                            <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc]">
+                              <ImageIcon className="h-6 w-6 text-[#94a3b8]" />
                             </div>
                           )}
                           <input
@@ -194,11 +204,11 @@ function SettingsPage() {
                               if (e.target.files?.[0])
                                 handleImageUpload(setting.key, e.target.files[0]);
                             }}
-                            className="block w-full text-xs text-slate-400 file:mr-4 file:rounded-full file:border-0 file:bg-cyan-900/30 file:px-4 file:py-1.5 file:text-xs file:font-semibold file:text-cyan-400 hover:file:bg-cyan-900/50 cursor-pointer"
+                            className="block w-full text-xs text-[#64748b] file:mr-3 file:rounded-lg file:border-0 file:bg-[#fff7ed] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#c2410c] hover:file:bg-[#ffedd5] cursor-pointer"
                           />
                           {uploading[setting.key] && (
-                            <span className="text-xs text-cyan-400 flex items-center gap-1">
-                              <Loader2 className="h-3 w-3 animate-spin" /> Uploading...
+                            <span className="text-xs font-semibold text-[#ea580c] flex items-center gap-1">
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading...
                             </span>
                           )}
                           <input
@@ -209,7 +219,7 @@ function SettingsPage() {
                             onChange={(e) =>
                               setFormData({ ...formData, [setting.key]: e.target.value })
                             }
-                            className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm focus:border-cyan-500"
+                            className="mt-1 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-medium text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                           />
                         </div>
                       ) : setting.type === "boolean" ? (
@@ -219,7 +229,7 @@ function SettingsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, [setting.key]: e.target.value })
                           }
-                          className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm focus:border-cyan-500"
+                          className="w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-semibold text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                         >
                           <option value="true">Enabled</option>
                           <option value="false">Disabled</option>
@@ -232,7 +242,7 @@ function SettingsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, [setting.key]: e.target.value })
                           }
-                          className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm focus:border-cyan-500"
+                          className="w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-medium text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                         />
                       ) : setting.key === "site.currency" || setting.key.includes("currency") ? (
                         <select
@@ -241,12 +251,12 @@ function SettingsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, [setting.key]: e.target.value })
                           }
-                          className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm focus:border-cyan-500"
+                          className="w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-semibold text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                         >
-                          <option value="INR">INR (Indian Rupee)</option>
-                          <option value="USD">USD (US Dollar)</option>
-                          <option value="EUR">EUR (Euro)</option>
-                          <option value="GBP">GBP (British Pound)</option>
+                          <option value="INR">INR (Indian Rupee - ₹)</option>
+                          <option value="USD">USD (US Dollar - $)</option>
+                          <option value="EUR">EUR (Euro - €)</option>
+                          <option value="GBP">GBP (British Pound - £)</option>
                         </select>
                       ) : setting.key === "site.language" || setting.key.includes("language") ? (
                         <select
@@ -255,7 +265,7 @@ function SettingsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, [setting.key]: e.target.value })
                           }
-                          className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm focus:border-cyan-500"
+                          className="w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-semibold text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                         >
                           <option value="en">English (en)</option>
                           <option value="hi">Hindi (hi)</option>
@@ -270,16 +280,15 @@ function SettingsPage() {
                           onChange={(e) =>
                             setFormData({ ...formData, [setting.key]: e.target.value })
                           }
-                          className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm focus:border-cyan-500"
+                          className="w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-medium text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                         />
                       )}
                     </div>
                   </div>
                   {setting.key === "platform.maintenanceMode" &&
                     formData[setting.key] === "true" && (
-                      <div className="flex items-center gap-2 mt-2 rounded bg-amber-500/10 p-3 text-xs text-amber-400">
-                        <AlertTriangle className="h-4 w-4" /> Maintenance mode will block all
-                        non-admin access!
+                      <div className="flex items-center gap-2 mt-2 rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-3 text-xs font-semibold text-[#c2410c]">
+                        <AlertTriangle className="h-4 w-4 shrink-0" /> Maintenance mode will block all non-admin access!
                       </div>
                     )}
                 </div>
@@ -288,11 +297,11 @@ function SettingsPage() {
           </div>
         ))}
 
-        <div className="flex justify-end sticky bottom-6 z-10 p-4 bg-[#091521]/90 backdrop-blur rounded-xl border border-slate-800 shadow-xl">
+        <div className="flex justify-end sticky bottom-6 z-10 p-4 bg-white/95 backdrop-blur rounded-xl border border-[#e2e8f0] shadow-lg">
           <button
             type="submit"
             disabled={updateMutation.isPending}
-            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#059669] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#059669]"
           >
             <Save className="h-4 w-4" />
             {updateMutation.isPending ? "Saving changes..." : "Save Settings"}

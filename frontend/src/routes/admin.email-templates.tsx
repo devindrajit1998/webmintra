@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
 import {
@@ -227,87 +227,110 @@ function EmailTemplatesPage() {
     return html;
   }
 
+  // Auto-select first template if none selected and not creating
+  useEffect(() => {
+    if (!activeTemplateId && !isCreating && templates.length > 0) {
+      handleSelectTemplate(templates[0]);
+    }
+  }, [templates, activeTemplateId, isCreating]);
+
   return (
-    <div className="w-full h-[calc(100vh-6rem)] flex flex-col">
-      <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <div className="mx-auto flex h-[calc(100vh-6.5rem)] w-full max-w-[1600px] flex-col">
+      {/* Top Header */}
+      <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight">Email Templates</h1>
-          <p className="mt-1 text-xs text-slate-500">Design and manage system emails.</p>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Email Templates</h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">Design and manage system notification & transactional emails.</p>
         </div>
         <button
+          type="button"
           onClick={handleCreateNew}
-          className="inline-flex items-center gap-2 rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400"
+          className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#ea580c] px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-[#c2410c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea580c] focus-visible:ring-offset-2"
         >
           <Plus className="h-4 w-4" /> New Template
         </button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[320px_1fr] flex-1 min-h-0">
-        {/* Sidebar */}
-        <div className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+      {/* Main Grid */}
+      <div className="grid min-h-0 flex-1 gap-5 lg:grid-cols-[330px_1fr]">
+        {/* Left Sidebar - Template List */}
+        <div className="flex flex-col gap-2 overflow-y-auto pr-1">
           {isLoading ? (
-            <div className="p-4 text-slate-500">
-              <div className="flex flex-col items-center justify-center gap-3 py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
-                <p className="text-sm text-slate-500">Loading templates...</p>
+            <div className="rounded-xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
+              <div className="flex flex-col items-center justify-center gap-3 py-10">
+                <Loader2 className="h-7 w-7 animate-spin text-[#ea580c]" />
+                <p className="text-xs font-medium text-[#64748b]">Loading templates...</p>
               </div>
             </div>
           ) : (
             <>
-              {templates.map((t: any) => (
-                <button
-                  key={t.id || t._id}
-                  onClick={() => handleSelectTemplate(t)}
-                  className={`flex flex-col gap-2 rounded-lg border p-3 text-left transition ${
-                    activeTemplateId === (t.id || t._id)
-                      ? "border-cyan-500/50 bg-[#0c1c2e]"
-                      : "border-slate-800 bg-[#0b1826] hover:border-slate-700"
-                  }`}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-800 text-slate-400">
-                        <Mail className="h-3.5 w-3.5" />
+              {templates.map((t: any) => {
+                const isSelected = activeTemplateId === (t.id || t._id);
+                return (
+                  <button
+                    key={t.id || t._id}
+                    onClick={() => handleSelectTemplate(t)}
+                    className={`group flex flex-col gap-2.5 rounded-xl border p-3.5 text-left transition-all ${
+                      isSelected
+                        ? "border-[#fed7aa] bg-[#fff7ed] shadow-xs ring-1 ring-[#fed7aa]"
+                        : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:bg-[#f8fafc] shadow-xs"
+                    }`}
+                  >
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition ${
+                            isSelected
+                              ? "border-[#fed7aa] bg-white text-[#ea580c]"
+                              : "border-[#e2e8f0] bg-[#f8fafc] text-[#64748b] group-hover:text-[#0b192c]"
+                          }`}
+                        >
+                          <Mail className="h-4 w-4" />
+                        </div>
+                        <p className="truncate text-xs font-bold text-[#0b192c]">{t.name}</p>
                       </div>
-                      <p className="truncate text-sm font-medium text-slate-200">{t.name}</p>
+                      {t.isDefault && (
+                        <span title="Default template">
+                          <CheckCircle className="h-4 w-4 shrink-0 text-[#059669]" />
+                        </span>
+                      )}
                     </div>
-                    {t.isDefault && <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-slate-400">
-                      {t.type}
-                    </span>
-                    <span className="rounded bg-slate-800/50 px-1.5 py-0.5 text-[9px] font-medium text-slate-500">
-                      {t.category}
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-md border border-[#fed7aa] bg-[#fff7ed] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#c2410c]">
+                        {t.type}
+                      </span>
+                      <span className="rounded-md border border-[#a7f3d0] bg-[#ecfdf5] px-2 py-0.5 text-[10px] font-bold text-[#047857]">
+                        {t.category}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </>
           )}
         </div>
 
-        {/* Editor Panel */}
-        <div className="rounded-xl border border-slate-800 bg-[#0b1826] flex flex-col min-h-0 overflow-hidden">
+        {/* Editor & Preview Workspace */}
+        <div className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-sm">
           {activeTemplate ? (
             <form onSubmit={handleSave} className="flex h-full flex-col">
-              {/* Header */}
-              <div className="flex items-start justify-between border-b border-slate-800 p-4 bg-slate-900/50">
-                <div className="flex-1 mr-4">
+              {/* Toolbar Header */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e2e8f0] bg-[#f8fafc] px-5 py-3.5">
+                <div className="flex flex-1 items-center gap-4 min-w-[280px]">
                   <input
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="text-lg font-bold text-slate-200 bg-transparent border-none outline-none w-full mb-1 placeholder-slate-600"
+                    className="w-full max-w-sm rounded-lg border border-transparent bg-transparent px-2 py-1 text-base font-bold text-[#0b192c] transition focus:border-[#cbd5e1] focus:bg-white focus:outline-none"
                     placeholder="Template Name"
                   />
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold text-[#64748b]">
                       Type:
                       <select
                         value={form.type}
                         onChange={(e) => setForm({ ...form, type: e.target.value })}
-                        className="bg-slate-800 rounded px-2 py-1 text-slate-300 border border-slate-700 outline-none"
+                        className="rounded-lg border border-[#cbd5e1] bg-white px-2.5 py-1 text-xs font-semibold text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-1 focus:ring-[#ea580c]"
                       >
                         {types.map((t: string) => (
                           <option key={t} value={t}>
@@ -316,12 +339,12 @@ function EmailTemplatesPage() {
                         ))}
                       </select>
                     </label>
-                    <label className="flex items-center gap-2 text-xs text-slate-400">
+                    <label className="flex items-center gap-1.5 text-xs font-semibold text-[#64748b]">
                       Category:
                       <select
                         value={form.category}
                         onChange={(e) => setForm({ ...form, category: e.target.value })}
-                        className="bg-slate-800 rounded px-2 py-1 text-slate-300 border border-slate-700 outline-none"
+                        className="rounded-lg border border-[#cbd5e1] bg-white px-2.5 py-1 text-xs font-semibold text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-1 focus:ring-[#ea580c]"
                       >
                         {[
                           "User",
@@ -342,6 +365,8 @@ function EmailTemplatesPage() {
                     </label>
                   </div>
                 </div>
+
+                {/* Header Actions */}
                 <div className="flex items-center gap-2">
                   {activeTemplateId !== "new" && (
                     <>
@@ -349,16 +374,17 @@ function EmailTemplatesPage() {
                         type="button"
                         onClick={() => setDefaultMutation.mutate(activeTemplateId)}
                         disabled={form.isDefault || setDefaultMutation.isPending}
-                        className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 disabled:opacity-50"
+                        className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#475569] shadow-2xs transition hover:border-[#a7f3d0] hover:bg-[#ecfdf5] hover:text-[#047857] disabled:opacity-50"
                       >
-                        Set Default
+                        {form.isDefault ? "Default Template" : "Set as Default"}
                       </button>
                       <button
                         type="button"
+                        title="Delete Template"
                         onClick={() => {
-                          if (confirm("Are you sure?")) deleteMutation.mutate(activeTemplateId);
+                          if (confirm("Are you sure you want to delete this template?")) deleteMutation.mutate(activeTemplateId);
                         }}
-                        className="inline-flex items-center justify-center rounded-lg border border-red-900/30 bg-red-900/20 p-1.5 text-red-400 hover:bg-red-900/40"
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs transition hover:bg-[#ffedd5]"
                       >
                         <Trash className="h-4 w-4" />
                       </button>
@@ -367,55 +393,66 @@ function EmailTemplatesPage() {
                   <button
                     type="submit"
                     disabled={updateMutation.isPending || createMutation.isPending}
-                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-1.5 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-50"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-[#059669] px-4 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#059669]"
                   >
-                    <Save className="h-4 w-4" /> Save
+                    <Save className="h-3.5 w-3.5" /> Save
                   </button>
                 </div>
               </div>
 
+              {/* Main Body Columns */}
               <div className="flex flex-1 min-h-0">
-                {/* Main Content Area */}
-                <div className="flex flex-col flex-1 border-r border-slate-800 overflow-y-auto">
-                  <div className="p-4 space-y-4 border-b border-slate-800">
+                {/* Center Content Column */}
+                <div className="flex flex-1 flex-col overflow-y-auto border-r border-[#e2e8f0]">
+                  {/* Subject & Preview Inputs */}
+                  <div className="grid gap-3 border-b border-[#e2e8f0] p-4 sm:grid-cols-2 bg-white">
                     <div>
-                      <label className="text-xs font-medium text-slate-400">Subject Line</label>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#475569]">Subject Line</label>
                       <input
                         required
                         value={form.subject}
                         onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                        className="mt-1 h-9 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
+                        className="mt-1.5 h-9 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-medium text-[#0b192c] outline-none shadow-2xs transition focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                         placeholder="e.g. Welcome to {{appName}}"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-slate-400">
-                        Preview Text (Optional)
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#475569]">
+                        Preview Text <span className="font-normal lowercase text-[#94a3b8]">(optional)</span>
                       </label>
                       <input
                         value={form.previewText}
                         onChange={(e) => setForm({ ...form, previewText: e.target.value })}
-                        className="mt-1 h-9 w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
-                        placeholder="Displays in email client snippet..."
+                        className="mt-1.5 h-9 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-medium text-[#0b192c] outline-none shadow-2xs transition focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
+                        placeholder="Displays in inbox snippet..."
                       />
                     </div>
                   </div>
 
-                  {/* Editor / Preview */}
-                  <div className="flex flex-col flex-1 min-h-0">
-                    <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/30 px-4 py-2">
-                      <div className="flex gap-1 bg-slate-900 p-0.5 rounded-lg border border-slate-800">
+                  {/* Editor / Preview Mode Container */}
+                  <div className="flex flex-1 flex-col min-h-0">
+                    {/* View Switcher Sub-bar */}
+                    <div className="flex items-center justify-between border-b border-[#e2e8f0] bg-[#f8fafc] px-4 py-2">
+                      <div className="flex gap-1 rounded-lg border border-[#e2e8f0] bg-white p-1 shadow-2xs">
                         <button
                           type="button"
                           onClick={() => setViewMode("code")}
-                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium ${viewMode === "code" ? "bg-slate-700 text-slate-200" : "text-slate-400 hover:text-slate-300"}`}
+                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition ${
+                            viewMode === "code"
+                              ? "bg-[#fff7ed] text-[#c2410c] shadow-2xs"
+                              : "text-[#64748b] hover:text-[#0b192c]"
+                          }`}
                         >
                           <Code className="h-3.5 w-3.5" /> HTML Source
                         </button>
                         <button
                           type="button"
                           onClick={() => setViewMode("preview")}
-                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium ${viewMode === "preview" ? "bg-slate-700 text-slate-200" : "text-slate-400 hover:text-slate-300"}`}
+                          className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition ${
+                            viewMode === "preview"
+                              ? "bg-[#ecfdf5] text-[#047857] shadow-2xs"
+                              : "text-[#64748b] hover:text-[#0b192c]"
+                          }`}
                         >
                           <Eye className="h-3.5 w-3.5" /> Visual Preview
                         </button>
@@ -434,7 +471,7 @@ function EmailTemplatesPage() {
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isUploading}
-                            className="inline-flex items-center gap-1.5 rounded-md text-xs font-medium text-cyan-400 hover:text-cyan-300 disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-[#cbd5e1] bg-white px-2.5 py-1 text-xs font-semibold text-[#ea580c] shadow-2xs transition hover:bg-[#fff7ed] hover:border-[#fed7aa] disabled:opacity-50"
                           >
                             {isUploading ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -447,12 +484,13 @@ function EmailTemplatesPage() {
                       )}
                     </div>
 
-                    <div className="flex-1 min-h-[300px] relative bg-white">
+                    {/* Editor Frame */}
+                    <div className="flex-1 min-h-[350px] relative bg-white">
                       {viewMode === "code" ? (
                         <Editor
                           height="100%"
                           defaultLanguage="html"
-                          theme="vs-dark"
+                          theme="vs-light"
                           value={form.htmlBody}
                           onChange={(val) => setForm({ ...form, htmlBody: val || "" })}
                           onMount={(editor) => (editorRef.current = editor)}
@@ -464,25 +502,34 @@ function EmailTemplatesPage() {
                           }}
                         />
                       ) : (
-                        <iframe
-                          className="w-full h-full border-none"
-                          srcDoc={getPreviewHtml()}
-                          title="Email Preview"
-                        />
+                        <div className="h-full w-full bg-[#f1f5f9] p-4 overflow-y-auto flex items-start justify-center">
+                          <div className="w-full max-w-[650px] rounded-lg shadow-sm border border-[#e2e8f0] bg-white overflow-hidden">
+                            <iframe
+                              className="w-full min-h-[500px] border-none block"
+                              srcDoc={getPreviewHtml()}
+                              title="Email Preview"
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Right Sidebar - Tools */}
-                <div className="w-[280px] flex flex-col bg-slate-900/30 overflow-y-auto">
-                  <div className="p-4 border-b border-slate-800">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                      Variables
-                    </h3>
+                {/* Right Tool Sidebar */}
+                <div className="flex w-[290px] shrink-0 flex-col overflow-y-auto bg-[#f8fafc]">
+                  {/* Variables Palette */}
+                  <div className="border-b border-[#e2e8f0] p-4">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
+                        Variables
+                      </h3>
+                      <span className="text-[10px] font-semibold text-[#94a3b8]">Click to insert</span>
+                    </div>
+
                     {activeTemplateId === "new" ? (
-                      <p className="text-xs text-slate-500">
-                        Save template to see available variables.
+                      <p className="text-xs text-[#64748b]">
+                        Save template to load its available variables.
                       </p>
                     ) : variablesData?.variables?.length > 0 ? (
                       <div className="flex flex-wrap gap-1.5">
@@ -491,44 +538,47 @@ function EmailTemplatesPage() {
                             key={v}
                             type="button"
                             onClick={() => handleInsertVariable(v)}
-                            className="rounded bg-slate-800 px-2 py-1 text-[10px] font-mono text-slate-300 border border-slate-700 hover:border-cyan-500 hover:text-cyan-400 transition-colors text-left break-all"
+                            className="rounded-md border border-[#cbd5e1] bg-white px-2.5 py-1 font-mono text-[11px] font-medium text-[#0b192c] shadow-2xs transition hover:border-[#ea580c] hover:bg-[#fff7ed] hover:text-[#c2410c]"
                             title={`Insert {{${v}}}`}
                           >
-                            {v}
+                            {`{{${v}}}`}
                           </button>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-xs text-slate-500">No variables found.</p>
+                      <p className="text-xs text-[#64748b]">No variables specified.</p>
                     )}
-                    <p className="mt-3 text-[10px] text-slate-500 leading-relaxed">
-                      Click a variable to insert it into the editor at your cursor position.
-                    </p>
                   </div>
 
+                  {/* Test Email Section */}
                   <div className="p-4">
-                    <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                    <h3 className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-[#475569]">
                       Test Send
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       <input
                         type="email"
-                        placeholder="Recipient Email"
+                        placeholder="recipient@example.com"
                         value={testEmail}
                         onChange={(e) => setTestEmail(e.target.value)}
-                        className="w-full h-8 rounded border border-slate-700 bg-slate-900 px-2 text-xs text-slate-200 outline-none focus:border-cyan-500"
+                        className="h-9 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-medium text-[#0b192c] outline-none shadow-2xs transition focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
                       />
                       <button
                         type="button"
                         onClick={() => {
-                          if (!testEmail) return toast.error("Enter an email");
+                          if (!testEmail) return toast.error("Enter an email address");
                           if (activeTemplateId === "new") return toast.error("Save template first");
                           sendTestMutation.mutate({ id: activeTemplateId, to: testEmail });
                         }}
                         disabled={sendTestMutation.isPending || activeTemplateId === "new"}
-                        className="w-full inline-flex items-center justify-center gap-2 rounded bg-slate-700 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-600 disabled:opacity-50 transition"
+                        className="inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-lg bg-[#0b192c] px-3 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1e293b] disabled:opacity-50"
                       >
-                        <Play className="h-3 w-3" /> Send Test
+                        {sendTestMutation.isPending ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Play className="h-3 w-3" />
+                        )}
+                        Send Test Email
                       </button>
                     </div>
                   </div>
@@ -536,11 +586,12 @@ function EmailTemplatesPage() {
               </div>
             </form>
           ) : (
-            <div className="flex h-full min-h-[400px] flex-col items-center justify-center text-slate-500 bg-slate-900/20">
-              <div className="rounded-full bg-slate-800/50 p-6 mb-4">
-                <Mail className="h-12 w-12 opacity-50" />
+            <div className="flex h-full min-h-[400px] flex-col items-center justify-center bg-[#f8fafc] text-[#64748b]">
+              <div className="mb-4 rounded-2xl border border-[#fed7aa] bg-[#fff7ed] p-6 text-[#ea580c] shadow-2xs">
+                <Mail className="h-10 w-10 opacity-80" />
               </div>
-              <p className="text-sm font-medium">Select a template or create a new one.</p>
+              <p className="text-sm font-semibold text-[#0b192c]">No Template Selected</p>
+              <p className="mt-1 text-xs text-[#64748b]">Select an existing template or create a new one.</p>
             </div>
           )}
         </div>
@@ -548,3 +599,4 @@ function EmailTemplatesPage() {
     </div>
   );
 }
+

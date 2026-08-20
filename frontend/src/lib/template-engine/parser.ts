@@ -884,6 +884,19 @@ export function analyzeTemplate(
   const { theme, sourceColors } = detectTheme(parsed.map((p) => p.doc));
   const issues = validate(pages, assets);
 
+  // Intelligently extract clean title from home page <title> tag, og:title, or prominent <h1>
+  const homePage = pages.find((p) => p.isHome) || pages[0];
+  let detectedTitle = templateName;
+  if (homePage?.title && homePage.title !== homePage.name) {
+    // If title has separators like "Event Photography | Aura Studio", take the brand/title
+    detectedTitle = homePage.title.trim();
+  } else if (homePage?.fields) {
+    const primaryHeading = homePage.fields.find((f) => f.kind === "title" && f.value)?.value;
+    if (primaryHeading && primaryHeading.length < 60) {
+      detectedTitle = primaryHeading.trim();
+    }
+  }
+
   const count = (fn: (f: EditableField) => boolean) =>
     pages.reduce((n, p) => n + p.fields.filter(fn).length, 0);
   const stats: Record<string, number> = {
@@ -909,7 +922,7 @@ export function analyzeTemplate(
   };
 
   return {
-    name: templateName,
+    name: detectedTitle || templateName,
     pages,
     assets,
     theme,

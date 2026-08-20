@@ -19,96 +19,102 @@ export function RefundCancellationPolicyPage() {
   const supportEmail = settings["site.supportEmail"] || "support@webmintra.com";
 
   return (
-    <div className="min-h-screen bg-[#07111f] text-slate-200 font-sans">
-      <header className="sticky top-0 z-40 w-full border-b border-white/5 bg-[#07111f]/90 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+      {/* ── HEADER NAVIGATION ────────────────────────────────────────── */}
+      <header className="landing-nav-glass sticky top-0 z-40 w-full">
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
           <Link
             to="/"
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition"
+            className="flex items-center gap-2 text-xs font-bold text-[#475569] hover:text-[#0f172a] transition"
           >
             <ArrowLeft className="h-4 w-4" /> Back to Home
           </Link>
-          <span className="text-[20px] font-black tracking-tight bg-gradient-to-r from-[#0055ff] via-[#00c9a7] to-[#10e793] bg-clip-text text-transparent lowercase">
+          <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
             {siteName}
           </span>
         </div>
       </header>
 
-      <main className="mx-auto max-w-4xl px-6 py-12 lg:py-16">
-        <div className="rounded-3xl border border-white/10 bg-[#0c1827] p-8 sm:p-12 shadow-2xl space-y-8">
+      {/* ── MAIN CONTENT ────────────────────────────────────────────── */}
+      <main className="mx-auto max-w-4xl px-5 sm:px-6 py-12 lg:py-16">
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 sm:p-12 shadow-sm space-y-8">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3.5 py-1 text-xs font-bold text-cyan-300 mb-3">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11px] font-bold text-[#c2410c] shadow-2xs">
               <RefreshCw className="h-3.5 w-3.5" /> Billing Guidelines
-            </span>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white">
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0f172a]">
               Refund & Cancellation Policy
             </h1>
-            <p className="text-xs text-slate-400 mt-2">
-              Transparent billing policy for subscriptions, domain add-ons, and renewals
+            <p className="text-xs text-[#64748b] mt-2">
+              Transparent billing policy for Indian subscriptions, UPI payments, and GST renewals
             </p>
           </div>
 
-          <div className="space-y-6 text-sm text-slate-300 leading-relaxed">
+          <div className="space-y-6 text-sm text-[#475569] leading-relaxed">
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">1. 15-Day Free Trial</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">1. 14-Day Free Trial</h2>
               <p>
-                Every new {siteName} tenant workspace includes an unrestricted 15-day free trial. No
-                credit card is required to begin building, previewing, and testing your website
-                templates.
+                Every new {siteName} business workspace includes an unrestricted 14-day free trial. No credit card or upfront payment is required to begin building, customizing templates, and testing your website.
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">2. Subscription Cancellation</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">2. Subscription Cancellation</h2>
               <p>
                 You may cancel your monthly or annual subscription at any time directly from your{" "}
                 <strong>Tenant Workspace &rarr; Billing</strong> dashboard. Upon cancellation:
               </p>
-              <ul className="list-disc pl-5 space-y-1 text-slate-400">
+              <ul className="list-disc pl-5 space-y-1 text-[#64748b]">
                 <li>
                   Your website remains active until the end of the current paid billing period.
                 </li>
                 <li>No further automatic recurring charges will be initiated.</li>
                 <li>
-                  Your website data and content are preserved for 60 days in case you wish to
-                  reactivate.
+                  Your website data and uploaded media are preserved safely for 60 days in case you wish to reactivate.
                 </li>
               </ul>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">3. Refund Terms</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">3. Refund Terms</h2>
               <p>
-                If you encounter technical issues that prevent your website from functioning as
-                advertised and our support team is unable to resolve it within 7 business days, you
-                are eligible for a full refund of your most recent subscription cycle.
+                If you encounter technical issues that prevent your website from functioning as advertised and our support team is unable to resolve it within 7 business days, you are eligible for a full refund of your most recent subscription cycle.
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">4. Refund Processing Time</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">4. Refund Processing Time</h2>
               <p>
-                Approved refunds are credited back to the original payment method (Bank Account,
-                UPI, Credit/Debit Card) within 5 to 7 business days via our payment gateway partner.
+                Approved refunds are credited back to the original Indian payment method (UPI, Bank Account, NetBanking, Debit/Credit Card) within 5 to 7 business days via our RBI-authorized payment partner.
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="text-lg font-bold text-white">5. How to Request Support</h2>
+              <h2 className="text-base font-bold text-[#0f172a]">5. How to Request Support</h2>
               <p>
                 To request a billing review or refund, email our accounts team at{" "}
                 <a
                   href={`mailto:${supportEmail}`}
-                  className="text-cyan-400 underline font-semibold"
+                  className="text-[#059669] underline font-bold"
                 >
                   {supportEmail}
                 </a>{" "}
-                with your registered workspace email and invoice reference.
+                with your registered workspace email and GST invoice number.
               </p>
             </section>
           </div>
         </div>
       </main>
+
+      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
+      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
+        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>© 2026 {siteName}. All rights reserved.</p>
+          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
+            <span>100% Data Stored in India</span> <span>🇮🇳</span>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
