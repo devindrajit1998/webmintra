@@ -219,36 +219,74 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
               </div>
             )}
 
-            <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
-              <div className="space-y-1.5">
+            <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
+              <div className="space-y-3">
                 <label
-                  className="block text-xs font-bold text-[#0f172a]"
-                  htmlFor="verification-code"
+                  className="block text-xs font-bold text-[#0f172a] text-center"
+                  htmlFor="otp-input-0"
                 >
-                  Verification code
+                  Enter 6-Digit Verification Code
                 </label>
-                <InputOTP
-                  id="verification-code"
-                  maxLength={6}
-                  value={code}
-                  onChange={setCode}
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  autoComplete="one-time-code"
-                  aria-describedby={descriptionId}
-                  containerClassName="justify-center"
-                  className="w-full"
-                >
-                  <InputOTPGroup>
-                    {Array.from({ length: 6 }, (_, index) => (
-                      <InputOTPSlot
+                <div className="flex items-center justify-center gap-2 sm:gap-2.5">
+                  {Array.from({ length: 6 }).map((_, index) => {
+                    const digit = code[index] || "";
+                    return (
+                      <input
                         key={index}
-                        index={index}
-                        className="h-11 w-11 text-base sm:w-12 border-[#cbd5e1] text-[#0f172a]"
+                        id={`otp-input-${index}`}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={1}
+                        value={digit}
+                        autoFocus={index === 0}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, "");
+                          const codeArr = code.padEnd(6, " ").split("");
+                          if (val) {
+                            codeArr[index] = val.slice(-1);
+                            const newCode = codeArr.join("").trimEnd();
+                            setCode(newCode);
+                            // Auto advance to next slot
+                            if (index < 5) {
+                              const nextInput = document.getElementById(`otp-input-${index + 1}`);
+                              nextInput?.focus();
+                            }
+                          } else {
+                            codeArr[index] = " ";
+                            setCode(codeArr.join("").trimEnd());
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Backspace") {
+                            if (!code[index] && index > 0) {
+                              const prevInput = document.getElementById(`otp-input-${index - 1}`);
+                              prevInput?.focus();
+                            }
+                          } else if (e.key === "ArrowLeft" && index > 0) {
+                            document.getElementById(`otp-input-${index - 1}`)?.focus();
+                          } else if (e.key === "ArrowRight" && index < 5) {
+                            document.getElementById(`otp-input-${index + 1}`)?.focus();
+                          }
+                        }}
+                        onPaste={(e) => {
+                          e.preventDefault();
+                          const pasted = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 6);
+                          if (pasted) {
+                            setCode(pasted);
+                            const targetIndex = Math.min(pasted.length, 5);
+                            document.getElementById(`otp-input-${targetIndex}`)?.focus();
+                          }
+                        }}
+                        className={`h-12 w-11 sm:h-13 sm:w-12 rounded-xl border text-center text-xl font-bold transition-all outline-none shadow-xs ${
+                          digit
+                            ? "border-[#059669] bg-[#f0fdf4]/50 text-[#0f172a]"
+                            : "border-[#cbd5e1] bg-white text-[#0f172a] hover:border-[#94a3b8]"
+                        } focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15 focus:scale-105`}
                       />
-                    ))}
-                  </InputOTPGroup>
-                </InputOTP>
+                    );
+                  })}
+                </div>
               </div>
               {purpose === "password-reset" && (
                 <div className="space-y-1">
