@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getPublicSettings } from "@/lib/public-api";
-import { ShieldCheck, ArrowLeft, FileText, CheckCircle2 } from "lucide-react";
+import { FileText } from "lucide-react";
+import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const Route = createFileRoute("/terms-and-conditions")({
   component: TermsAndConditionsPage,
@@ -17,23 +19,11 @@ export function TermsAndConditionsPage() {
 
   const siteName = settings["site.name"] || "WebMintra";
   const supportEmail = settings["site.supportEmail"] || "support@webmintra.in";
+  const policyContent = settings["content.termsAndConditions"];
 
   return (
     <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
-      {/* ── HEADER NAVIGATION ────────────────────────────────────────── */}
-      <header className="landing-nav-glass sticky top-0 z-40 w-full">
-        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-xs font-bold text-[#475569] hover:text-[#0f172a] transition"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Home
-          </Link>
-          <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
-            {siteName}
-          </span>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* ── MAIN CONTENT ────────────────────────────────────────────── */}
       <main className="mx-auto max-w-4xl px-5 sm:px-6 py-12 lg:py-16">
@@ -48,68 +38,67 @@ export function TermsAndConditionsPage() {
             </p>
           </div>
 
-          <div className="space-y-6 text-sm text-[#475569] leading-relaxed">
-            <section className="space-y-2">
-              <h2 className="text-base font-bold text-[#0f172a]">1. Acceptance of Terms</h2>
-              <p>
-                By creating an account or accessing the {siteName} platform, you agree to comply with and be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.
-              </p>
-            </section>
+          {typeof policyContent === "string" && policyContent.trim() ? (
+            <article
+              className="prose prose-slate max-w-none text-sm leading-relaxed text-[#475569] prose-headings:text-[#0f172a] prose-headings:font-bold prose-h2:text-base prose-a:font-bold prose-a:text-[#059669] prose-li:text-[#64748b]"
+              dangerouslySetInnerHTML={{ __html: policyContent }}
+            />
+          ) : (
+            <div className="space-y-6 text-sm text-[#475569] leading-relaxed">
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-[#0f172a]">1. Acceptance of Terms</h2>
+                <p>
+                  By creating an account or accessing the {siteName} platform, you agree to comply with and be bound by these Terms and Conditions. If you do not agree to these terms, please do not use our services.
+                </p>
+              </section>
 
-            <section className="space-y-2">
-              <h2 className="text-base font-bold text-[#0f172a]">2. Platform Subscription & Service Use</h2>
-              <p>
-                {siteName} provides website building software, cloud edge hosting, template libraries, WhatsApp form processing, and custom .in / .com domain connection services. You agree to use the service only for lawful business operations and represent that you have the right to publish all content you upload.
-              </p>
-            </section>
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-[#0f172a]">2. Platform Subscription & Service Use</h2>
+                <p>
+                  {siteName} provides website building software, cloud edge hosting, template libraries, WhatsApp form processing, and custom .in / .com domain connection services. You agree to use the service only for lawful business operations and represent that you have the right to publish all content you upload.
+                </p>
+              </section>
 
-            <section className="space-y-2">
-              <h2 className="text-base font-bold text-[#0f172a]">3. Intellectual Property Rights</h2>
-              <p>
-                You retain all rights, title, and interest in your own text, business logos, product catalogs, and trademarked materials. {siteName} retains all rights to the underlying software engine, builder code, template architectures, and platform infrastructure.
-              </p>
-            </section>
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-[#0f172a]">3. Intellectual Property Rights</h2>
+                <p>
+                  You retain all rights, title, and interest in your own text, business logos, product catalogs, and trademarked materials. {siteName} retains all rights to the underlying software engine, builder code, template architectures, and platform infrastructure.
+                </p>
+              </section>
 
-            <section className="space-y-2">
-              <h2 className="text-base font-bold text-[#0f172a]">4. Prohibited Content</h2>
-              <p>
-                Users may not publish websites involving illegal goods, deceptive financial schemes, malware, spam, or copyright-infringing media.
-              </p>
-            </section>
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-[#0f172a]">4. Prohibited Content</h2>
+                <p>
+                  Users may not publish websites involving illegal goods, deceptive financial schemes, malware, spam, or copyright-infringing media.
+                </p>
+              </section>
 
-            <section className="space-y-2">
-              <h2 className="text-base font-bold text-[#0f172a]">5. Service Availability & Uptime</h2>
-              <p>
-                We strive for 99.9% uptime on managed cloud infrastructure hosted across Indian edge nodes. Scheduled maintenance windows will be communicated via the platform announcements dashboard.
-              </p>
-            </section>
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-[#0f172a]">5. Service Availability & Uptime</h2>
+                <p>
+                  We strive for 99.9% uptime on managed cloud infrastructure hosted across Indian edge nodes. Scheduled maintenance windows will be communicated via the platform announcements dashboard.
+                </p>
+              </section>
 
-            <section className="space-y-2">
-              <h2 className="text-base font-bold text-[#0f172a]">6. Inquiries</h2>
-              <p>
-                Questions regarding platform terms can be directed to{" "}
-                <a
-                  href={`mailto:${supportEmail}`}
-                  className="text-[#059669] underline font-bold"
-                >
-                  {supportEmail}
-                </a>
-                .
-              </p>
-            </section>
-          </div>
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-[#0f172a]">6. Inquiries</h2>
+                <p>
+                  Questions regarding platform terms can be directed to{" "}
+                  <a
+                    href={`mailto:${supportEmail}`}
+                    className="text-[#059669] underline font-bold"
+                  >
+                    {supportEmail}
+                  </a>
+                  .
+                </p>
+              </section>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
-      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 {siteName}. All rights reserved.</p>
-          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
-            <span>100% Data Stored in India</span> <span>🇮🇳</span>
-          </p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

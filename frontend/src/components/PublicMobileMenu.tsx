@@ -16,6 +16,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { SessionUser } from "@/lib/auth-api";
+import { BrandLogo } from "./BrandLogo";
 
 interface PublicMobileMenuProps {
   isOpen: boolean;
@@ -88,27 +89,9 @@ export function PublicMobileMenu({
           <Link
             to="/"
             onClick={onClose}
-            className="flex items-center gap-2.5 transition hover:opacity-90"
+            className="flex items-center transition hover:opacity-90"
           >
-            {logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-7 w-auto object-contain" />
-            ) : (
-              <div className="relative flex h-7 w-7 items-center justify-center">
-                <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none">
-                  <path
-                    d="M4 8L10 24L16 12L22 24L28 8"
-                    stroke="#ea580c"
-                    strokeWidth="3.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="16" cy="24" r="3" fill="#059669" />
-                </svg>
-              </div>
-            )}
-            <span className="text-[20px] font-black tracking-tight text-[#0f172a] lowercase">
-              {siteName}
-            </span>
+            <BrandLogo logoUrl={logoUrl} siteName={siteName} size="md" />
           </Link>
 
           <button

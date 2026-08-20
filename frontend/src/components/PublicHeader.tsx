@@ -6,6 +6,8 @@ import { getAuthenticatedUser, routeForRole, type SessionUser } from "@/lib/auth
 import { Menu } from "lucide-react";
 import { PublicMobileMenu } from "./PublicMobileMenu";
 
+import { BrandLogo } from "./BrandLogo";
+
 interface PublicHeaderProps {
   isLandingPage?: boolean;
 }
@@ -36,21 +38,8 @@ export function PublicHeader({ isLandingPage = false }: PublicHeaderProps) {
       <header className="landing-nav-glass sticky top-0 z-40 w-full border-b border-[#e2e8f0]/80 bg-white/95 backdrop-blur-md">
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 transition hover:opacity-90">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={siteName}
-                className="h-8 max-w-[180px] object-contain"
-              />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
-                W
-              </div>
-            )}
-            <span className="text-[22px] font-black tracking-tight text-[#0f172a] lowercase font-sans">
-              {siteName}
-            </span>
+          <Link to="/" className="flex items-center transition hover:opacity-95">
+            <BrandLogo logoUrl={logoUrl} siteName={siteName} size="md" />
           </Link>
 
           {/* Desktop Navigation Links */}

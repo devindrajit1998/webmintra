@@ -1,8 +1,23 @@
+# Technical SEO robots.txt for WebMintra Platform
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /accept-invitation
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /accept-invitation
 
 User-agent: Twitterbot
 Allow: /
@@ -12,3 +27,13 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /accept-invitation
+
+# Reference to dynamic XML Sitemap
+Sitemap: https://webmintra.com/sitemap.xml

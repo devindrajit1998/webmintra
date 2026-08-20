@@ -81,6 +81,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#059669" },
+      { name: "format-detection", content: "telephone=no" },
       { property: "og:site_name", content: "WebMintra" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -91,6 +93,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: appCss,
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/favicon.ico" },
+      { rel: "manifest", href: "/site.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -131,7 +135,10 @@ function RootApp() {
   });
 
   useEffect(() => {
-    if (settings?.["brand.faviconUrl"]) {
+    if (!settings) return;
+
+    // Favicon
+    if (settings["brand.faviconUrl"]) {
       let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
       if (!link) {
         link = document.createElement("link");
@@ -139,6 +146,28 @@ function RootApp() {
         document.head.appendChild(link);
       }
       link.href = settings["brand.faviconUrl"];
+    }
+
+    // Google Search Console Site Verification
+    if (settings["seo.googleSiteVerification"]) {
+      let meta: HTMLMetaElement | null = document.querySelector("meta[name='google-site-verification']");
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.name = "google-site-verification";
+        document.head.appendChild(meta);
+      }
+      meta.content = String(settings["seo.googleSiteVerification"]);
+    }
+
+    // Bing Webmaster Verification
+    if (settings["seo.bingVerification"]) {
+      let meta: HTMLMetaElement | null = document.querySelector("meta[name='msvalidate.01']");
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.name = "msvalidate.01";
+        document.head.appendChild(meta);
+      }
+      meta.content = String(settings["seo.bingVerification"]);
     }
   }, [settings]);
 

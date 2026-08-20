@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { getSettings, updateSettings, uploadAdminFile } from "@/lib/admin-api";
+import { RichCKEditor } from "@/components/RichCKEditor";
 import {
   Loader2,
   Settings as SettingsIcon,
@@ -9,6 +10,7 @@ import {
   AlertTriangle,
   Image as ImageIcon,
   SearchCheck,
+  FilePenLine,
 } from "lucide-react";
 import { AdminSeoPage } from "@/components/AdminSeoPage";
 
@@ -21,7 +23,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
-  const [activeView, setActiveView] = useState<"seo" | "platform">("seo");
+  const [activeView, setActiveView] = useState<"seo" | "platform" | "content">("seo");
 
   const { data, isLoading } = useQuery({
     queryKey: ["adminSettings"],
@@ -42,6 +44,7 @@ function SettingsPage() {
     mutationFn: (updates: any[]) => updateSettings(updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminSettings"] });
+      queryClient.invalidateQueries({ queryKey: ["publicSettings"] });
       toast.success("Settings updated successfully.");
     },
     onError: (err: Error) => {
@@ -99,24 +102,32 @@ function SettingsPage() {
       <button
         type="button"
         onClick={() => setActiveView("seo")}
-        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
-          activeView === "seo"
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${activeView === "seo"
             ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
             : "text-[#64748b] hover:text-[#0b192c]"
-        }`}
+          }`}
       >
         <SearchCheck className="h-4 w-4" /> Search Optimization
       </button>
       <button
         type="button"
         onClick={() => setActiveView("platform")}
-        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
-          activeView === "platform"
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${activeView === "platform"
             ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
             : "text-[#64748b] hover:text-[#0b192c]"
-        }`}
+          }`}
       >
         <SettingsIcon className="h-4 w-4" /> Platform Settings
+      </button>
+      <button
+        type="button"
+        onClick={() => setActiveView("content")}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${activeView === "content"
+            ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
+            : "text-[#64748b] hover:text-[#0b192c]"
+          }`}
+      >
+        <FilePenLine className="h-4 w-4" /> Public Content
       </button>
     </div>
   );
@@ -129,11 +140,67 @@ function SettingsPage() {
       </div>
     );
 
+  const contentSettings = data?.settings?.filter((setting: any) => setting.group === "content") || [];
+
+  if (activeView === "content")
+    return (
+      <div className="mx-auto w-full max-w-[1600px]">
+        {viewTabs}
+        <div className="mb-6">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+            Public Content
+          </h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
+            Edit the legal content published on public policy pages. Changes become visible after saving.
+          </p>
+        </div>
+
+        <form onSubmit={handleSave} className="space-y-6 pb-20">
+          {contentSettings.map((setting: any) => (
+            <section
+              key={setting.key}
+              className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-xs"
+            >
+              <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-5 py-4">
+                <h2 className="text-sm font-bold text-[#0b192c]">{setting.label}</h2>
+                <p className="mt-1 text-xs text-[#64748b]">{setting.description}</p>
+              </div>
+              <div className="p-5">
+                <RichCKEditor
+                  value={formData[setting.key] || ""}
+                  onChange={(value) =>
+                    setFormData((previous) => ({ ...previous, [setting.key]: value }))
+                  }
+                  placeholder={`Write the ${setting.label.toLowerCase()} content...`}
+                  minHeight="360px"
+                />
+              </div>
+            </section>
+          ))}
+
+          <div className="sticky bottom-6 z-10 flex justify-end rounded-xl border border-[#e2e8f0] bg-white/95 p-4 shadow-lg backdrop-blur">
+            <button
+              type="submit"
+              disabled={updateMutation.isPending}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#059669] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#059669]"
+            >
+              {updateMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {updateMutation.isPending ? "Saving content..." : "Save Public Content"}
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+
   // Group settings by category
   const groups: Record<string, any[]> = {};
   data?.settings?.forEach((setting: any) => {
     const group = setting.group || "general";
-    if (group === "seo") return;
+    if (group === "seo" || group === "content") return;
     if (!groups[group]) groups[group] = [];
     groups[group].push(setting);
   });

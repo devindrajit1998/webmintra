@@ -50,6 +50,7 @@ import adminCouponsRouter from "./routes/admin/coupons.js";
 import adminTemplatesRouter from "./routes/admin/templates.js";
 import adminTemplateCategoriesRouter from "./routes/admin/templateCategories.js";
 import adminTestimonialsRouter from "./routes/admin/testimonials.js";
+import adminFaqsRouter from "./routes/admin/faqs.js";
 import adminUploadRouter from "./routes/admin/upload.js";
 import { initCronJobs } from "./services/cron.js";
 
@@ -163,10 +164,155 @@ app.use("/api/admin/coupons", adminCouponsRouter);
 app.use("/api/admin/templates", adminTemplatesRouter);
 app.use("/api/admin/template-categories", adminTemplateCategoriesRouter);
 app.use("/api/admin/testimonials", adminTestimonialsRouter);
+app.use("/api/admin/faqs", adminFaqsRouter);
 app.use("/api/admin/upload", adminUploadRouter);
 
 // ── Public APIs ──────────────────────────────────────────────────
 app.use("/api/public", publicSubmissionsLimiter, publicRouter);
+
+// ── Technical SEO: Dynamic Root Sitemap & Robots ─────────────────
+app.get("/sitemap.xml", async (req, res, next) => {
+  try {
+    const { BlogPost } = await import("./models/Blog.js");
+    const { Template } = await import("./models/Template.js");
+    const { Setting } = await import("./models/Setting.js");
+    const { KBArticle } = await import("./models/KnowledgeBase.js").catch(() => ({ KBArticle: null }));
+
+    const host = req.get("x-forwarded-host") || req.get("host") || "webmintra.com";
+    const protocol = req.get("x-forwarded-proto") || req.protocol || "https";
+    const baseUrl = `${protocol}://${host}`.replace(/\/$/, "");
+
+    // Fetch site canonical setting if configured
+    const canonicalSetting = await Setting.findOne({ key: "seo.canonicalUrl" }).lean();
+    const siteOrigin = canonicalSetting?.value && typeof canonicalSetting.value === "string" && canonicalSetting.value.startsWith("http")
+      ? canonicalSetting.value.replace(/\/$/, "")
+      : baseUrl;
+
+    // Core static platform pages
+    const staticRoutes = [
+      { loc: `${siteOrigin}/`, priority: "1.0", changefreq: "daily" },
+      { loc: `${siteOrigin}/templates`, priority: "0.9", changefreq: "weekly" },
+      { loc: `${siteOrigin}/blog`, priority: "0.9", changefreq: "daily" },
+      { loc: `${siteOrigin}/help`, priority: "0.8", changefreq: "weekly" },
+      { loc: `${siteOrigin}/contact`, priority: "0.7", changefreq: "monthly" },
+      { loc: `${siteOrigin}/privacy-policy`, priority: "0.5", changefreq: "monthly" },
+      { loc: `${siteOrigin}/terms-and-conditions`, priority: "0.5", changefreq: "monthly" },
+      { loc: `${siteOrigin}/refund-cancellation-policy`, priority: "0.5", changefreq: "monthly" },
+    ];
+
+    // Fetch published dynamic blog articles
+    const blogPosts = await BlogPost.find({ status: "published" })
+      .select("slug updatedAt publishedAt")
+      .sort({ publishedAt: -1 })
+      .lean();
+
+    const blogRoutes = blogPosts.map((post) => ({
+      loc: `${siteOrigin}/blog/${encodeURIComponent(post.slug)}`,
+      lastmod: (post.updatedAt || post.publishedAt || new Date()).toISOString().split("T")[0],
+      priority: "0.8",
+      changefreq: "weekly",
+    }));
+
+    // Fetch published templates
+    const templates = await Template.find({ isActive: true })
+      .select("title category updatedAt")
+      .lean();
+
+    const templateRoutes = templates.map((tpl) => ({
+      loc: `${siteOrigin}/templates?category=${encodeURIComponent(tpl.category || "all")}`,
+      lastmod: (tpl.updatedAt || new Date()).toISOString().split("T")[0],
+      priority: "0.7",
+      changefreq: "weekly",
+    }));
+
+    // Combine all entries
+    const allUrls = [...staticRoutes, ...blogRoutes, ...templateRoutes];
+
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allUrls
+        .map(
+          (u) => `  <url>
+    <loc>${u.loc}</loc>
+    ${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ""}
+    <changefreq>${u.changefreq || "weekly"}</changefreq>
+    <priority>${u.priority || "0.7"}</priority>
+  </url>`
+        )
+        .join("\n")}
+</urlset>`;
+
+    res.set("Content-Type", "application/xml; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=3600, s-maxage=3600");
+    return res.send(xml);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+app.get("/robots.txt", async (req, res, next) => {
+  try {
+    const { Setting } = await import("./models/Setting.js");
+    const allowSetting = await Setting.findOne({ key: "seo.allowIndexing" }).lean();
+    const isIndexingAllowed = allowSetting?.value !== false && allowSetting?.value !== "false";
+
+    const host = req.get("x-forwarded-host") || req.get("host") || "webmintra.com";
+    const protocol = req.get("x-forwarded-proto") || req.protocol || "https";
+    const siteOrigin = `${protocol}://${host}`.replace(/\/$/, "");
+
+    if (!isIndexingAllowed) {
+      res.set("Content-Type", "text/plain; charset=utf-8");
+      return res.send(`User-agent: *\nDisallow: /\n`);
+    }
+
+    const robotsContent = `# Technical SEO robots.txt for WebMintra
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /accept-invitation
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /accept-invitation
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /tenant/
+Disallow: /api/
+Disallow: /workspace/
+Disallow: /sign-in
+Disallow: /create-account
+Disallow: /accept-invitation
+
+# Dynamic Sitemap Reference
+Sitemap: ${siteOrigin}/sitemap.xml
+`;
+
+    res.set("Content-Type", "text/plain; charset=utf-8");
+    res.set("Cache-Control", "public, max-age=86400, s-maxage=86400");
+    return res.send(robotsContent);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // ── Health Check ────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
@@ -190,7 +336,7 @@ app.use((error, _request, response, _next) => {
 });
 
 // ── Start ───────────────────────────────────────────────────────
-const port = Number(process.env.PORT ?? 3001);
+const port = Number(process.env.PORT ?? 5000);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {

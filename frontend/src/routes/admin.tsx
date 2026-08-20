@@ -25,6 +25,7 @@ import {
   BarChart,
   HardDrive,
   Quote,
+  HelpCircle,
 } from "lucide-react";
 import { clearSessionUser, getAuthenticatedUser, type SessionUser } from "@/lib/auth-api";
 import { apiFetch, clearCsrfToken } from "@/lib/api-fetch";
@@ -53,6 +54,7 @@ const billing = [
 const content = [
   { label: "Blog", icon: FileText, to: "/admin/blog" },
   { label: "Knowledge Base", icon: FileText, to: "/admin/kb" },
+  { label: "FAQs", icon: HelpCircle, to: "/admin/faqs" },
   { label: "Testimonials", icon: Quote, to: "/admin/testimonials" },
   { label: "Support", icon: CircleHelp, to: "/admin/support" },
   { label: "Announcements", icon: Megaphone, to: "/admin/announcements" },
@@ -135,8 +137,11 @@ function AdminLayout() {
             )}
             {!sidebarCollapsed && (
               <div className="min-w-0">
-                <p className="truncate text-[18px] font-black tracking-tight leading-none text-[#0f172a] lowercase">
-                  {settings["site.name"] || "webmintra"}
+                <p className="truncate text-[18px] font-black tracking-tight leading-none text-[#0f172a] lowercase flex items-baseline">
+                  <span>web</span>
+                  <span className="bg-gradient-to-r from-[#ea580c] via-[#f59e0b] to-[#059669] bg-clip-text text-transparent">
+                    mintra
+                  </span>
                 </p>
                 <p className="truncate text-[10px] font-bold tracking-wide text-[#ea580c] mt-1 flex items-center gap-1">
                   <span>🇮🇳</span> <span>Admin Central</span>

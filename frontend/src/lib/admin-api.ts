@@ -421,3 +421,23 @@ export const deleteAdminTestimonial = (id: string) =>
   adminRequest<{ message: string }>(`/testimonials/${id}`, {
     method: "DELETE",
   });
+
+// ── FAQs ──────────────────────────────────────────────────────
+export const getAdminFaqs = () => adminRequest<{ faqs: any[] }>("/faqs");
+
+export const createAdminFaq = (data: any) =>
+  adminRequest<{ faq: any }>("/faqs", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateAdminFaq = (id: string, data: any) =>
+  adminRequest<{ faq: any }>(`/faqs/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const deleteAdminFaq = (id: string) =>
+  adminRequest<{ message: string }>(`/faqs/${id}`, {
+    method: "DELETE",
+  });

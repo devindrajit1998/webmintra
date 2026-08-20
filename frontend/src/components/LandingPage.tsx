@@ -47,6 +47,7 @@ import {
   getPublicTemplates,
   getPublicPlans,
   getPublicTestimonials,
+  getPublicFaqs,
 } from "@/lib/public-api";
 import { PublicHeader } from "./PublicHeader";
 
@@ -84,6 +85,12 @@ export function LandingPage() {
   const { data: dynamicTestimonials = [] } = useQuery({
     queryKey: ["publicTestimonials"],
     queryFn: getPublicTestimonials,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: dynamicFaqs = [] } = useQuery({
+    queryKey: ["publicFaqs"],
+    queryFn: getPublicFaqs,
     staleTime: 1000 * 60 * 5,
   });
 
@@ -1131,79 +1138,78 @@ export function LandingPage() {
               </h2>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              {/* Left Column */}
-              <div className="space-y-3">
-                <details className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs">
-                  <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
-                    <span>Do I need any coding skills?</span>
-                    <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                    Zero coding or technical knowledge required. You can edit any text, image,
-                    price, or button just by clicking on it.
-                  </p>
-                </details>
+            {(() => {
+              const faqsToRender = dynamicFaqs && dynamicFaqs.length > 0 ? dynamicFaqs : [
+                {
+                  question: "Do I need any coding skills?",
+                  answer: "Zero coding or technical knowledge required. You can edit any text, image, price, or button just by clicking on it.",
+                },
+                {
+                  question: "Can I use my own domain name?",
+                  answer: "Yes! You can connect any custom .in, .com, or .org domain with 1-click DNS connection.",
+                },
+                {
+                  question: "Is hosting included?",
+                  answer: "Yes, high-speed managed cloud hosting with automated SSL encryption and daily backups is included in every plan.",
+                },
+                {
+                  question: "Can I change my template later?",
+                  answer: "Yes, you can switch or customize your template layout at any point from your dashboard.",
+                },
+                {
+                  question: "Will my website work on mobile devices?",
+                  answer: "Every Webmintra template is 100% mobile-responsive and loads fast on smartphones and tablets.",
+                },
+                {
+                  question: "Do you offer customer support?",
+                  answer: "Yes, our dedicated support team is available via WhatsApp, email, and live help center guides.",
+                },
+              ];
 
-                <details className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs">
-                  <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
-                    <span>Can I use my own domain name?</span>
-                    <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                    Yes! You can connect any custom .in, .com, or .org domain with 1-click DNS
-                    connection.
-                  </p>
-                </details>
+              const mid = Math.ceil(faqsToRender.length / 2);
+              const leftCol = faqsToRender.slice(0, mid);
+              const rightCol = faqsToRender.slice(mid);
 
-                <details className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs">
-                  <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
-                    <span>Is hosting included?</span>
-                    <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                    Yes, high-speed managed cloud hosting with automated SSL encryption and daily
-                    backups is included in every plan.
-                  </p>
-                </details>
-              </div>
+              return (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {/* Left Column */}
+                  <div className="space-y-3">
+                    {leftCol.map((faq: any, idx: number) => (
+                      <details
+                        key={faq._id || idx}
+                        className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs transition-colors hover:border-[#cbd5e1]"
+                      >
+                        <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
+                          <span>{faq.question}</span>
+                          <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
+                        </summary>
+                        <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
+                          {faq.answer}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
 
-              {/* Right Column */}
-              <div className="space-y-3">
-                <details className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs">
-                  <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
-                    <span>Can I change my template later?</span>
-                    <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                    Yes, you can switch or customize your template layout at any point from your
-                    dashboard.
-                  </p>
-                </details>
-
-                <details className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs">
-                  <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
-                    <span>Will my website work on mobile devices?</span>
-                    <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                    Every Webmintra template is 100% mobile-responsive and loads fast on smartphones
-                    and tablets.
-                  </p>
-                </details>
-
-                <details className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs">
-                  <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
-                    <span>Do you offer customer support?</span>
-                    <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
-                  </summary>
-                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                    Yes, our dedicated support team is available via WhatsApp, email, and live help
-                    center guides.
-                  </p>
-                </details>
-              </div>
-            </div>
+                  {/* Right Column */}
+                  <div className="space-y-3">
+                    {rightCol.map((faq: any, idx: number) => (
+                      <details
+                        key={faq._id || idx}
+                        className="group rounded-lg border border-[#e2e8f0] bg-white p-4 shadow-2xs transition-colors hover:border-[#cbd5e1]"
+                      >
+                        <summary className="landing-faq-summary flex cursor-pointer items-center justify-between text-xs font-bold text-[#0f172a]">
+                          <span>{faq.question}</span>
+                          <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
+                        </summary>
+                        <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
+                          {faq.answer}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </section>
 

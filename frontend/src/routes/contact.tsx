@@ -16,10 +16,63 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const Route = createFileRoute("/contact")({
+  loader: async () => {
+    try {
+      const settings = await getPublicSettings().catch(() => ({}));
+      return { settings };
+    } catch {
+      return { settings: {} };
+    }
+  },
+  head: ({ loaderData }) => {
+    const settings = loaderData?.settings || {};
+    const siteName = String(settings["site.name"] || "WebMintra");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.com").replace(/\/$/, "");
+    const pageUrl = `${canonicalBase}/contact`;
+    const title = `Contact Us & 24/7 Support | ${siteName}`;
+    const description = `Get in touch with the ${siteName} team for sales enquiries, custom domains assistance, or technical website support.`;
+
+    const jsonLdContact = {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      name: title,
+      url: pageUrl,
+      description,
+      mainEntity: {
+        "@type": "Organization",
+        name: siteName,
+        url: canonicalBase,
+        ...(settings["brand.logoUrl"] ? { logo: settings["brand.logoUrl"] } : {}),
+      },
+    };
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow, max-snippet:-1, max-image-preview:large" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:site_name", content: siteName },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(jsonLdContact),
+        },
+      ],
+    };
+  },
   component: PublicContactPage,
-  head: () => ({ meta: [{ title: "Contact Us & Support | WebMintra" }] }),
 });
 
 export function PublicContactPage() {
@@ -147,21 +200,6 @@ export function PublicContactPage() {
               </div>
             </div>
 
-            {/* Trial Box */}
-            <div className="rounded-2xl border border-[#fed7aa] bg-[#fffaf5] p-6 shadow-xs">
-              <h4 className="text-sm font-bold text-[#0f172a] flex items-center gap-2">
-                <Clock className="h-4 w-4 text-[#ea580c]" /> 14-Day Free Trial
-              </h4>
-              <p className="text-xs text-[#64748b] mt-1.5 leading-relaxed">
-                Ready to explore? You can create your website immediately without entering credit card details or waiting for sales calls.
-              </p>
-              <Link
-                to="/create-account"
-                className="mt-3.5 inline-flex items-center gap-1.5 text-xs font-bold text-[#ea580c] hover:underline"
-              >
-                Start Free Trial Now <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
           </div>
 
           {/* Right: Message Form */}
@@ -294,15 +332,7 @@ export function PublicContactPage() {
         </div>
       </main>
 
-      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
-      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 {siteName}. All rights reserved.</p>
-          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
-            <span>100% Data Stored in India</span> <span>🇮🇳</span>
-          </p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

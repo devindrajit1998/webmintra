@@ -244,6 +244,24 @@ router.post("/contact", async (req, res) => {
   }
 });
 
+// ── Public FAQs ────────────────────────────────────────────────
+router.get("/faqs", async (req, res) => {
+  try {
+    const { FAQ, DEFAULT_FAQS } = await import("../models/Faq.js");
+    const count = await FAQ.countDocuments();
+    if (count === 0) {
+      await FAQ.insertMany(DEFAULT_FAQS);
+    }
+    const faqs = await FAQ.find({ isPublished: true })
+      .sort({ sortOrder: 1, createdAt: 1 })
+      .lean();
+    return res.json({ faqs });
+  } catch (error) {
+    console.error("Error fetching public FAQs:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 // ── Public Testimonials ────────────────────────────────────────
 router.get("/testimonials", async (req, res) => {
   try {

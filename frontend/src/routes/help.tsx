@@ -16,10 +16,91 @@ import {
   X,
 } from "lucide-react";
 import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const Route = createFileRoute("/help")({
+  loader: async () => {
+    try {
+      const [kbData, settings] = await Promise.all([
+        getPublicKB({}).catch(() => ({ articles: [] })),
+        getPublicSettings().catch(() => ({})),
+      ]);
+      return { kbData, settings };
+    } catch {
+      return { kbData: { articles: [] }, settings: {} };
+    }
+  },
+  head: ({ loaderData }) => {
+    const settings = loaderData?.settings || {};
+    const articles = loaderData?.kbData?.articles || [];
+    const siteName = String(settings["site.name"] || "WebMintra");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.com").replace(/\/$/, "");
+    const pageUrl = `${canonicalBase}/help`;
+    const title = `Help Center, Guides & FAQs | ${siteName}`;
+    const description = `Find answers, video tutorials, domain setup guides, and troubleshooting resources for ${siteName}.`;
+
+    const jsonLdBreadcrumb = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: canonicalBase,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Help Center",
+          item: pageUrl,
+        },
+      ],
+    };
+
+    const faqItems = articles.slice(0, 10).map((art: any) => ({
+      "@type": "Question",
+      name: art.title,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: art.excerpt || art.content?.replace(/<[^>]*>?/gm, "").slice(0, 300) || art.title,
+      },
+    }));
+
+    const jsonLdFaq = faqItems.length > 0 ? {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqItems,
+    } : null;
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow, max-snippet:-1, max-image-preview:large" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:site_name", content: siteName },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(jsonLdBreadcrumb),
+        },
+        ...(jsonLdFaq ? [{
+          type: "application/ld+json",
+          children: JSON.stringify(jsonLdFaq),
+        }] : []),
+      ],
+    };
+  },
   component: PublicHelpCenterPage,
-  head: () => ({ meta: [{ title: "Help Center & Tutorials | WebMintra" }] }),
 });
 
 export function PublicHelpCenterPage() {
@@ -90,11 +171,10 @@ export function PublicHelpCenterPage() {
         <div className="mb-10 flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${
-              selectedCategory === "all"
+            className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${selectedCategory === "all"
                 ? "bg-[#059669] text-white shadow-xs"
                 : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-            }`}
+              }`}
           >
             All Guides
           </button>
@@ -102,11 +182,10 @@ export function PublicHelpCenterPage() {
             <button
               key={c._id}
               onClick={() => setSelectedCategory(c.slug)}
-              className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${
-                selectedCategory === c.slug
+              className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${selectedCategory === c.slug
                   ? "bg-[#059669] text-white shadow-xs"
                   : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-              }`}
+                }`}
             >
               {c.name}
             </button>
@@ -233,15 +312,7 @@ export function PublicHelpCenterPage() {
         </div>
       )}
 
-      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
-      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 {settings["site.name"] || "webmintra"}. All rights reserved.</p>
-          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
-            <span>100% Data Stored in India</span> <span>🇮🇳</span>
-          </p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

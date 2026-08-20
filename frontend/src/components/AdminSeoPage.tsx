@@ -24,6 +24,8 @@ type SeoForm = {
   organizationName: string;
   organizationLogoUrl: string;
   allowIndexing: boolean;
+  googleSiteVerification: string;
+  bingVerification: string;
 };
 type SeoField = keyof SeoForm;
 type Errors = Partial<Record<SeoField, string>>;
@@ -39,6 +41,8 @@ const INITIAL: SeoForm = {
   organizationName: "WebMintra",
   organizationLogoUrl: "",
   allowIndexing: true,
+  googleSiteVerification: "",
+  bingVerification: "",
 };
 const KEYS: Record<SeoField, string> = {
   title: "seo.defaultTitle",
@@ -51,6 +55,8 @@ const KEYS: Record<SeoField, string> = {
   organizationName: "seo.organizationName",
   organizationLogoUrl: "seo.organizationLogoUrl",
   allowIndexing: "seo.allowIndexing",
+  googleSiteVerification: "seo.googleSiteVerification",
+  bingVerification: "seo.bingVerification",
 };
 
 function mapSettings(settings: Array<{ key: string; value: unknown }>): SeoForm {
@@ -66,6 +72,8 @@ function mapSettings(settings: Array<{ key: string; value: unknown }>): SeoForm 
     organizationName: String(values[KEYS.organizationName] ?? "WebMintra"),
     organizationLogoUrl: String(values[KEYS.organizationLogoUrl] ?? ""),
     allowIndexing: values[KEYS.allowIndexing] !== false && values[KEYS.allowIndexing] !== "false",
+    googleSiteVerification: String(values[KEYS.googleSiteVerification] ?? ""),
+    bingVerification: String(values[KEYS.bingVerification] ?? ""),
   };
 }
 function validUrl(value: string) {
@@ -299,6 +307,24 @@ export function AdminSeoPage() {
               onUpload={(file) => void upload("organizationLogoUrl", file)}
               compact
             />
+          </Panel>
+          <Panel icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />} title="Search Engine Verification">
+            <Field label="Google Search Console verification code" error={errors.googleSiteVerification}>
+              <input
+                value={form.googleSiteVerification}
+                placeholder="e.g. 4v9hQz_abc123..."
+                onChange={(e) => update("googleSiteVerification", e.target.value)}
+                className={input(errors.googleSiteVerification)}
+              />
+            </Field>
+            <Field label="Bing Webmaster verification code" error={errors.bingVerification}>
+              <input
+                value={form.bingVerification}
+                placeholder="e.g. 8C5C89F3A1..."
+                onChange={(e) => update("bingVerification", e.target.value)}
+                className={input(errors.bingVerification)}
+              />
+            </Field>
           </Panel>
         </div>
         <aside className="space-y-6 xl:sticky xl:top-22">

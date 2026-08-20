@@ -16,10 +16,70 @@ import {
   Menu,
 } from "lucide-react";
 import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const Route = createFileRoute("/blog/")({
+  loader: async () => {
+    try {
+      const settings = await getPublicSettings().catch(() => ({}));
+      return { settings };
+    } catch {
+      return { settings: {} };
+    }
+  },
+  head: ({ loaderData }) => {
+    const settings = loaderData?.settings || {};
+    const siteName = String(settings["site.name"] || "WebMintra");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.com").replace(/\/$/, "");
+    const pageUrl = `${canonicalBase}/blog`;
+    const title = `Official Blog - Website Tips, Case Studies & Guides | ${siteName}`;
+    const description = `Explore the latest articles on web design, local SEO, online business scaling, and digital growth from ${siteName}.`;
+    const ogImage = settings["seo.socialImageUrl"] || settings["brand.logoUrl"] || "";
+
+    const jsonLdBreadcrumb = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: canonicalBase,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Blog",
+          item: pageUrl,
+        },
+      ],
+    };
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow, max-snippet:-1, max-image-preview:large" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:site_name", content: siteName },
+        ...(ogImage ? [{ property: "og:image", content: ogImage }] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(jsonLdBreadcrumb),
+        },
+      ],
+    };
+  },
   component: PublicBlogPage,
-  head: () => ({ meta: [{ title: "Blog & Local Business Guides | WebMintra" }] }),
 });
 
 export function PublicBlogPage() {
@@ -90,11 +150,10 @@ export function PublicBlogPage() {
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
-                selectedCategory === "all"
+              className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${selectedCategory === "all"
                   ? "bg-[#059669] text-white shadow-xs"
                   : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-              }`}
+                }`}
             >
               All Articles
             </button>
@@ -102,11 +161,10 @@ export function PublicBlogPage() {
               <button
                 key={c._id}
                 onClick={() => setSelectedCategory(c.slug)}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
-                  selectedCategory === c.slug
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${selectedCategory === c.slug
                     ? "bg-[#059669] text-white shadow-xs"
                     : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-                }`}
+                  }`}
               >
                 {c.name}
               </button>
@@ -189,15 +247,7 @@ export function PublicBlogPage() {
         )}
       </main>
 
-      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
-      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 {settings["site.name"] || "webmintra"}. All rights reserved.</p>
-          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
-            <span>100% Data Stored in India</span> <span>🇮🇳</span>
-          </p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

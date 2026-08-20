@@ -13,6 +13,7 @@ import {
 import { FormEvent, useId, useState, useEffect } from "react";
 import { authRequest, routeForRole, saveSessionUser } from "@/lib/auth-api";
 import { getPublicSettings } from "@/lib/public-api";
+import { BrandLogo } from "./BrandLogo";
 
 type AuthMode = "sign-in" | "create-account" | "forgot-password";
 
@@ -137,18 +138,13 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
           <Link
             to="/"
-            className="flex items-center gap-2.5 transition hover:opacity-90"
+            className="flex items-center transition hover:opacity-95"
           >
-            {isMounted && logoUrl ? (
-              <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
-            ) : (
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
-                W
-              </div>
-            )}
-            <span className="text-[21px] font-black tracking-tight text-[#0f172a] lowercase">
-              {isMounted ? siteName : "webmintra"}
-            </span>
+            <BrandLogo
+              logoUrl={isMounted ? logoUrl : undefined}
+              siteName={isMounted ? siteName : "webmintra"}
+              size="md"
+            />
           </Link>
           <Link
             to="/"

@@ -32,6 +32,7 @@ import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminDomainsRouteImport } from './routes/admin.domains'
 import { Route as AdminEmailTemplatesRouteImport } from './routes/admin.email-templates'
+import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminKbRouteImport } from './routes/admin.kb'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
@@ -184,6 +185,11 @@ const AdminDomainsRoute = AdminDomainsRouteImport.update({
 const AdminEmailTemplatesRoute = AdminEmailTemplatesRouteImport.update({
   id: '/email-templates',
   path: '/email-templates',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFaqsRoute = AdminFaqsRouteImport.update({
+  id: '/faqs',
+  path: '/faqs',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminKbRoute = AdminKbRouteImport.update({
@@ -396,6 +402,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/domains': typeof AdminDomainsRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
+  '/admin/faqs': typeof AdminFaqsRoute
   '/admin/kb': typeof AdminKbRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -457,6 +464,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/domains': typeof AdminDomainsRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
+  '/admin/faqs': typeof AdminFaqsRoute
   '/admin/kb': typeof AdminKbRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -520,6 +528,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/domains': typeof AdminDomainsRoute
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
+  '/admin/faqs': typeof AdminFaqsRoute
   '/admin/kb': typeof AdminKbRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -584,6 +593,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/domains'
     | '/admin/email-templates'
+    | '/admin/faqs'
     | '/admin/kb'
     | '/admin/notifications'
     | '/admin/payments'
@@ -645,6 +655,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/domains'
     | '/admin/email-templates'
+    | '/admin/faqs'
     | '/admin/kb'
     | '/admin/notifications'
     | '/admin/payments'
@@ -707,6 +718,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/domains'
     | '/admin/email-templates'
+    | '/admin/faqs'
     | '/admin/kb'
     | '/admin/notifications'
     | '/admin/payments'
@@ -929,6 +941,13 @@ declare module '@tanstack/react-router' {
       path: '/email-templates'
       fullPath: '/admin/email-templates'
       preLoaderRoute: typeof AdminEmailTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/faqs': {
+      id: '/admin/faqs'
+      path: '/faqs'
+      fullPath: '/admin/faqs'
+      preLoaderRoute: typeof AdminFaqsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/kb': {
@@ -1201,6 +1220,7 @@ interface AdminRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDomainsRoute: typeof AdminDomainsRoute
   AdminEmailTemplatesRoute: typeof AdminEmailTemplatesRoute
+  AdminFaqsRoute: typeof AdminFaqsRoute
   AdminKbRoute: typeof AdminKbRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
@@ -1229,6 +1249,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDomainsRoute: AdminDomainsRoute,
   AdminEmailTemplatesRoute: AdminEmailTemplatesRoute,
+  AdminFaqsRoute: AdminFaqsRoute,
   AdminKbRoute: AdminKbRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,

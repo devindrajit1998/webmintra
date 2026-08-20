@@ -81,6 +81,13 @@ export async function getPublicKBArticle(slug: string): Promise<any> {
   return payload.article || null;
 }
 
+export async function getPublicFaqs(): Promise<any[]> {
+  const response = await fetch(`${API_URL}/public/faqs`);
+  if (!response.ok) return [];
+  const payload = await response.json().catch(() => ({ faqs: [] }));
+  return payload.faqs || [];
+}
+
 export async function submitPublicContactForm(data: {
   name: string;
   email: string;

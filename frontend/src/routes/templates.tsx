@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner";
 import { PublicMobileMenu } from "@/components/PublicMobileMenu";
 import { PublicHeader } from "@/components/PublicHeader";
+import { PublicFooter } from "@/components/PublicFooter";
 
 export const Route = createFileRoute("/templates")({
   component: PublicTemplatesCatalogPage,
@@ -150,11 +151,10 @@ export function PublicTemplatesCatalogPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
-                  selectedCategory.toLowerCase() === cat.toLowerCase()
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${selectedCategory.toLowerCase() === cat.toLowerCase()
                     ? "bg-[#059669] text-white shadow-xs"
                     : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:border-[#cbd5e1]"
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -350,11 +350,10 @@ export function PublicTemplatesCatalogPage() {
                             key={p.name}
                             type="button"
                             onClick={() => setPreviewActivePage(p.name)}
-                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
-                              isActive
+                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${isActive
                                 ? "bg-[#059669] text-white shadow-sm border border-emerald-400/30"
                                 : "text-slate-200 hover:text-white hover:bg-slate-800"
-                            }`}
+                              }`}
                             style={{ color: isActive ? "#ffffff" : "#cbd5e1" }}
                           >
                             <FileText className="h-3.5 w-3.5 opacity-80" />
@@ -414,13 +413,12 @@ export function PublicTemplatesCatalogPage() {
               {/* Iframe Viewport Frame */}
               <div className="flex-1 flex justify-center w-full min-h-0">
                 <div
-                  className={`h-full rounded-2xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${
-                    previewDevice === "desktop"
+                  className={`h-full rounded-2xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${previewDevice === "desktop"
                       ? "w-full"
                       : previewDevice === "tablet"
                         ? "w-[768px]"
                         : "w-[375px]"
-                  }`}
+                    }`}
                 >
                   <iframe
                     srcDoc={previewHtml}
@@ -449,15 +447,7 @@ export function PublicTemplatesCatalogPage() {
           );
         })()}
 
-      {/* ── SUB-FOOTER ──────────────────────────────────────────────── */}
-      <footer className="border-t border-[#e2e8f0] bg-white py-8 text-center text-xs text-[#64748b]">
-        <div className="mx-auto max-w-7xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p>© 2026 {siteName}. All rights reserved.</p>
-          <p className="flex items-center gap-1 font-semibold text-[#0f172a]">
-            <span>100% Data Stored in India</span> <span>🇮🇳</span>
-          </p>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
