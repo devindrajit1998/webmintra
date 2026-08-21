@@ -112,6 +112,10 @@ export const reviewAccountDeletionRequest = (
 // ── Subscriptions ─────────────────────────────────────────────
 export const getSubscriptions = (params?: { page?: number; limit?: number; status?: string }) =>
   adminRequest<any>(`/subscriptions${buildQuery(params)}`);
+export const updateSubscription = (id: string, data: any) =>
+  adminRequest<any>(`/subscriptions/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+export const cancelSubscription = (id: string, reason?: string) =>
+  adminRequest<any>(`/subscriptions/${id}/cancel`, { method: "POST", body: JSON.stringify({ reason }) });
 
 // ── Plans ─────────────────────────────────────────────────────
 export const getPlans = (params?: { page?: number; limit?: number; status?: string }) =>

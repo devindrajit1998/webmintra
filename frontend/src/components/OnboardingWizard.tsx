@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { getPublicSettings } from "@/lib/public-api";
+import { BrandLogo } from "./BrandLogo";
 import {
   getOnboardingPlans,
   getOnboardingTemplates,
@@ -221,74 +222,85 @@ export function OnboardingWizard() {
     queryFn: getPublicSettings,
   });
 
-  const logoUrl = settings["brand.logoUrl"];
-  const siteName = settings["brand.siteName"] || "WebMintra";
-
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row bg-[#07111f] font-sans text-slate-200">
+    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern font-sans text-[#0f172a] flex flex-col lg:flex-row">
       {/* Left Sidebar (Progress) */}
-      <div className="flex w-full flex-col border-b border-white/5 bg-[#0c1827] lg:w-[320px] lg:shrink-0 lg:border-b-0 lg:border-r lg:border-white/5 xl:w-[380px]">
+      <div className="flex w-full flex-col border-b border-[#e2e8f0] bg-white/90 backdrop-blur-md lg:w-[320px] lg:shrink-0 lg:border-b-0 lg:border-r lg:border-[#e2e8f0] xl:w-[360px] shadow-sm">
         {/* Branding */}
-        <div className="flex items-center gap-3 p-6 lg:p-8">
-          {logoUrl ? (
-            <img
-              src={logoUrl}
-              alt={siteName}
-              className="h-8 w-8 rounded-lg object-contain shadow-[0_0_15px_rgba(6,182,212,0.5)]"
-            />
-          ) : (
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-[#06b6d4] font-bold text-[#083344] shadow-[0_0_15px_rgba(6,182,212,0.5)]">
-              {siteName.slice(0, 1).toUpperCase()}
-            </span>
-          )}
-          <span className="font-display text-base font-bold text-white">{siteName} Setup</span>
+        <div className="flex items-center gap-3 p-6 lg:p-8 border-b border-[#f1f5f9]">
+          <BrandLogo logoUrl={logoUrl} siteName={siteName} size="md" />
         </div>
 
         {/* Steps Tracker */}
-        <div className="flex flex-row overflow-x-auto px-6 pb-6 lg:flex-col lg:overflow-visible lg:px-8 lg:pb-8 scrollbar-hide">
-          {STEPS.map((label, i) => (
-            <div
-              key={label}
-              className="relative flex flex-row items-center lg:mb-8 lg:flex-col lg:items-start last:mb-0"
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold transition-colors ${
-                    i < step
-                      ? "bg-[#06b6d4] text-[#083344]"
-                      : i === step
-                        ? "border-2 border-[#06b6d4] text-[#06b6d4]"
-                        : "border border-white/20 bg-black/20 text-slate-500"
-                  }`}
-                >
-                  {i < step ? <Check className="h-4 w-4" /> : i + 1}
+        <div className="flex flex-row overflow-x-auto p-6 lg:flex-col lg:overflow-visible lg:p-8 scrollbar-none">
+          {STEPS.map((label, i) => {
+            const isCompleted = i < step;
+            const isCurrent = i === step;
+            return (
+              <div
+                key={label}
+                className="relative flex flex-row items-center lg:mb-7 lg:flex-col lg:items-start last:mb-0"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div
+                    className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl text-xs font-bold transition-all shadow-xs ${
+                      isCompleted
+                        ? "bg-[#059669] text-white shadow-emerald-500/20"
+                        : isCurrent
+                          ? "border-2 border-[#ea580c] bg-[#fff7ed] text-[#ea580c] shadow-orange-500/20"
+                          : "border border-[#cbd5e1] bg-white text-[#94a3b8]"
+                    }`}
+                  >
+                    {isCompleted ? <Check className="h-4 w-4 stroke-[3]" /> : i + 1}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
+                      Step {i + 1}
+                    </span>
+                    <span
+                      className={`whitespace-nowrap text-xs font-bold transition-colors ${
+                        isCurrent
+                          ? "text-[#0f172a]"
+                          : isCompleted
+                            ? "text-[#059669]"
+                            : "text-[#64748b]"
+                      }`}
+                    >
+                      {label}
+                    </span>
+                  </div>
                 </div>
-                <span
-                  className={`whitespace-nowrap text-sm font-semibold transition-colors ${
-                    i === step ? "text-white" : i < step ? "text-[#06b6d4]" : "text-slate-500"
-                  }`}
-                >
-                  {label}
-                </span>
-              </div>
 
-              {/* Connector Line */}
-              {i < STEPS.length - 1 && (
-                <div
-                  className={`
-                    mx-4 h-px w-8 lg:absolute lg:left-4 lg:top-8 lg:mx-0 lg:-ml-px lg:h-[calc(100%+1rem)] lg:w-px 
-                    transition-colors ${i < step ? "bg-[#06b6d4]" : "bg-white/10"}
-                 `}
-                />
-              )}
-            </div>
-          ))}
+                {/* Connector Line */}
+                {i < STEPS.length - 1 && (
+                  <div
+                    className={`
+                      mx-3 h-0.5 w-6 lg:absolute lg:left-4.5 lg:top-9 lg:mx-0 lg:-ml-px lg:h-[calc(100%+0.75rem)] lg:w-0.5 
+                      transition-colors ${isCompleted ? "bg-[#059669]" : "bg-[#e2e8f0]"}
+                   `}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Sub-card: Bharat Trust Badge */}
+        <div className="mt-auto hidden lg:block p-6">
+          <div className="rounded-2xl border border-[#fed7aa] bg-[#fffaf5] p-4 shadow-2xs">
+            <p className="text-xs font-bold text-[#ea580c] flex items-center gap-1.5">
+              <span>🇮🇳</span> <span>Made for Indian Businesses</span>
+            </p>
+            <p className="text-[11px] text-[#64748b] mt-1 leading-relaxed">
+              100% Data Stored in India. Instant WhatsApp enquiries and UPI/Razorpay integration ready.
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Right Content Area */}
       <div className="flex flex-1 flex-col overflow-y-auto">
-        <div className="flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 py-12 lg:pl-12 lg:pr-6 lg:py-20 xl:pl-20">
+        <div className="flex w-full max-w-4xl flex-1 flex-col justify-center px-6 py-10 sm:px-10 lg:py-14 mx-auto">
           {step === 0 && <BusinessStep business={business} onChange={setBusiness} />}
           {step === 1 && (
             <PlanStep
@@ -323,13 +335,13 @@ export function OnboardingWizard() {
             />
           )}
 
-          {/* Navigation */}
-          <div className="mt-10 flex items-center justify-between border-t border-white/5 pt-10">
+          {/* Bottom Action Nav Bar */}
+          <div className="mt-10 flex items-center justify-between border-t border-[#e2e8f0] pt-6">
             <button
               type="button"
               onClick={prevStep}
               disabled={step === 0}
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 disabled:pointer-events-none disabled:opacity-40"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#cbd5e1] bg-white px-5 py-2.5 text-xs font-bold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0f172a] disabled:pointer-events-none disabled:opacity-40"
             >
               <ArrowLeft className="h-4 w-4" /> Back
             </button>
@@ -338,7 +350,7 @@ export function OnboardingWizard() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="inline-flex items-center gap-2 rounded-full bg-[#06b6d4] px-8 py-3 text-sm font-bold text-[#083344] shadow-[0_0_20px_rgba(6,182,212,0.3)] transition hover:bg-[#22d3ee]"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#059669] px-7 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] active:scale-[0.98]"
               >
                 Continue <ArrowRight className="h-4 w-4" />
               </button>
@@ -347,7 +359,7 @@ export function OnboardingWizard() {
                 type="button"
                 onClick={handlePay}
                 disabled={isPaying}
-                className="inline-flex items-center gap-2 rounded-full bg-[#06b6d4] px-8 py-3 text-sm font-bold text-[#083344] shadow-[0_0_20px_rgba(6,182,212,0.3)] transition hover:bg-[#22d3ee] disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#059669] px-7 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] active:scale-[0.98] disabled:opacity-50"
               >
                 {isPaying ? (
                   <>
@@ -355,7 +367,7 @@ export function OnboardingWizard() {
                   </>
                 ) : (
                   <>
-                    <CreditCard className="h-4 w-4" /> Pay & Complete Setup
+                    <CreditCard className="h-4 w-4" /> Confirm & Launch Workspace
                   </>
                 )}
               </button>
@@ -392,66 +404,74 @@ function BusinessStep({
 
   return (
     <div className="w-full max-w-3xl">
-      <p className="mb-2 text-sm font-bold text-[#06b6d4]">Step 1 of 4</p>
-      <h1 className="font-display text-3xl font-bold text-white">Tell us about your business</h1>
-      <p className="mt-2 text-slate-400">This information will appear on your website.</p>
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-xs font-bold text-[#ea580c] shadow-2xs">
+        <Sparkles className="h-3.5 w-3.5" /> Step 1 of 4: Business Details
+      </span>
+      <h1 className="mt-3 font-display text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">
+        Tell us about your business
+      </h1>
+      <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
+        This information will appear automatically on your website's header, contact section, and enquiry forms.
+      </p>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2">
-        <Field label="Business name *" icon={<Building2 className="h-4 w-4" />}>
-          <input
-            value={business.name}
-            onChange={set("name")}
-            placeholder="My Business"
-            maxLength={120}
-            required
-            className={inputCls}
-          />
-        </Field>
-        <Field label="Business email" icon={<Mail className="h-4 w-4" />}>
-          <input
-            type="email"
-            value={business.email}
-            onChange={set("email")}
-            placeholder="hello@mybusiness.com"
-            maxLength={254}
-            className={inputCls}
-          />
-        </Field>
-        <Field label="Phone number" icon={<Phone className="h-4 w-4" />}>
-          <input
-            type="tel"
-            value={business.phone}
-            onChange={set("phone")}
-            placeholder="+91 98765 43210"
-            maxLength={20}
-            className={inputCls}
-          />
-        </Field>
-        <Field label="Website / Address" icon={<MapPin className="h-4 w-4" />}>
-          <input
-            value={business.address}
-            onChange={set("address")}
-            placeholder="123 Main St, City"
-            maxLength={300}
-            className={inputCls}
-          />
-        </Field>
+      <div className="mt-8 rounded-2xl border border-[#e2e8f0] bg-white p-6 sm:p-8 shadow-sm">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field label="Business name *" icon={<Building2 className="h-4 w-4" />}>
+            <input
+              value={business.name}
+              onChange={set("name")}
+              placeholder="e.g. Sharma Dental Clinic"
+              maxLength={120}
+              required
+              className={inputCls}
+            />
+          </Field>
+          <Field label="Business email" icon={<Mail className="h-4 w-4" />}>
+            <input
+              type="email"
+              value={business.email}
+              onChange={set("email")}
+              placeholder="contact@mybusiness.in"
+              maxLength={254}
+              className={inputCls}
+            />
+          </Field>
+          <Field label="Phone number (WhatsApp Ready)" icon={<Phone className="h-4 w-4" />}>
+            <input
+              type="tel"
+              value={business.phone}
+              onChange={set("phone")}
+              placeholder="+91 98765 43210"
+              maxLength={20}
+              className={inputCls}
+            />
+          </Field>
+          <Field label="Location / City / Address" icon={<MapPin className="h-4 w-4" />}>
+            <input
+              value={business.address}
+              onChange={set("address")}
+              placeholder="Connaught Place, New Delhi"
+              maxLength={300}
+              className={inputCls}
+            />
+          </Field>
 
-        <div className="sm:col-span-2">
-          <label className="mb-1.5 block text-sm font-medium text-slate-300">
-            Brief description
-          </label>
-          <textarea
-            value={business.description}
-            onChange={set("description")}
-            placeholder="What does your business do?"
-            maxLength={500}
-            rows={3}
-            className={`${inputCls} h-auto py-3`}
-          />
-          <p className="mt-1 text-right text-xs text-slate-500">
-            {business.description.length}/500
-          </p>
+          <div className="sm:col-span-2">
+            <label className="mb-1.5 block text-xs font-bold text-[#0f172a]">
+              Brief description / Tagline
+            </label>
+            <textarea
+              value={business.description}
+              onChange={set("description")}
+              placeholder="Briefly describe what your business offers (e.g. Best dental implants and root canal specialists in Delhi since 2012)..."
+              maxLength={500}
+              rows={3}
+              className={`${inputCls} h-auto py-3 leading-relaxed`}
+            />
+            <p className="mt-1 text-right text-[11px] font-mono text-[#94a3b8]">
+              {business.description.length}/500
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -475,31 +495,41 @@ function PlanStep({
   onIntervalChange: (i: "monthly" | "yearly") => void;
 }) {
   return (
-    <div>
-      <p className="mb-2 text-sm font-bold text-[#06b6d4]">Step 2 of 4</p>
-      <h1 className="font-display text-3xl font-bold text-white">Choose your plan</h1>
-      <p className="mt-2 text-slate-400">Pick the plan that suits your business best.</p>
+    <div className="w-full">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-xs font-bold text-[#ea580c] shadow-2xs">
+        <Sparkles className="h-3.5 w-3.5" /> Step 2 of 4: Select Plan
+      </span>
+      <h1 className="mt-3 font-display text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">
+        Choose your platform plan
+      </h1>
+      <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
+        All plans come with a 14-day free trial. Upgrade, downgrade, or cancel at any time.
+      </p>
 
       {/* Billing toggle */}
-      <div className="mt-6 inline-flex items-center gap-1 rounded-full border border-white/10 bg-[#0c1827] p-1">
+      <div className="mt-6 inline-flex items-center gap-1 rounded-xl border border-[#cbd5e1] bg-white p-1 shadow-2xs">
         {(["monthly", "yearly"] as const).map((opt) => (
           <button
             key={opt}
             type="button"
             onClick={() => onIntervalChange(opt)}
-            className={`rounded-full px-5 py-2 text-sm font-semibold transition ${interval === opt ? "bg-[#06b6d4] text-[#083344]" : "text-slate-400 hover:text-white"}`}
+            className={`rounded-lg px-5 py-2 text-xs font-bold transition ${
+              interval === opt
+                ? "bg-[#059669] text-white shadow-xs"
+                : "text-[#64748b] hover:text-[#0f172a]"
+            }`}
           >
-            {opt === "monthly" ? "Monthly" : "Yearly (save ~20%)"}
+            {opt === "monthly" ? "Monthly Billing" : "Yearly (Save ~20% 🇮🇳)"}
           </button>
         ))}
       </div>
 
       {loading ? (
         <div className="mt-12 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#06b6d4]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
         </div>
       ) : (
-        <div className="mt-12 flex flex-wrap gap-8 justify-start">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {plans.map((plan) => {
             const price = interval === "yearly" ? plan.pricing.yearly : plan.pricing.monthly;
             const isSelected = selected?.id === plan.id;
@@ -508,73 +538,58 @@ function PlanStep({
                 key={plan.id}
                 type="button"
                 onClick={() => onSelect(plan)}
-                className={`group relative flex w-full max-w-[340px] shrink-0 flex-col rounded-3xl border p-8 text-left transition duration-300 ${isSelected ? "border-[#06b6d4] bg-[#06b6d4]/10 shadow-[0_0_30px_rgba(6,182,212,0.15)] -translate-y-2" : "border-white/5 bg-[#0c1827] hover:border-white/10 hover:-translate-y-1 hover:bg-[#0f1d30]"}`}
+                className={`group relative flex flex-col rounded-2xl border p-6 text-left transition-all duration-200 shadow-sm ${
+                  isSelected
+                    ? "border-[#059669] bg-[#ecfdf5]/50 ring-2 ring-[#059669]/30 -translate-y-1 shadow-md"
+                    : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1] hover:-translate-y-0.5"
+                }`}
               >
                 {isSelected && (
-                  <div className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-[#06b6d4] text-[#083344]">
-                    <Check className="h-4 w-4" />
+                  <div className="absolute right-4 top-4 grid h-6 w-6 place-items-center rounded-full bg-[#059669] text-white shadow-xs">
+                    <Check className="h-3.5 w-3.5 stroke-[3]" />
                   </div>
                 )}
-                <h3 className="font-display text-xl font-bold text-white">{plan.name}</h3>
-                <p className="mt-1 text-sm text-slate-400">{plan.description}</p>
+                <h3 className="font-display text-lg font-bold text-[#0f172a]">{plan.name}</h3>
+                <p className="mt-1 text-xs text-[#64748b] line-clamp-2">{plan.description}</p>
                 <div className="mt-4">
-                  <span className="text-3xl font-bold text-white">
+                  <span className="text-3xl font-black text-[#0f172a]">
                     ₹{price.toLocaleString("en-IN")}
                   </span>
-                  <span className="ml-1 text-sm text-slate-400">
+                  <span className="ml-1 text-xs font-semibold text-[#64748b]">
                     /{interval === "yearly" ? "yr" : "mo"}
                   </span>
                 </div>
                 {plan.trialDays > 0 && (
-                  <p className="mt-1 text-xs text-emerald-400">{plan.trialDays}-day free trial</p>
+                  <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#059669]">
+                    ✓ {plan.trialDays}-day free trial included
+                  </span>
                 )}
-                <div className="mt-5 flex-1 border-t border-white/10 pt-5">
-                  <ul className="space-y-3">
-                    {/* Highlights */}
+                <div className="mt-5 flex-1 border-t border-[#f1f5f9] pt-4">
+                  <ul className="space-y-2.5 text-xs">
                     {plan.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-2 text-sm text-slate-300">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                        {h}
+                      <li key={h} className="flex items-start gap-2 text-[#334155]">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#059669]" />
+                        <span>{h}</span>
                       </li>
                     ))}
-
-                    {/* Limits */}
                     {plan.limits.pagesPerWebsite > 0 && (
-                      <li className="flex items-start gap-2 text-sm text-slate-300">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                        Up to {plan.limits.pagesPerWebsite} pages
+                      <li className="flex items-start gap-2 text-[#334155]">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#059669]" />
+                        <span>Up to {plan.limits.pagesPerWebsite} pages</span>
                       </li>
                     )}
                     {plan.limits.websites > 1 && (
-                      <li className="flex items-start gap-2 text-sm text-slate-300">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                        {plan.limits.websites} Websites
+                      <li className="flex items-start gap-2 text-[#334155]">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#059669]" />
+                        <span>{plan.limits.websites} Websites</span>
                       </li>
                     )}
                     {plan.limits.customDomains > 0 && (
-                      <li className="flex items-start gap-2 text-sm text-slate-300">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                        {plan.limits.customDomains} Custom Domains
+                      <li className="flex items-start gap-2 text-[#334155]">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#059669]" />
+                        <span>{plan.limits.customDomains} Custom Domains</span>
                       </li>
                     )}
-
-                    {/* Features */}
-                    {plan.features &&
-                      Object.entries(plan.features).map(([key, active]) => (
-                        <li
-                          key={key}
-                          className={`flex items-start gap-2 text-sm ${active ? "text-slate-300" : "text-slate-500 opacity-70"}`}
-                        >
-                          {active ? (
-                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#06b6d4]" />
-                          ) : (
-                            <X className="mt-0.5 h-4 w-4 shrink-0 text-slate-600" />
-                          )}
-                          <span className={active ? "" : "line-through"}>
-                            {key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, " $1")}
-                          </span>
-                        </li>
-                      ))}
                   </ul>
                 </div>
               </button>
@@ -607,29 +622,41 @@ function TemplateStep({
   onPreview: (t: OnboardingTemplate) => void;
 }) {
   return (
-    <div>
-      <p className="mb-2 text-sm font-bold text-[#06b6d4]">Step 3 of 4</p>
-      <h1 className="font-display text-3xl font-bold text-white">Choose a template</h1>
-      <p className="mt-2 text-slate-400">
-        Pick a design that matches your business type. Templates are filtered to match your plan.
+    <div className="w-full">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-xs font-bold text-[#ea580c] shadow-2xs">
+        <Sparkles className="h-3.5 w-3.5" /> Step 3 of 4: Choose Template
+      </span>
+      <h1 className="mt-3 font-display text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">
+        Pick your starting design
+      </h1>
+      <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
+        Select a template layout optimized for your business sector. You can customize all text and images later.
       </p>
 
       {/* Category filter */}
       {categories.length > 0 && (
-        <div className="mt-5 flex flex-wrap gap-2">
+        <div className="mt-6 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => onCategoryChange("")}
-            className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${!selectedCategory ? "border-[#06b6d4] bg-[#06b6d4]/10 text-[#06b6d4]" : "border-white/10 text-slate-400 hover:text-white"}`}
+            className={`rounded-full px-4 py-1.5 text-xs font-bold transition shadow-2xs ${
+              !selectedCategory
+                ? "bg-[#059669] text-white shadow-xs"
+                : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
+            }`}
           >
-            All
+            All Categories
           </button>
           {categories.map((cat) => (
             <button
               key={cat}
               type="button"
               onClick={() => onCategoryChange(cat)}
-              className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${selectedCategory === cat ? "border-[#06b6d4] bg-[#06b6d4]/10 text-[#06b6d4]" : "border-white/10 text-slate-400 hover:text-white"}`}
+              className={`rounded-full px-4 py-1.5 text-xs font-bold transition shadow-2xs ${
+                selectedCategory === cat
+                  ? "bg-[#059669] text-white shadow-xs"
+                  : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
+              }`}
             >
               {cat}
             </button>
@@ -639,16 +666,16 @@ function TemplateStep({
 
       {loading ? (
         <div className="mt-12 flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#06b6d4]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
         </div>
       ) : templates.length === 0 ? (
-        <div className="mt-12 rounded-2xl border border-white/10 bg-[#0c1827] p-12 text-center">
-          <p className="text-slate-400">
-            No templates match your current filters. Try selecting a different category.
+        <div className="mt-10 rounded-2xl border border-[#e2e8f0] bg-white p-12 text-center">
+          <p className="text-xs font-semibold text-[#64748b]">
+            No templates found matching this category.
           </p>
         </div>
       ) : (
-        <div className="mt-8 flex flex-wrap gap-8 justify-start">
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {templates.map((t) => {
             const isSelected = selected?.id === t.id;
             return (
@@ -658,49 +685,52 @@ function TemplateStep({
                 tabIndex={0}
                 onClick={() => onSelect(t)}
                 onKeyDown={(e) => e.key === "Enter" && onSelect(t)}
-                className={`group relative flex w-full max-w-[360px] shrink-0 flex-col rounded-3xl border text-left transition overflow-hidden cursor-pointer ${isSelected ? "border-[#06b6d4] shadow-[0_0_20px_rgba(6,182,212,0.2)] -translate-y-1" : "border-white/10 bg-[#0c1827] hover:border-white/20 hover:-translate-y-1"}`}
+                className={`group relative flex flex-col rounded-2xl border bg-white overflow-hidden transition-all duration-200 shadow-sm cursor-pointer ${
+                  isSelected
+                    ? "border-[#059669] ring-2 ring-[#059669]/30 -translate-y-1 shadow-md"
+                    : "border-[#e2e8f0] hover:border-[#cbd5e1] hover:-translate-y-0.5"
+                }`}
               >
                 {isSelected && (
-                  <div className="absolute right-3 top-3 z-10 grid h-6 w-6 place-items-center rounded-full bg-[#06b6d4] text-[#083344]">
-                    <Check className="h-4 w-4" />
+                  <div className="absolute right-3 top-3 z-30 grid h-6 w-6 place-items-center rounded-full bg-[#059669] text-white shadow-xs">
+                    <Check className="h-3.5 w-3.5 stroke-[3]" />
                   </div>
                 )}
-                <div className="relative aspect-video bg-slate-800">
+                <div className="relative aspect-video bg-slate-100 overflow-hidden">
                   {t.thumbnailUrl ? (
                     <img
                       src={t.thumbnailUrl}
                       alt={t.title}
-                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105 group-hover:opacity-80"
+                      className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                     />
                   ) : (
                     <AutoThumbnail templateId={t.id} title={t.title} />
                   )}
-                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
+                  <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#0b192c]/50 opacity-0 transition group-hover:opacity-100">
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         onPreview(t);
                       }}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#06b6d4] px-4 py-2 text-xs font-bold text-[#083344] shadow-lg hover:bg-[#22d3ee]"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-bold text-[#0f172a] shadow-md hover:bg-[#f8fafc]"
                     >
-                      <Eye className="h-4 w-4" /> Preview
+                      <Eye className="h-3.5 w-3.5 text-[#ea580c]" /> Live Preview
                     </button>
                   </div>
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex items-center justify-between">
-                    <span className="rounded bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                  <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex items-center justify-between z-10">
+                    <span className="rounded-md border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs">
                       {t.category}
                     </span>
-                    <span className="rounded bg-black/50 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                    <span className="rounded-md border border-white/20 bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-xs">
                       {t.pageCount} page{t.pageCount !== 1 ? "s" : ""}
                     </span>
                   </div>
                 </div>
-                <div className="bg-[#0c1827] p-4">
-                  <p className="font-bold text-white">{t.title}</p>
+                <div className="p-4 border-t border-[#f1f5f9]">
+                  <p className="text-sm font-bold text-[#0f172a]">{t.title}</p>
                   {t.description && (
-                    <p className="mt-1 line-clamp-2 text-sm text-slate-400">{t.description}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-[#64748b]">{t.description}</p>
                   )}
                 </div>
               </div>
@@ -733,12 +763,14 @@ function PaymentStep({
   const isFree = price === 0 || hasTrial;
 
   return (
-    <div className="w-full max-w-3xl">
-      <p className="mb-2 text-sm font-bold text-cyan-400">Step 4 of 4</p>
-      <h1 className="font-display text-3xl font-bold text-white">
-        {hasTrial ? "Start Your Free Trial" : isFree ? "Confirm & Launch" : "Review & Subscribe"}
+    <div className="w-full max-w-2xl">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-xs font-bold text-[#ea580c] shadow-2xs">
+        <Sparkles className="h-3.5 w-3.5" /> Step 4 of 4: Setup & Launch
+      </span>
+      <h1 className="mt-3 font-display text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">
+        {hasTrial ? "Start Your 14-Day Free Trial" : isFree ? "Confirm & Launch" : "Review & Subscribe"}
       </h1>
-      <p className="mt-2 text-slate-400">
+      <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
         {hasTrial
           ? `Enjoy ${plan.trialDays} days of full unrestricted access. No credit card or upfront payment needed.`
           : isFree
@@ -746,8 +778,8 @@ function PaymentStep({
             : "Review your order before completing payment."}
       </p>
 
-      <div className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-[#0c1827]">
-        <div className="p-8 space-y-6">
+      <div className="mt-8 overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-sm">
+        <div className="p-6 sm:p-8 space-y-4">
           <SummaryRow label="Business Name" value={business.name || "—"} />
           <SummaryRow label="Chosen Plan" value={`${plan.name} (${interval})`} />
           <SummaryRow label="Website Template" value={template.title} />
@@ -758,13 +790,13 @@ function PaymentStep({
           />
         </div>
 
-        <div className="bg-[#0f1d30] border-t border-white/5 p-8">
+        <div className="bg-[#f8fafc] border-t border-[#e2e8f0] p-6 sm:p-8">
           <div className="flex items-center justify-between">
-            <span className="text-lg font-bold text-slate-300">Due Today</span>
-            <span className="text-3xl font-extrabold text-emerald-400">
+            <span className="text-sm font-bold text-[#475569]">Due Today</span>
+            <span className="text-2xl sm:text-3xl font-black text-[#059669]">
               {hasTrial ? "₹0 (Free Trial)" : isFree ? "Free" : `₹${price.toLocaleString("en-IN")}`}
               {!isFree && !hasTrial && (
-                <span className="text-sm font-normal text-slate-400 ml-1">
+                <span className="text-xs font-normal text-[#64748b] ml-1">
                   / {interval === "yearly" ? "year" : "month"}
                 </span>
               )}
@@ -772,12 +804,12 @@ function PaymentStep({
           </div>
 
           {hasTrial && (
-            <div className="mt-6 flex items-start gap-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 p-4 text-sm font-medium text-cyan-300">
-              <Sparkles className="h-5 w-5 shrink-0 text-cyan-400 mt-0.5" />
+            <div className="mt-5 flex items-start gap-3 rounded-xl bg-[#ecfdf5] border border-[#a7f3d0] p-4 text-xs font-medium text-[#047857]">
+              <Sparkles className="h-4 w-4 shrink-0 text-[#059669] mt-0.5" />
               <div>
-                <p className="font-bold text-white">Instant Access • No Card Required</p>
-                <p className="text-xs text-slate-300 mt-0.5">
-                  Your website workspace will be ready in 5 seconds. You can edit content, test
+                <p className="font-bold text-[#065f46]">Instant Access • No Card Required 🇮🇳</p>
+                <p className="text-[11px] text-[#047857] mt-0.5 leading-relaxed">
+                  Your website workspace will be ready immediately. You can edit content, test
                   layouts, and connect your domain during your {plan.trialDays}-day trial.
                 </p>
               </div>
@@ -785,40 +817,13 @@ function PaymentStep({
           )}
         </div>
       </div>
-
-      <div className="mt-8 flex justify-end">
-        <button
-          type="button"
-          onClick={onPay}
-          disabled={isPaying}
-          className="inline-flex h-12 items-center gap-2 rounded-2xl bg-cyan-500 px-8 text-sm font-bold text-slate-950 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition hover:bg-cyan-400 disabled:opacity-50 cursor-pointer"
-        >
-          {isPaying ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Setting Up Your Workspace...
-            </>
-          ) : hasTrial ? (
-            <>
-              Start {plan.trialDays}-Day Free Trial <ArrowRight className="h-4 w-4" />
-            </>
-          ) : isFree ? (
-            <>
-              Launch Free Workspace <ArrowRight className="h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Proceed to Payment <ArrowRight className="h-4 w-4" />
-            </>
-          )}
-        </button>
-      </div>
     </div>
   );
 }
 
 // ── UI Helpers ────────────────────────────────────────────────
 const inputCls =
-  "h-11 w-full rounded-xl border border-white/10 bg-black/20 px-4 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-[#06b6d4] focus:ring-2 focus:ring-[#06b6d4]/20";
+  "h-11 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-xs font-semibold text-[#0f172a] shadow-xs outline-none transition placeholder:text-[#94a3b8] focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15";
 
 function Field({
   label,
@@ -833,9 +838,9 @@ function Field({
 }) {
   return (
     <div className={className}>
-      <label className="mb-1.5 block text-sm font-medium text-slate-300">{label}</label>
+      <label className="mb-1.5 block text-xs font-bold text-[#0f172a]">{label}</label>
       <div className="relative">
-        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
+        <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]">
           {icon}
         </div>
         <div className="[&>input]:pl-9 [&>textarea]:pl-9">{children}</div>
@@ -847,8 +852,12 @@ function Field({
 function SummaryRow({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-sm text-slate-400">{label}</span>
-      <span className={`text-sm ${bold ? "font-bold text-white" : "text-slate-200"}`}>{value}</span>
+      <span className="text-xs text-[#64748b]">{label}</span>
+      <span
+        className={`text-xs text-[#0f172a] ${bold ? "font-bold text-[#059669]" : "font-semibold"}`}
+      >
+        {value}
+      </span>
     </div>
   );
 }

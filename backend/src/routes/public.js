@@ -328,16 +328,51 @@ function applyEdit(element, edit) {
 }
 
 async function resolvePublishedWebsite(domainOrId) {
+  if (!domainOrId) return null;
+
+  // 1. Direct MongoDB Website ID Match
   if (WEBSITE_ID_PATTERN.test(domainOrId)) {
-    return Website.findOne({ _id: domainOrId, status: "published" }).populate("templateId", "htmlContent pages");
+    const site = await Website.findOne({ _id: domainOrId, status: "published" }).populate("templateId", "htmlContent pages");
+    if (site) return site;
   }
+
+  // 2. Custom Domain Match (e.g. clientdomain.com or mybrand.in)
   const domain = await Domain.findOne({ domain: domainOrId.toLowerCase(), status: "active" }).populate({
     path: "website",
     match: { status: "published" },
     populate: { path: "templateId", select: "htmlContent pages" },
   });
-  if (!domain?.website || String(domain.tenant) !== String(domain.website.owner)) return null;
-  return domain.website;
+  if (domain?.website && String(domain.tenant) === String(domain.website.owner)) {
+    return domain.website;
+  }
+
+  // 3. Business Name / Subdomain Slug Match (e.g., "webmintra", "lens-and-light")
+  // Check if a tenant's business name matches the subdomain slug
+  const normalizedSlug = domainOrId.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const tenants = await User.find({ role: "tenant" }).select("_id name business").lean();
+  
+  const matchedTenant = tenants.find((t) => {
+    const bizName = t.business?.name ? t.business.name.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
+    const userName = t.name ? t.name.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
+    return (bizName && (bizName === normalizedSlug || bizName.includes(normalizedSlug) || normalizedSlug.includes(bizName))) ||
+           (userName && (userName === normalizedSlug || userName.includes(normalizedSlug)));
+  });
+
+  if (matchedTenant) {
+    const site = await Website.findOne({ owner: matchedTenant._id, status: "published" })
+      .sort({ updatedAt: -1 })
+      .populate("templateId", "htmlContent pages");
+    if (site) return site;
+  }
+
+  // 4. Website Name Slug Match
+  const siteByName = await Website.findOne({
+    status: "published",
+    name: { $regex: new RegExp(`^${escapeRegex(domainOrId.replace(/-/g, " "))}$`, "i") },
+  }).populate("templateId", "htmlContent pages");
+  if (siteByName) return siteByName;
+
+  return null;
 }
 
 export function publicBaseUrl(req) {

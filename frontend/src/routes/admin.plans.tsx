@@ -284,18 +284,18 @@ function SelectRow({
   onChange: (v: number) => void;
 }) {
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-slate-800/60 last:border-0">
-      <div className="flex items-center gap-2 text-sm text-slate-300">
-        <Icon className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+    <div className="flex items-center justify-between py-2.5 border-b border-[#f1f5f9] last:border-0 gap-3">
+      <div className="flex items-center gap-2.5 text-xs font-bold text-[#0f172a]">
+        <Icon className="h-4 w-4 text-[#059669] shrink-0" />
         <span>{label}</span>
       </div>
       <select
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-200 outline-none focus:border-cyan-500 min-w-[130px] text-right"
+        className="rounded-xl border border-[#cbd5e1] bg-white px-3 py-1.5 text-xs font-bold text-[#0f172a] shadow-2xs outline-none transition focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 min-w-[140px] text-right cursor-pointer"
       >
         {options.map((opt, i) => (
-          <option key={`${opt}-${i}`} value={opt}>
+          <option key={`${opt}-${i}`} value={opt} className="bg-white text-[#0f172a]">
             {opt === 0 ? "Unlimited / Off" : `${opt.toLocaleString()} ${unit}`}
           </option>
         ))}
@@ -319,22 +319,26 @@ function ToggleRow({
 }) {
   return (
     <div
-      className={`flex items-center justify-between rounded-lg px-3 py-2.5 cursor-pointer transition-colors ${enabled ? "bg-emerald-500/5 border border-emerald-500/20" : "bg-slate-900/30 border border-slate-800"}`}
+      className={`flex items-center justify-between rounded-xl px-3.5 py-2.5 cursor-pointer transition shadow-2xs ${
+        enabled
+          ? "bg-[#ecfdf5] border border-[#a7f3d0]"
+          : "bg-[#f8fafc] border border-[#e2e8f0] hover:border-[#cbd5e1]"
+      }`}
       onClick={() => onChange(!enabled)}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <Icon
-          className={`h-3.5 w-3.5 shrink-0 ${enabled ? "text-emerald-400" : "text-slate-500"}`}
+          className={`h-4 w-4 shrink-0 ${enabled ? "text-[#059669]" : "text-[#94a3b8]"}`}
         />
         <div>
-          <p className={`text-sm font-medium ${enabled ? "text-emerald-300" : "text-slate-400"}`}>
+          <p className={`text-xs font-bold ${enabled ? "text-[#065f46]" : "text-[#334155]"}`}>
             {label}
           </p>
-          {description && <p className="text-[10px] text-slate-500">{description}</p>}
+          {description && <p className="text-[10px] text-[#64748b]">{description}</p>}
         </div>
       </div>
       <div
-        className={`relative h-5 w-9 rounded-full transition-colors ${enabled ? "bg-emerald-500" : "bg-slate-700"}`}
+        className={`relative h-5 w-9 rounded-full transition-colors ${enabled ? "bg-[#059669]" : "bg-[#cbd5e1]"}`}
       >
         <span
           className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${enabled ? "translate-x-4" : ""}`}
@@ -547,15 +551,15 @@ function PlanFormDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-stretch justify-end">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 flex h-full w-full max-w-[520px] flex-col border-l border-slate-800 bg-[#08111e] shadow-2xl overflow-hidden">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={onClose} />
+      <div className="relative z-10 flex h-screen w-full max-w-[540px] flex-col border-l border-[#e2e8f0] bg-white shadow-2xl overflow-hidden text-[#0f172a]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 px-6 py-4 bg-slate-900/50">
+        <div className="flex items-center justify-between border-b border-[#e2e8f0] px-6 py-4 bg-[#f8fafc] shrink-0">
           <div>
-            <h2 className="font-display text-lg font-bold">
+            <h2 className="font-display text-lg font-bold text-[#0f172a]">
               {isEdit ? "Edit Plan" : "Create New Plan"}
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#64748b] mt-0.5 font-medium">
               {isEdit
                 ? `Editing "${initial?.slug === "pro" ? "Business" : initial?.name}"`
                 : "Configure all plan limits and features."}
@@ -563,167 +567,167 @@ function PlanFormDrawer({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 hover:text-white hover:bg-slate-800"
+            className="rounded-lg p-2 text-[#64748b] hover:text-[#0f172a] hover:bg-[#e2e8f0] transition cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Body */}
+        {/* Body Form */}
         <form
+          id="plan-drawer-form"
           onSubmit={handleSubmit}
-          className="flex flex-1 flex-col overflow-y-auto custom-scrollbar"
+          className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6"
         >
-          <div className="p-6 space-y-6">
-            {/* Basic Info */}
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                Basic Info
-              </h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-xs font-medium text-slate-400">Plan Name</label>
+          {/* Basic Info */}
+          <section>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-[11px] font-bold text-[#ea580c] shadow-2xs mb-3">
+              <Sparkles className="h-3 w-3" /> Basic Info
+            </span>
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-[#0f172a]">Plan Name</label>
+                <input
+                  required
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      name: e.target.value,
+                      slug: makeSlug(e.target.value),
+                    }))
+                  }
+                  className="mt-1.5 h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-xs font-semibold text-[#0f172a] shadow-xs outline-none transition focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15 placeholder:text-[#94a3b8]"
+                  placeholder="e.g. Starter, Growth, Business"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#0f172a]">
+                  URL Slug (auto-generated)
+                </label>
+                <div className="mt-1.5 flex h-10 items-center rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3.5 shadow-xs">
+                  <span className="text-[#94a3b8] text-xs mr-1 font-mono font-bold">/</span>
                   <input
                     required
-                    value={form.name}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        name: e.target.value,
-                        slug: makeSlug(e.target.value),
-                      }))
-                    }
-                    className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
-                    placeholder="e.g. Business Monthly"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-slate-400">
-                    URL Slug (auto-generated)
-                  </label>
-                  <div className="mt-1 flex h-10 items-center rounded-lg border border-slate-700 bg-slate-900/50 px-3">
-                    <span className="text-slate-500 text-sm mr-1">/</span>
-                    <input
-                      required
-                      value={form.slug}
-                      onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
-                      className="flex-1 bg-transparent text-sm text-slate-300 outline-none font-mono"
-                      placeholder="business-monthly"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-slate-400">
-                    Description (optional)
-                  </label>
-                  <textarea
-                    value={form.description}
-                    onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                    rows={2}
-                    className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-200 outline-none focus:border-cyan-500 resize-none"
-                    placeholder="Short description shown on pricing page..."
+                    value={form.slug}
+                    onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
+                    className="flex-1 bg-transparent text-xs font-mono font-semibold text-[#0f172a] outline-none"
+                    placeholder="growth"
                   />
                 </div>
               </div>
-            </section>
+              <div>
+                <label className="text-xs font-bold text-[#0f172a]">
+                  Description (optional)
+                </label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                  rows={2}
+                  className="mt-1.5 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 py-2 text-xs font-medium text-[#0f172a] shadow-xs outline-none transition focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15 resize-none placeholder:text-[#94a3b8]"
+                  placeholder="Short description shown on pricing page..."
+                />
+              </div>
+            </div>
+          </section>
 
-            {/* Pricing */}
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                Pricing
-              </h3>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-slate-400">
-                    Monthly Price (INR ₹)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.pricing.monthly === null ? "" : form.pricing.monthly}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        pricing: {
-                          ...f.pricing,
-                          monthly: e.target.value === "" ? null : Number(e.target.value),
-                        },
-                      }))
-                    }
-                    placeholder="Empty = N/A, 0 = Free"
-                    className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-slate-400">Yearly Price (INR ₹)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.pricing.yearly === null ? "" : form.pricing.yearly}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        pricing: {
-                          ...f.pricing,
-                          yearly: e.target.value === "" ? null : Number(e.target.value),
-                        },
-                      }))
-                    }
-                    placeholder="Empty = N/A, 0 = Free"
-                    className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-slate-400">Trial Days</label>
-                  <select
-                    value={form.trialDays}
-                    onChange={(e) => setForm((f) => ({ ...f, trialDays: Number(e.target.value) }))}
-                    className="mt-1 h-10 w-full rounded-lg border border-slate-700 bg-slate-900 px-3 text-sm text-slate-200 outline-none focus:border-cyan-500"
-                  >
-                    {TRIAL_OPTIONS.map((d) => (
-                      <option key={d} value={d}>
-                        {d === 0 ? "No trial" : `${d} days`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          {/* Pricing */}
+          <section>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-[11px] font-bold text-[#ea580c] shadow-2xs mb-3">
+              <Sparkles className="h-3 w-3" /> Pricing (INR ₹)
+            </span>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-bold text-[#0f172a]">
+                  Monthly Price (₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.pricing.monthly === null ? "" : form.pricing.monthly}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      pricing: {
+                        ...f.pricing,
+                        monthly: e.target.value === "" ? null : Number(e.target.value),
+                      },
+                    }))
+                  }
+                  placeholder="0 = Free"
+                  className="mt-1.5 h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-xs font-bold text-[#0f172a] shadow-xs outline-none transition focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#0f172a]">Yearly Price (₹)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.pricing.yearly === null ? "" : form.pricing.yearly}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      pricing: {
+                        ...f.pricing,
+                        yearly: e.target.value === "" ? null : Number(e.target.value),
+                      },
+                    }))
+                  }
+                  placeholder="0 = Free"
+                  className="mt-1.5 h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-xs font-bold text-[#0f172a] shadow-xs outline-none transition focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#0f172a]">Trial Days</label>
+                <select
+                  value={form.trialDays}
+                  onChange={(e) => setForm((f) => ({ ...f, trialDays: Number(e.target.value) }))}
+                  className="mt-1.5 h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-xs font-bold text-[#0f172a] shadow-xs outline-none transition focus:border-[#059669] focus:ring-3 focus:ring-[#059669]/15 cursor-pointer"
+                >
+                  {TRIAL_OPTIONS.map((d) => (
+                    <option key={d} value={d}>
+                      {d === 0 ? "No trial" : `${d} days`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div
+              className="mt-3.5 flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 cursor-pointer hover:border-[#cbd5e1] transition"
+              onClick={() => setForm((f) => ({ ...f, isPublic: !f.isPublic }))}
+            >
+              <div className="flex items-center gap-2.5 text-xs font-bold">
+                {form.isPublic ? (
+                  <Eye className="h-4 w-4 text-[#059669]" />
+                ) : (
+                  <EyeOff className="h-4 w-4 text-[#94a3b8]" />
+                )}
+                <span className={form.isPublic ? "text-[#059669]" : "text-[#64748b]"}>
+                  {form.isPublic
+                    ? "Publicly visible on pricing page"
+                    : "Hidden — internal use only"}
+                </span>
               </div>
               <div
-                className="mt-3 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900/30 px-3 py-2.5 cursor-pointer"
-                onClick={() => setForm((f) => ({ ...f, isPublic: !f.isPublic }))}
+                className={`relative h-5 w-9 rounded-full transition-colors ${form.isPublic ? "bg-[#059669]" : "bg-[#cbd5e1]"}`}
               >
-                <div className="flex items-center gap-2 text-sm text-slate-300">
-                  {form.isPublic ? (
-                    <Eye className="h-4 w-4 text-cyan-400" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 text-slate-500" />
-                  )}
-                  <span>
-                    {form.isPublic
-                      ? "Publicly visible on pricing page"
-                      : "Hidden — internal use only"}
-                  </span>
-                </div>
-                <div
-                  className={`relative h-5 w-9 rounded-full transition-colors ${form.isPublic ? "bg-cyan-500" : "bg-slate-700"}`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.isPublic ? "translate-x-4" : ""}`}
-                  />
-                </div>
+                <span
+                  className={`absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.isPublic ? "translate-x-4" : ""}`}
+                />
               </div>
-            </section>
+            </div>
+          </section>
 
-            {/* Limits */}
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-                Usage Limits
-              </h3>
-              <p className="text-[10px] text-slate-500 mb-3">
-                "Unlimited / Off" sets the value to 0, which the system treats as unlimited (or
-                disabled for emails/AI credits).
-              </p>
-              <div className="rounded-xl border border-slate-800 bg-slate-900/30 px-4 py-1 divide-y divide-slate-800/60">
+          {/* Limits */}
+          <section>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-[11px] font-bold text-[#ea580c] shadow-2xs mb-1">
+              <Sparkles className="h-3 w-3" /> Usage Limits
+            </span>
+            <p className="text-[11px] text-[#64748b] mb-3 mt-1">
+              "Unlimited / Off" sets the value to 0, which the system treats as unlimited (or
+              disabled for emails/AI credits).
+            </p>
+            <div className="rounded-2xl border border-[#e2e8f0] bg-white px-4 py-1 divide-y divide-[#f1f5f9] shadow-xs">
                 <SelectRow
                   label="Websites"
                   icon={Globe}
@@ -791,337 +795,360 @@ function PlanFormDrawer({
               </div>
             </section>
 
-            {/* Features */}
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
-                Feature Access
-              </h3>
-              <div className="space-y-2">
-                <ToggleRow
-                  label="Custom Domain Support"
-                  icon={Globe}
-                  enabled={form.features.customDomain}
-                  description="Allow tenants to connect their own domain"
-                  onChange={setFeat("customDomain")}
-                />
-                <ToggleRow
-                  label="White Label (Remove Branding)"
-                  icon={Zap}
-                  enabled={form.features.removeBranding}
-                  description="Hide all WebMintra branding from published sites"
-                  onChange={setFeat("removeBranding")}
-                />
-                <ToggleRow
-                  label="API Access"
-                  icon={ShieldCheck}
-                  enabled={form.features.apiAccess}
-                  description="Grant access to the developer REST API"
-                  onChange={setFeat("apiAccess")}
-                />
-                <ToggleRow
-                  label="Analytics Dashboard"
-                  icon={BarChart2}
-                  enabled={form.features.analytics}
-                  description="Built-in visitor analytics and heatmaps"
-                  onChange={setFeat("analytics")}
-                />
-                <ToggleRow
-                  label="SEO Tools"
-                  icon={Search}
-                  enabled={form.features.seoTools}
-                  description="Meta tags, sitemaps, robots.txt editor"
-                  onChange={setFeat("seoTools")}
-                />
-                <ToggleRow
-                  label="Form Submissions"
-                  icon={FileText}
-                  enabled={form.features.formSubmissions}
-                  description="Capture and export form data"
-                  onChange={setFeat("formSubmissions")}
-                />
-                <ToggleRow
-                  label="Password-Protected Pages"
-                  icon={ShieldCheck}
-                  enabled={form.features.passwordProtectedPages}
-                  description="Lock individual pages with a password"
-                  onChange={setFeat("passwordProtectedPages")}
-                />
-                <ToggleRow
-                  label="Priority Support"
-                  icon={Sparkles}
-                  enabled={form.features.prioritySupport}
-                  description="Dedicated support queue with faster SLA"
-                  onChange={setFeat("prioritySupport")}
-                />
-              </div>
-            </section>
+          {/* Platform Features */}
+          <section>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-[11px] font-bold text-[#ea580c] shadow-2xs mb-3">
+              <Sparkles className="h-3 w-3" /> Core Features
+            </span>
+            <div className="grid gap-2">
+              <ToggleRow
+                label="Custom Domains"
+                icon={Globe}
+                enabled={form.features.customDomain}
+                description="Allow tenants to connect their own .in/.com domains"
+                onChange={setFeat("customDomain")}
+              />
+              <ToggleRow
+                label="White Label"
+                icon={ShieldCheck}
+                enabled={form.features.removeBranding}
+                description="Remove WebMintra branding from published footer"
+                onChange={setFeat("removeBranding")}
+              />
+              <ToggleRow
+                label="Analytics & Insights"
+                icon={BarChart2}
+                enabled={form.features.analytics}
+                description="Visitor tracking, page views & traffic sources"
+                onChange={setFeat("analytics")}
+              />
+              <ToggleRow
+                label="SEO Tools Suite"
+                icon={Search}
+                enabled={form.features.seoTools}
+                description="Meta tags, XML sitemaps & Schema validation"
+                onChange={setFeat("seoTools")}
+              />
+              <ToggleRow
+                label="Priority 24/7 Support"
+                icon={Zap}
+                enabled={form.features.prioritySupport}
+                description="Priority WhatsApp and email ticket handling"
+                onChange={setFeat("prioritySupport")}
+              />
+              <ToggleRow
+                label="Form Submissions"
+                icon={Mail}
+                enabled={form.features.formSubmissions}
+                description="Capture visitor lead forms & instant WhatsApp alerts"
+                onChange={setFeat("formSubmissions")}
+              />
+            </div>
+          </section>
 
-            <section>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">
-                SEO Package Tier
-              </h3>
-              <p className="text-[10px] text-slate-500 mb-3">
-                Select the SEO tier for this plan. Higher tiers include all features from lower
-                tiers.
-              </p>
+          {/* SEO Tier Package */}
+          <section>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-[11px] font-bold text-[#ea580c] shadow-2xs mb-1">
+              <Sparkles className="h-3 w-3" /> SEO Package Tier
+            </span>
+            <p className="text-[11px] text-[#64748b] mb-3 mt-1">
+              Select the SEO tier for this plan. Higher tiers include all features from lower tiers.
+            </p>
 
-              {/* 3 Tier Selection Cards */}
-              <div className="grid gap-2.5">
-                {/* Basic SEO */}
-                <div
-                  onClick={() => setTier("basic")}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${seoTier === "basic"
-                    ? "border-cyan-500 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500"
-                    : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className={`grid h-7 w-7 place-items-center rounded-lg ${seoTier === "basic" ? "bg-cyan-500 text-slate-950" : "bg-slate-800 text-slate-400"}`}
-                      >
-                        <Search className="h-3.5 w-3.5" />
-                      </div>
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-200">Basic SEO</h4>
-                        <p className="text-[10px] text-slate-400">
-                          Essential search engine tags & sitemap
-                        </p>
-                      </div>
-                    </div>
+            {/* 3 Tier Selection Cards */}
+            <div className="grid gap-3">
+              {/* Basic SEO */}
+              <div
+                onClick={() => setTier("basic")}
+                className={`cursor-pointer rounded-2xl border p-4 transition-all shadow-2xs ${
+                  seoTier === "basic"
+                    ? "border-[#059669] bg-[#ecfdf5]/60 ring-2 ring-[#059669]/20 shadow-sm"
+                    : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1]"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <div
-                      className={`h-4 w-4 rounded-full border flex items-center justify-center ${seoTier === "basic" ? "border-cyan-500 bg-cyan-500 text-slate-950" : "border-slate-700"}`}
+                      className={`grid h-8 w-8 place-items-center rounded-xl font-bold ${
+                        seoTier === "basic" ? "bg-[#059669] text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                      }`}
                     >
-                      {seoTier === "basic" && <Check className="h-2.5 w-2.5 stroke-[3]" />}
+                      <Search className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-[#0f172a]">Basic SEO</h4>
+                      <p className="text-[11px] text-[#64748b]">
+                        Essential search engine tags & dynamic XML sitemap
+                      </p>
                     </div>
                   </div>
-                  <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-800/60 text-[10px] text-slate-400">
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">
-                      Page Titles & Descriptions
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Keywords</span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">XML Sitemap</span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Standard Robots</span>
+                  <div
+                    className={`h-5 w-5 rounded-full border flex items-center justify-center ${
+                      seoTier === "basic"
+                        ? "border-[#059669] bg-[#059669] text-white"
+                        : "border-[#cbd5e1]"
+                    }`}
+                  >
+                    {seoTier === "basic" && <Check className="h-3 w-3 stroke-[3]" />}
                   </div>
                 </div>
-
-                {/* Advance SEO */}
-                <div
-                  onClick={() => setTier("advance")}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${seoTier === "advance"
-                    ? "border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500"
-                    : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className={`grid h-7 w-7 place-items-center rounded-lg ${seoTier === "advance" ? "bg-emerald-500 text-slate-950" : "bg-slate-800 text-slate-400"}`}
-                      >
-                        <Sparkles className="h-3.5 w-3.5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-xs font-bold text-slate-200">Advance SEO</h4>
-                          <span className="rounded-full bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-semibold text-emerald-400">
-                            Basic + Advance
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-400">
-                          Social cards, Google Analytics, 301 redirects & presets
-                        </p>
-                      </div>
-                    </div>
-                    <div
-                      className={`h-4 w-4 rounded-full border flex items-center justify-center ${seoTier === "advance" ? "border-emerald-500 bg-emerald-500 text-slate-950" : "border-slate-700"}`}
-                    >
-                      {seoTier === "advance" && <Check className="h-2.5 w-2.5 stroke-[3]" />}
-                    </div>
-                  </div>
-                  <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-800/60 text-[10px] text-slate-400">
-                    <span className="rounded bg-emerald-500/10 text-emerald-300 px-2 py-0.5">
-                      All Basic Features
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">
-                      Open Graph & Twitter Cards
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">
-                      Google Analytics & Verification
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">301 Redirects</span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Schema Presets</span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Per-Page SEO</span>
-                  </div>
-                </div>
-
-                {/* Premium SEO */}
-                <div
-                  onClick={() => setTier("premium")}
-                  className={`cursor-pointer rounded-xl border p-3.5 transition-all ${seoTier === "premium"
-                    ? "border-amber-500 bg-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.15)] ring-1 ring-amber-500"
-                    : "border-slate-800 bg-slate-900/40 hover:border-slate-700 hover:bg-slate-900/70"
-                    }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className={`grid h-7 w-7 place-items-center rounded-lg ${seoTier === "premium" ? "bg-amber-500 text-slate-950" : "bg-slate-800 text-slate-400"}`}
-                      >
-                        <ShieldCheck className="h-3.5 w-3.5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1.5">
-                          <h4 className="text-xs font-bold text-slate-200">Premium SEO</h4>
-                          <span className="rounded-full bg-amber-500/20 px-1.5 py-0.2 text-[9px] font-semibold text-amber-400">
-                            Basic + Advance + Premium
-                          </span>
-                        </div>
-                        <p className="text-[10px] text-slate-400">
-                          Full control, Custom JSON-LD, Search Console, Custom 404 & AI
-                        </p>
-                      </div>
-                    </div>
-                    <div
-                      className={`h-4 w-4 rounded-full border flex items-center justify-center ${seoTier === "premium" ? "border-amber-500 bg-amber-500 text-slate-950" : "border-slate-700"}`}
-                    >
-                      {seoTier === "premium" && <Check className="h-2.5 w-2.5 stroke-[3]" />}
-                    </div>
-                  </div>
-                  <div className="mt-2.5 flex flex-wrap gap-1.5 pt-2.5 border-t border-slate-800/60 text-[10px] text-slate-400">
-                    <span className="rounded bg-amber-500/10 text-amber-300 px-2 py-0.5">
-                      All Basic + Advance
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Custom JSON-LD</span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">
-                      Search Console Integration
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">Custom 404 Page</span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">
-                      Sitemap Customization
-                    </span>
-                    <span className="rounded bg-slate-800/80 px-2 py-0.5">AI Recommendations</span>
-                  </div>
+                <div className="mt-3 flex flex-wrap gap-1.5 pt-3 border-t border-[#e2e8f0]/80 text-[10px]">
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Page Titles & Descriptions
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Keywords
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    XML Sitemap
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Standard Robots.txt
+                  </span>
                 </div>
               </div>
 
-              {/* Optional Advanced Override Accordion */}
-              <div className="mt-4 pt-3 border-t border-slate-800/60">
-                <button
-                  type="button"
-                  onClick={() => setShowDetailedSeo(!showDetailedSeo)}
-                  className="flex items-center justify-between w-full text-[11px] font-medium text-slate-400 hover:text-slate-200 transition"
-                >
-                  <span>
-                    Fine-tune individual capabilities ({Object.keys(SEO_FEATURES).length})
-                  </span>
-                  <span className="text-[10px] text-cyan-400">
-                    {showDetailedSeo ? "Hide details" : "Customize..."}
-                  </span>
-                </button>
-
-                {showDetailedSeo && (
-                  <div className="mt-3 space-y-4 pt-3 border-t border-slate-800">
-                    <div className="relative mb-3">
-                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                      <input
-                        value={seoSearch}
-                        onChange={(event) => setSeoSearch(event.target.value)}
-                        placeholder="Search SEO capabilities"
-                        className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900 pl-9 pr-3 text-xs text-slate-200 outline-none focus:border-cyan-500"
-                      />
+              {/* Advance SEO */}
+              <div
+                onClick={() => setTier("advance")}
+                className={`cursor-pointer rounded-2xl border p-4 transition-all shadow-2xs ${
+                  seoTier === "advance"
+                    ? "border-[#059669] bg-[#ecfdf5]/60 ring-2 ring-[#059669]/20 shadow-sm"
+                    : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1]"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`grid h-8 w-8 place-items-center rounded-xl font-bold ${
+                        seoTier === "advance"
+                          ? "bg-[#059669] text-white"
+                          : "bg-[#f1f5f9] text-[#64748b]"
+                      }`}
+                    >
+                      <Sparkles className="h-4 w-4" />
                     </div>
-                    {SEO_GROUPS.map((group) => {
-                      const features = SEO_FEATURES.filter(
-                        ([key, label]) =>
-                          group.keys.includes(key) &&
-                          label.toLowerCase().includes(seoSearch.trim().toLowerCase()),
-                      );
-                      if (!features.length) return null;
-                      return (
-                        <div key={group.label}>
-                          <p className="mb-2 text-[10px] font-semibold uppercase text-slate-500">
-                            {group.label}
-                          </p>
-                          <div className="space-y-2">
-                            {features.map(([key, label, kind]) =>
-                              kind === "boolean" ? (
-                                <ToggleRow
-                                  key={key}
-                                  label={label}
-                                  icon={Search}
-                                  enabled={form.seoFeatures[key] === true}
-                                  onChange={(value) => {
-                                    setSeo(key, value);
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <h4 className="text-xs font-bold text-[#0f172a]">Advance SEO</h4>
+                        <span className="rounded-full bg-[#dcfce7] border border-[#bbf7d0] px-2 py-0.2 text-[9px] font-bold text-[#15803d]">
+                          Basic + Advance
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#64748b]">
+                        Social cards, Google Analytics, 301 redirects & schema presets
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`h-5 w-5 rounded-full border flex items-center justify-center ${
+                      seoTier === "advance"
+                        ? "border-[#059669] bg-[#059669] text-white"
+                        : "border-[#cbd5e1]"
+                    }`}
+                  >
+                    {seoTier === "advance" && <Check className="h-3 w-3 stroke-[3]" />}
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5 pt-3 border-t border-[#e2e8f0]/80 text-[10px]">
+                  <span className="rounded-md bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 font-bold text-[#047857]">
+                    All Basic Features
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Open Graph & Twitter Cards
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Google Analytics & Verification
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    301 Redirects
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Schema Presets
+                  </span>
+                </div>
+              </div>
+
+              {/* Premium SEO */}
+              <div
+                onClick={() => setTier("premium")}
+                className={`cursor-pointer rounded-2xl border p-4 transition-all shadow-2xs ${
+                  seoTier === "premium"
+                    ? "border-[#ea580c] bg-[#fff7ed] ring-2 ring-[#ea580c]/20 shadow-sm"
+                    : "border-[#e2e8f0] bg-white hover:border-[#cbd5e1]"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`grid h-8 w-8 place-items-center rounded-xl font-bold ${
+                        seoTier === "premium"
+                          ? "bg-[#ea580c] text-white"
+                          : "bg-[#f1f5f9] text-[#64748b]"
+                      }`}
+                    >
+                      <ShieldCheck className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <h4 className="text-xs font-bold text-[#0f172a]">Premium SEO 🇮🇳</h4>
+                        <span className="rounded-full bg-[#ffedd5] border border-[#fed7aa] px-2 py-0.2 text-[9px] font-bold text-[#c2410c]">
+                          Ultimate AI Suite
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#64748b]">
+                        Custom JSON-LD, Search Console, Custom 404 & AI Recommendations
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`h-5 w-5 rounded-full border flex items-center justify-center ${
+                      seoTier === "premium"
+                        ? "border-[#ea580c] bg-[#ea580c] text-white"
+                        : "border-[#cbd5e1]"
+                    }`}
+                  >
+                    {seoTier === "premium" && <Check className="h-3 w-3 stroke-[3]" />}
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-1.5 pt-3 border-t border-[#e2e8f0]/80 text-[10px]">
+                  <span className="rounded-md bg-[#fff7ed] border border-[#fed7aa] px-2 py-0.5 font-bold text-[#ea580c]">
+                    All Basic + Advance
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Custom JSON-LD
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Search Console Integration
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    Custom 404 Page
+                  </span>
+                  <span className="rounded-md bg-[#f8fafc] border border-[#e2e8f0] px-2 py-0.5 font-bold text-[#334155]">
+                    AI Recommendations
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Optional Advanced Override Accordion */}
+            <div className="mt-4 pt-3 border-t border-[#e2e8f0]">
+              <button
+                type="button"
+                onClick={() => setShowDetailedSeo(!showDetailedSeo)}
+                className="flex items-center justify-between w-full text-xs font-bold text-[#475569] hover:text-[#0f172a] transition cursor-pointer"
+              >
+                <span>Fine-tune individual capabilities ({Object.keys(SEO_FEATURES).length})</span>
+                <span className="text-xs text-[#ea580c]">
+                  {showDetailedSeo ? "Hide details" : "Customize..."}
+                </span>
+              </button>
+
+              {showDetailedSeo && (
+                <div className="mt-3 space-y-4 pt-3 border-t border-[#e2e8f0]">
+                  <div className="relative mb-3">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
+                    <input
+                      value={seoSearch}
+                      onChange={(event) => setSeoSearch(event.target.value)}
+                      placeholder="Search SEO capabilities..."
+                      className="h-9 w-full rounded-xl border border-[#cbd5e1] bg-white pl-9 pr-3 text-xs font-medium text-[#0f172a] shadow-xs outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15"
+                    />
+                  </div>
+                  {SEO_GROUPS.map((group) => {
+                    const features = SEO_FEATURES.filter(
+                      ([key, label]) =>
+                        group.keys.includes(key) &&
+                        label.toLowerCase().includes(seoSearch.trim().toLowerCase()),
+                    );
+                    if (!features.length) return null;
+                    return (
+                      <div key={group.label}>
+                        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#ea580c]">
+                          {group.label}
+                        </p>
+                        <div className="space-y-2">
+                          {features.map(([key, label, kind]) =>
+                            kind === "boolean" ? (
+                              <ToggleRow
+                                key={key}
+                                label={label}
+                                icon={Search}
+                                enabled={form.seoFeatures[key] === true}
+                                onChange={(value) => {
+                                  setSeo(key, value);
+                                  setSeoTier("custom");
+                                }}
+                              />
+                            ) : (
+                              <label
+                                key={key}
+                                className="flex items-center justify-between gap-3 rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2 text-xs font-bold text-[#0f172a] shadow-2xs"
+                              >
+                                <span>{label}</span>
+                                <select
+                                  value={String(form.seoFeatures[key])}
+                                  onChange={(event) => {
+                                    setSeo(key, event.target.value);
                                     setSeoTier("custom");
                                   }}
-                                />
-                              ) : (
-                                <label
-                                  key={key}
-                                  className="flex items-center justify-between gap-3 rounded-lg border border-slate-800 bg-slate-900/30 px-3 py-2.5 text-sm text-slate-300"
+                                  className="min-w-32 rounded-lg border border-[#cbd5e1] bg-white px-2 py-1 text-xs font-semibold text-[#0f172a] outline-none focus:border-[#059669]"
                                 >
-                                  <span>{label}</span>
-                                  <select
-                                    value={String(form.seoFeatures[key])}
-                                    onChange={(event) => {
-                                      setSeo(key, event.target.value);
-                                      setSeoTier("custom");
-                                    }}
-                                    className="min-w-32 rounded border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-200"
-                                  >
-                                    {kind.map((value) => (
-                                      <option key={value} value={value}>
-                                        {value.replaceAll("_", " ")}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </label>
-                              ),
-                            )}
-                          </div>
+                                  {kind.map((value) => (
+                                    <option key={value} value={value}>
+                                      {value.replaceAll("_", " ")}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                            ),
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </section>
-          </div>
-
-          {/* Footer */}
-          <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-slate-800 bg-[#08111e] px-6 py-4">
-            {isEdit && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (confirm("Archive this plan? Active subscriptions are unaffected."))
-                    archiveMutation.mutate();
-                }}
-                disabled={archiveMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-lg border border-red-900/30 bg-red-900/10 px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-900/20"
-              >
-                <Archive className="h-3.5 w-3.5" /> Archive
-              </button>
-            )}
-            <div className="ml-auto flex gap-3">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-lg px-4 py-2 text-sm text-slate-400 hover:text-white"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={createMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-5 py-2 text-sm font-semibold text-emerald-950 hover:bg-emerald-400 disabled:opacity-50 transition"
-              >
-                {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                {createMutation.isPending ? "Saving…" : isEdit ? "Update Plan" : "Create Plan"}
-              </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
+          </section>
         </form>
+
+        {/* Action Footer */}
+        <div className="shrink-0 flex items-center justify-between gap-3 border-t border-[#e2e8f0] bg-[#f8fafc] px-6 py-4">
+          {isEdit ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm("Archive this plan? Active subscriptions are unaffected."))
+                  archiveMutation.mutate();
+              }}
+              disabled={archiveMutation.isPending}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100 transition cursor-pointer"
+            >
+              <Archive className="h-4 w-4" /> Archive
+            </button>
+          ) : (
+            <div />
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-[#cbd5e1] bg-white px-4 py-2 text-xs font-bold text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a] shadow-2xs transition cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="plan-drawer-form"
+              disabled={createMutation.isPending}
+              className="inline-flex items-center gap-2 rounded-xl bg-[#059669] px-6 py-2 text-xs font-bold text-white shadow-sm hover:bg-[#047857] active:scale-[0.98] disabled:opacity-50 transition cursor-pointer"
+            >
+              {createMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+              {createMutation.isPending ? "Saving…" : isEdit ? "Update Plan" : "Create Plan"}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

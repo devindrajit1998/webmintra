@@ -19,6 +19,7 @@ import {
 import { AdminDashboard as AdminDashboardView } from "@/components/AdminDashboard";
 import { TenantLayout } from "@/components/TenantDashboard";
 import { TenantOnboarding } from "@/components/TenantOnboarding";
+import { PageLoader } from "@/components/ui/SaaSSkeletons";
 import { toast } from "sonner";
 import { apiFetch, clearCsrfToken } from "@/lib/api-fetch";
 
@@ -90,7 +91,7 @@ export function WorkspacePage({ requiredRole }: { requiredRole: SessionUser["rol
     }
   }
 
-  if (!user) return <div className="min-h-screen bg-background" aria-busy="true" />;
+  if (!user) return <PageLoader text="Loading your workspace..." />;
 
   if (user.role === "admin")
     return (

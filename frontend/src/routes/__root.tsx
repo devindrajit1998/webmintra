@@ -198,10 +198,16 @@ function RootApp() {
   };
 
   const isSubdomain = !isMainPlatformHost(hostname);
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const previewSiteId = searchParams?.get("preview_site");
 
   if (isSubdomain) {
     const subdomain = hostname.split(".")[0];
     return <PublicSiteViewer subdomain={subdomain} />;
+  }
+
+  if (previewSiteId) {
+    return <PublicSiteViewer subdomain={previewSiteId} />;
   }
 
   return (

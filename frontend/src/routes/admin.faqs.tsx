@@ -19,6 +19,7 @@ import {
   Search,
 } from "lucide-react";
 import { toast } from "sonner";
+import { TableSkeleton } from "@/components/ui/SaaSSkeletons";
 
 export const Route = createFileRoute("/admin/faqs")({
   component: AdminFaqsPage,
@@ -217,9 +218,7 @@ export function AdminFaqsPage() {
       {/* FAQs Table / List */}
       <div className="rounded-2xl border border-[#e2e8f0] bg-white overflow-hidden shadow-xs">
         {isLoading ? (
-          <div className="flex items-center justify-center p-12 text-xs font-semibold text-[#64748b]">
-            Loading FAQs...
-          </div>
+          <TableSkeleton rows={6} columns={4} />
         ) : filteredFaqs.length === 0 ? (
           <div className="p-12 text-center">
             <HelpCircle className="h-10 w-10 text-[#94a3b8] mx-auto mb-3" />

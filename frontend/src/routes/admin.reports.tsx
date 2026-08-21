@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { getReport } from "@/lib/admin-api";
 import { BarChart3, TrendingUp, Users, IndianRupee, Download } from "lucide-react";
+import { StatCardsSkeleton, Shimmer } from "@/components/ui/SaaSSkeletons";
 import {
   Area,
   AreaChart,
@@ -188,8 +189,15 @@ function ReportsPage() {
       </div>
 
       {isLoading ? (
-        <div className="flex h-64 items-center justify-center rounded-xl border border-slate-800 bg-[#0b1826]">
-          <div className="text-slate-500">Generating report...</div>
+        <div className="space-y-6">
+          <StatCardsSkeleton count={4} />
+          <div className="rounded-xl border border-slate-800 bg-[#0b1826] p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <Shimmer className="h-5 w-40 rounded-md" />
+              <Shimmer className="h-4 w-24 rounded-md" />
+            </div>
+            <Shimmer className="h-[360px] w-full rounded-xl" />
+          </div>
         </div>
       ) : isError ? (
         <div className="flex h-64 items-center justify-center rounded-xl border border-rose-900/50 bg-[#0b1826] p-6 text-center text-rose-300">

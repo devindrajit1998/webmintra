@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 
 import { toast } from "sonner";
+import { TableSkeleton } from "@/components/ui/SaaSSkeletons";
 export const Route = createFileRoute("/admin/tenants/")({
   component: TenantsPage,
 });
@@ -409,29 +410,23 @@ function TenantsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-left text-sm">
-              <thead className="bg-[#f8fafc] text-[11px] font-bold uppercase tracking-wider text-[#475569] border-b border-[#e2e8f0]">
-                <tr>
-                  <th className="px-6 py-3.5 font-bold">Business / Owner</th>
-                  <th className="px-6 py-3.5 font-bold">Plan</th>
-                  <th className="px-6 py-3.5 font-bold">Status</th>
-                  <th className="px-6 py-3.5 font-bold">Joined</th>
-                  <th className="px-6 py-3.5 text-right font-bold">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#f1f5f9]">
-                {isLoading ? (
+          {isLoading ? (
+            <TableSkeleton rows={6} columns={5} />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[800px] text-left text-sm">
+                <thead className="bg-[#f8fafc] text-[11px] font-bold uppercase tracking-wider text-[#475569] border-b border-[#e2e8f0]">
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-[#64748b]">
-                      <div className="flex flex-col items-center justify-center gap-3">
-                        <Loader2 className="h-6 w-6 animate-spin text-[#059669]" />
-                        <p className="text-sm font-medium text-[#64748b]">Loading tenants...</p>
-                      </div>
-                    </td>
+                    <th className="px-6 py-3.5 font-bold">Business / Owner</th>
+                    <th className="px-6 py-3.5 font-bold">Plan</th>
+                    <th className="px-6 py-3.5 font-bold">Status</th>
+                    <th className="px-6 py-3.5 font-bold">Joined</th>
+                    <th className="px-6 py-3.5 text-right font-bold">Actions</th>
                   </tr>
-                ) : data?.tenants?.length ? (
-                  data.tenants.map((tenant: any) => (
+                </thead>
+                <tbody className="divide-y divide-[#f1f5f9]">
+                  {data?.tenants?.length ? (
+                    data.tenants.map((tenant: any) => (
                     <tr key={tenant.id} className="transition-colors hover:bg-[#f8fafc]">
                       <td className="px-6 py-4">
                         <Link
@@ -546,6 +541,7 @@ function TenantsPage() {
               </tbody>
             </table>
           </div>
+          )}
 
           {data?.pagination && data.pagination.pages > 1 && (
             <div className="flex items-center justify-between border-t border-[#e2e8f0] bg-[#fafcfb] p-4">

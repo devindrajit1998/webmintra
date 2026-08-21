@@ -48,6 +48,7 @@ export type Website = {
   name: string;
   templateName: string;
   templateId?: string;
+  customDomain?: string;
   status: "draft" | "published" | "archived";
   draftState?: Partial<EditorState>;
   publishedState?: Partial<EditorState>;
