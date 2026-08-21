@@ -136,13 +136,42 @@ function isPublicSiteEvent(request) {
     return request.method === "POST" && /^\/api\/public\/site\/[^/]+\/(form|analytics)\/?$/.test(request.path);
 }
 
+export function isOriginAllowed(rawOrigin) {
+    if (!rawOrigin) return false;
+    const origin = normalizedOrigin(rawOrigin);
+    if (!origin) return false;
+    const origins = allowedOrigins();
+    if (origins.has(origin)) return true;
+
+    try {
+        const originUrl = new URL(origin);
+        for (const allowed of origins) {
+            const allowedUrl = new URL(allowed);
+            if (
+                originUrl.protocol === allowedUrl.protocol &&
+                originUrl.port === allowedUrl.port &&
+                (originUrl.hostname === allowedUrl.hostname ||
+                 originUrl.hostname.endsWith(`.${allowedUrl.hostname}`) ||
+                 allowedUrl.hostname.endsWith(`.${originUrl.hostname}`))
+            ) {
+                return true;
+            }
+        }
+    } catch {}
+
+    return false;
+}
+
 export function requireTrustedOrigin(request, response, next) {
     if (SAFE_METHODS.has(request.method) || isPublicSiteEvent(request)) return next();
 
-    const origin = normalizedOrigin(request.get("origin"));
-    if (origin && allowedOrigins().has(origin)) return next();
+    const rawOrigin = request.get("origin") || (request.get("referer") ? new URL(request.get("referer")).origin : null);
+    
+    if (rawOrigin && isOriginAllowed(rawOrigin)) {
+        return next();
+    }
 
-    if (!origin && !isProduction()) return next();
+    if (!rawOrigin && !isProduction()) return next();
     return response.status(403).json({ message: "Request origin is not allowed." });
 }
 

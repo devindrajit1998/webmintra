@@ -388,6 +388,25 @@ export function updateBusinessInfo(business: BusinessInfo) {
   });
 }
 
+export async function uploadTenantBrandAsset(file: File, assetType: "logo" | "favicon" = "logo") {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("assetType", assetType);
+
+  const response = await apiFetch(`${API_URL}/tenants/business/upload`, {
+    method: "POST",
+    credentials: "include",
+    body: formData,
+  });
+
+  const payload = (await response.json().catch(() => ({
+    message: "Unable to upload brand asset.",
+  }))) as { url: string; fileId: string; message?: string };
+
+  if (!response.ok) throw new Error(payload.message || "Unable to upload brand asset.");
+  return payload;
+}
+
 export type AccountDeletionRequest = {
   id: string;
   status: "pending" | "approved" | "rejected" | "cancelled";

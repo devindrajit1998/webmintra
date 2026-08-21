@@ -220,7 +220,11 @@ export function OnboardingWizard() {
   const { data: settings = {} } = useQuery({
     queryKey: ["public-settings"],
     queryFn: getPublicSettings,
+    staleTime: 1000 * 60 * 5,
   });
+
+  const logoUrl = settings["brand.logoUrl"] || "";
+  const siteName = settings["brand.siteName"] || "webmintra";
 
   return (
     <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern font-sans text-[#0f172a] flex flex-col lg:flex-row">
@@ -398,9 +402,30 @@ function BusinessStep({
   business: BusinessInfo;
   onChange: (b: BusinessInfo) => void;
 }) {
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const set =
     (field: keyof BusinessInfo) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange({ ...business, [field]: e.target.value });
+
+  async function handleLogoUpload(file: File) {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Logo file size must be less than 2MB.");
+      return;
+    }
+    try {
+      setUploadingLogo(true);
+      const res = await uploadTenantBrandAsset(file, "logo");
+      onChange({ ...business, logoUrl: res.url });
+      toast.success("Business logo uploaded successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload business logo.");
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
 
   return (
     <div className="w-full max-w-3xl">
@@ -426,6 +451,69 @@ function BusinessStep({
               className={inputCls}
             />
           </Field>
+
+          {/* Logo Upload Field */}
+          <div>
+            <label className="mb-1.5 flex items-center justify-between text-xs font-bold text-[#0f172a]">
+              <span>Business Logo</span>
+              <span className="text-[11px] font-normal text-[#64748b]">Optional</span>
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/svg+xml"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleLogoUpload(file);
+              }}
+            />
+            {business.logoUrl ? (
+              <div className="flex h-11 items-center gap-3 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] px-3">
+                <img
+                  src={business.logoUrl}
+                  alt="Business Logo Preview"
+                  className="h-8 w-8 rounded-lg object-contain bg-white border border-[#cbd5e1]"
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-[#065f46] truncate">Logo Uploaded</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingLogo}
+                  className="rounded-lg border border-[#a7f3d0] bg-white px-2 py-1 text-[11px] font-bold text-[#065f46] hover:bg-[#d1fae5] transition"
+                >
+                  Change
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...business, logoUrl: "" })}
+                  className="rounded-lg p-1 text-[#065f46] hover:bg-rose-50 hover:text-rose-600 transition"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-11 items-center justify-center gap-2 rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] hover:border-[#059669] hover:bg-[#ecfdf5]/40 hover:text-[#059669] cursor-pointer transition shadow-2xs"
+              >
+                {uploadingLogo ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin text-[#059669]" />
+                    <span>Uploading logo...</span>
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="h-4 w-4 text-[#059669]" />
+                    <span>Upload Logo (PNG, JPG, WebP)</span>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           <Field label="Business email" icon={<Mail className="h-4 w-4" />}>
             <input
               type="email"

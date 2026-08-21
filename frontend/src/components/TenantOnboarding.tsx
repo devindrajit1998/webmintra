@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Check, ChevronRight, Phone, Search, Sparkles } from "lucide-react";
+import { Check, ChevronRight, Phone, Search, Sparkles, UploadCloud, Loader2, Image as ImageIcon, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getPublicSettings } from "@/lib/public-api";
+import { BrandLogo } from "@/components/BrandLogo";
+import { toast } from "sonner";
 import {
   completeOnboarding,
   getTemplates,
   phoneVerificationRequest,
   type CatalogTemplate,
   verifyPhone,
+  uploadTenantBrandAsset,
 } from "@/lib/auth-api";
 
 export function TenantOnboarding() {
@@ -28,6 +33,17 @@ export function TenantOnboarding() {
   const [category, setCategory] = useState("All");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: settings = {} } = useQuery({
+    queryKey: ["publicSettings"],
+    queryFn: getPublicSettings,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const logoUrl = settings["brand.logoUrl"] || "";
+  const siteName = settings["brand.siteName"] || "webmintra";
 
   useEffect(() => {
     void getTemplates()
@@ -40,6 +56,24 @@ export function TenantOnboarding() {
       (category === "All" || template.category === category) &&
       `${template.name} ${template.category}`.toLowerCase().includes(query.toLowerCase()),
   );
+
+  async function handleLogoUpload(file: File) {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Logo file size must be less than 2MB.");
+      return;
+    }
+    try {
+      setUploadingLogo(true);
+      const res = await uploadTenantBrandAsset(file, "logo");
+      setBusiness((prev) => ({ ...prev, logoUrl: res.url }));
+      toast.success("Business logo uploaded successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to upload business logo.");
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
 
   async function sendPhoneCode() {
     try {
@@ -83,13 +117,7 @@ export function TenantOnboarding() {
       <section className="mx-auto w-full max-w-4xl">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-base">
-              W
-            </div>
-            <div>
-              <p className="font-extrabold text-lg text-[#0f172a] leading-none lowercase">webmintra</p>
-              <p className="text-xs text-[#64748b] font-medium mt-0.5">Set up your Indian business website</p>
-            </div>
+            <BrandLogo logoUrl={logoUrl} siteName={siteName} size="md" />
           </div>
 
           <span className="rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-3 py-1 text-[11px] font-bold text-[#059669] hidden sm:inline-flex items-center gap-1">
@@ -118,22 +146,18 @@ export function TenantOnboarding() {
             <span className="inline-block rounded-full bg-[#fff7ed] border border-[#fed7aa] px-3 py-0.5 text-[11px] font-bold text-[#c2410c]">
               STEP {step} OF 5
             </span>
+            {notice ? <p className="text-xs font-bold text-rose-600">{notice}</p> : null}
           </div>
-
-          {notice ? (
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3.5 text-xs font-medium text-amber-800">
-              {notice}
-            </p>
-          ) : null}
 
           {step === 1 ? (
             <Step
-              title="Verify your Indian mobile number"
-              description="We use phone verification to protect your business workspace and route customer WhatsApp leads."
+              title="Verify your WhatsApp or mobile number"
+              description="Get lead submissions, payment updates, and domain alerts instantly."
             >
               <label className="block text-xs font-bold text-[#0f172a]">
-                Mobile number with +91 country code
+                Mobile number
                 <input
+                  type="tel"
                   value={phone}
                   onChange={(event) => setPhone(event.target.value)}
                   placeholder="+91 98765 43210"
@@ -184,33 +208,129 @@ export function TenantOnboarding() {
               description="These details appear on your website header, WhatsApp lead alerts, and Google Maps card."
             >
               <div className="grid gap-4 sm:grid-cols-2">
-                {Object.entries(business).map(([key, value]) => (
-                  <label
-                    className={`block text-xs font-bold text-[#0f172a] ${key === "description" || key === "address" ? "sm:col-span-2" : ""}`}
-                    key={key}
-                  >
-                    {key.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase())}
-                    <input
-                      value={value}
-                      onChange={(event) =>
-                        setBusiness((current) => ({ ...current, [key]: event.target.value }))
-                      }
-                      placeholder={
-                        key === "name"
-                          ? "e.g. Sharma Dental Clinic"
-                          : key === "address"
-                            ? "e.g. Greater Kailash 1, New Delhi"
-                            : ""
-                      }
-                      className="mt-1.5 h-10 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-1 focus:ring-[#059669] shadow-2xs"
-                    />
-                  </label>
-                ))}
+                {/* Business Name */}
+                <label className="block text-xs font-bold text-[#0f172a]">
+                  Business Name *
+                  <input
+                    required
+                    value={business.name}
+                    onChange={(e) => setBusiness((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g. Aura Dental Clinic"
+                    className="mt-1.5 h-11 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 shadow-2xs"
+                  />
+                </label>
+
+                {/* Business Logo Upload */}
+                <div className="block text-xs font-bold text-[#0f172a]">
+                  <span className="block mb-1.5">Business Logo</span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleLogoUpload(file);
+                    }}
+                  />
+                  {business.logoUrl ? (
+                    <div className="flex items-center gap-3 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-2">
+                      <img
+                        src={business.logoUrl}
+                        alt="Business Logo Preview"
+                        className="h-9 w-9 rounded-lg object-contain bg-white border border-[#e2e8f0]"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-bold text-[#065f46] truncate">Logo Uploaded</p>
+                        <p className="text-[10px] text-[#059669] truncate">Ready for your website header</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingLogo}
+                        className="rounded-lg border border-[#a7f3d0] bg-white px-2.5 py-1 text-[11px] font-bold text-[#065f46] hover:bg-[#d1fae5] transition"
+                      >
+                        Change
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBusiness((prev) => ({ ...prev, logoUrl: "" }))}
+                        className="rounded-lg p-1 text-[#065f46] hover:bg-rose-50 hover:text-rose-600 transition"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex h-11 items-center justify-center gap-2 rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#64748b] hover:border-[#059669] hover:bg-[#ecfdf5]/40 hover:text-[#059669] cursor-pointer transition shadow-2xs"
+                    >
+                      {uploadingLogo ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin text-[#059669]" />
+                          <span>Uploading logo...</span>
+                        </>
+                      ) : (
+                        <>
+                          <UploadCloud className="h-4 w-4 text-[#059669]" />
+                          <span>Upload Logo (PNG, JPG, WebP)</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Address */}
+                <label className="block text-xs font-bold text-[#0f172a] sm:col-span-2">
+                  Address / City
+                  <input
+                    value={business.address}
+                    onChange={(e) => setBusiness((prev) => ({ ...prev, address: e.target.value }))}
+                    placeholder="e.g. Greater Kailash 1, New Delhi"
+                    className="mt-1.5 h-11 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 shadow-2xs"
+                  />
+                </label>
+
+                {/* Email */}
+                <label className="block text-xs font-bold text-[#0f172a]">
+                  Business Email
+                  <input
+                    type="email"
+                    value={business.email}
+                    onChange={(e) => setBusiness((prev) => ({ ...prev, email: e.target.value }))}
+                    placeholder="contact@auradental.in"
+                    className="mt-1.5 h-11 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 shadow-2xs"
+                  />
+                </label>
+
+                {/* Phone */}
+                <label className="block text-xs font-bold text-[#0f172a]">
+                  Phone (WhatsApp)
+                  <input
+                    type="tel"
+                    value={business.phone}
+                    onChange={(e) => setBusiness((prev) => ({ ...prev, phone: e.target.value }))}
+                    placeholder="+91 98765 43210"
+                    className="mt-1.5 h-11 w-full rounded-xl border border-[#cbd5e1] bg-white px-3.5 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 shadow-2xs"
+                  />
+                </label>
+
+                {/* Description */}
+                <label className="block text-xs font-bold text-[#0f172a] sm:col-span-2">
+                  Description / Tagline
+                  <textarea
+                    rows={2}
+                    value={business.description}
+                    onChange={(e) => setBusiness((prev) => ({ ...prev, description: e.target.value }))}
+                    placeholder="Brief description of your business or services..."
+                    className="mt-1.5 w-full rounded-xl border border-[#cbd5e1] bg-white p-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 shadow-2xs resize-none"
+                  />
+                </label>
               </div>
               <button
-                disabled={busy || !business.name}
+                disabled={busy || !business.name || uploadingLogo}
                 onClick={() => setStep(4)}
-                className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-sm font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-60 cursor-pointer"
+                className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#059669] px-6 text-sm font-bold text-white shadow-sm transition hover:bg-[#047857] active:scale-[0.98] disabled:opacity-60 cursor-pointer"
               >
                 Continue to Plan <ChevronRight className="h-4 w-4" />
               </button>
