@@ -32,5 +32,8 @@ backend/.env
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+
+# WhatsApp session auth
+.whatsapp-auth/
+backend/.whatsapp-auth/

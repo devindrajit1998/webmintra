@@ -56,6 +56,7 @@ import adminTestimonialsRouter from "./routes/admin/testimonials.js";
 import adminFaqsRouter from "./routes/admin/faqs.js";
 import adminUploadRouter from "./routes/admin/upload.js";
 import { initCronJobs } from "./services/cron.js";
+import { initWhatsAppClient } from "./services/whatsapp.js";
 
 // ── Environment Validation ──────────────────────────────────────
 const required = ["MONGODB_URI", "JWT_SECRET", "OTP_SECRET"];
@@ -347,7 +348,11 @@ const port = Number(process.env.PORT ?? 5000);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(port, () => console.log(`API listening on ${port}`));
+    app.listen(port, () => {
+      // Initialize Free Self-Hosted WhatsApp Engine (Baileys)
+      initWhatsAppClient().catch((err) => console.error("[WhatsApp] Startup error:", err.message));
+      console.log(`Backend server listening on port ${port}`);
+    });
     initCronJobs();
   })
   .catch((error) => {

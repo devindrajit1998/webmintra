@@ -1,54 +1,164 @@
 /**
- * WhatsApp Notification Service
+ * Free Self-Hosted Node.js WhatsApp Service (Powered by Baileys)
  *
- * Sends a WhatsApp message to a phone number via a configured provider.
- * Supports WATI (popular in India) via its REST API.
- *
- * Required env vars (all optional — if missing, silently skipped):
- *   WATI_API_ENDPOINT  e.g. https://live-server.wati.io
- *   WATI_API_TOKEN     Bearer token from WATI dashboard
- *
- * How to get these:
- *   1. Sign up at wati.io
- *   2. Go to Settings → API → copy your API endpoint and token
+ * - Runs 100% locally on your Node server (zero subscription / no per-message fees).
+ * - Saves session auth in backend/.whatsapp-auth/ so pairing is only needed once.
+ * - Auto-reconnects on server restart or network drop.
+ * - Prints QR in terminal on first run or when session is disconnected.
  */
+
+import { makeWASocket, DisconnectReason, useMultiFileAuthState, fetchLatestBaileysVersion } from "@whiskeysockets/baileys";
+import path from "node:path";
+import fs from "node:fs";
+import pino from "pino";
+
+let sock = null;
+let isConnecting = false;
+let qrCodeString = null;
+let connectionStatus = "disconnected"; // 'disconnected' | 'connecting' | 'connected'
+
+const AUTH_DIR = path.resolve(process.cwd(), ".whatsapp-auth");
+
+export function getWhatsAppStatus() {
+  return {
+    status: connectionStatus,
+    hasQr: Boolean(qrCodeString),
+    qr: qrCodeString,
+    isAuthenticated: connectionStatus === "connected",
+  };
+}
+
+export async function initWhatsAppClient() {
+  if (sock || isConnecting) return;
+  isConnecting = true;
+  connectionStatus = "connecting";
+
+  try {
+    if (!fs.existsSync(AUTH_DIR)) {
+      fs.mkdirSync(AUTH_DIR, { recursive: true });
+    }
+
+    const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
+    const { version } = await fetchLatestBaileysVersion().catch(() => ({ version: [2, 3000, 1015901307] }));
+
+    sock = makeWASocket({
+      version,
+      auth: state,
+      printQRInTerminal: true,
+      logger: pino({ level: "silent" }), // keep server console clean
+      browser: ["WebMintra Platform", "Chrome", "1.0.0"],
+      syncFullHistory: false,
+    });
+
+    sock.ev.on("creds.update", saveCreds);
+
+    sock.ev.on("connection.update", async (update) => {
+      const { connection, lastDisconnect, qr } = update;
+
+      if (qr) {
+        qrCodeString = qr;
+        connectionStatus = "waiting_for_qr";
+        console.log("\n=======================================================");
+        console.log("👉 [WebMintra WhatsApp] Scan QR code above to link device");
+        console.log("=======================================================\n");
+      }
+
+      if (connection === "close") {
+        const statusCode = lastDisconnect?.error?.output?.statusCode;
+        const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+        connectionStatus = "disconnected";
+        sock = null;
+        isConnecting = false;
+        qrCodeString = null;
+
+        console.log(`[WhatsApp] Connection closed. Reason code: ${statusCode}. Reconnecting: ${shouldReconnect}`);
+
+        if (shouldReconnect) {
+          setTimeout(() => {
+            initWhatsAppClient().catch((err) => console.error("[WhatsApp] Reconnect failed:", err.message));
+          }, 5000);
+        } else {
+          console.log("[WhatsApp] Logged out. Session data deleted. Need new QR scan.");
+          try {
+            fs.rmSync(AUTH_DIR, { recursive: true, force: true });
+          } catch {}
+        }
+      } else if (connection === "open") {
+        connectionStatus = "connected";
+        qrCodeString = null;
+        isConnecting = false;
+        console.log("✅ [WebMintra WhatsApp] Connected and ready to send lead alerts!");
+      }
+    });
+  } catch (error) {
+    isConnecting = false;
+    connectionStatus = "disconnected";
+    console.warn("[WhatsApp] Init failed (will retry):", error?.message || error);
+  }
+}
 
 /**
- * Sends a WhatsApp text message to a phone number.
- * Fails silently — never throws, so it never breaks the caller's flow.
+ * Format phone number to WhatsApp JID format: <country_code><number>@s.whatsapp.net
+ */
+function formatWhatsAppJid(rawPhone) {
+  if (!rawPhone || typeof rawPhone !== "string") return null;
+  let digits = rawPhone.replace(/\D/g, "");
+  
+  // Default to 91 (India) if 10-digit Indian number is provided without country code
+  if (digits.length === 10) {
+    digits = `91${digits}`;
+  } else if (digits.startsWith("0") && digits.length === 11) {
+    digits = `91${digits.slice(1)}`;
+  }
+
+  if (digits.length < 10 || digits.length > 15) return null;
+  return `${digits}@s.whatsapp.net`;
+}
+
+/**
+ * Sends a WhatsApp notification message.
+ * Supports:
+ * 1. Self-hosted Baileys client (primary free zero-cost engine)
+ * 2. Fallback to WATI REST API if configured
  *
- * @param {object} options
- * @param {string} options.phone  - Phone number with country code, e.g. "+919876543210"
- * @param {string} options.message - The message text to send
+ * Fails gracefully and never breaks lead flow.
  */
 export async function sendWhatsAppNotification({ phone, message }) {
-    const endpoint = process.env.WATI_API_ENDPOINT;
-    const token = process.env.WATI_API_TOKEN;
+  if (!phone || !message) return;
 
-    if (!endpoint || !token) return; // Not configured — skip silently
-
-    // Normalize phone: strip non-digits except leading +
-    const normalizedPhone = phone.replace(/[^\d+]/g, "").replace(/^\+/, "");
-    if (!normalizedPhone || normalizedPhone.length < 7) return;
-
+  // 1. Try free self-hosted Baileys client first
+  if (sock && connectionStatus === "connected") {
     try {
-        const url = `${endpoint.replace(/\/$/, "")}/api/v1/sendSessionMessage/${encodeURIComponent(normalizedPhone)}`;
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify({ messageText: message }),
-            signal: AbortSignal.timeout(8000), // 8 second timeout
-        });
-
-        if (!response.ok) {
-            const body = await response.text().catch(() => "");
-            console.warn(`[WhatsApp] WATI API returned ${response.status}: ${body.slice(0, 200)}`);
-        }
-    } catch (error) {
-        // Fail silently — a WhatsApp notification failure must never break form submissions
-        console.warn("[WhatsApp] Notification failed (non-critical):", error?.message || error);
+      const jid = formatWhatsAppJid(phone);
+      if (jid) {
+        await sock.sendMessage(jid, { text: message });
+        console.log(`[WhatsApp] Alert sent successfully via Baileys to ${jid}`);
+        return;
+      }
+    } catch (err) {
+      console.warn("[WhatsApp] Baileys dispatch failed:", err?.message || err);
     }
+  }
+
+  // 2. Optional Fallback: WATI API if environment variables are provided
+  const watiEndpoint = process.env.WATI_API_ENDPOINT;
+  const watiToken = process.env.WATI_API_TOKEN;
+
+  if (watiEndpoint && watiToken) {
+    try {
+      const normalizedPhone = phone.replace(/[^\d+]/g, "").replace(/^\+/, "");
+      const url = `${watiEndpoint.replace(/\/$/, "")}/api/v1/sendSessionMessage/${encodeURIComponent(normalizedPhone)}`;
+      await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${watiToken}`,
+        },
+        body: JSON.stringify({ messageText: message }),
+        signal: AbortSignal.timeout(8000),
+      });
+    } catch (err) {
+      console.warn("[WhatsApp] WATI fallback failed:", err?.message || err);
+    }
+  }
 }
