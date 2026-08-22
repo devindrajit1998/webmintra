@@ -277,7 +277,11 @@ function SubscriptionPage() {
           <ul className="mt-5 space-y-3">
             {(subscription.highlights.length
               ? subscription.highlights
-              : ["Full access to WebMintra website builder", "Free SSL certificate & CDN", "Responsive mobile layouts"]
+              : [
+                  "Full access to WebMintra website builder",
+                  "Free SSL certificate & CDN",
+                  "Responsive mobile layouts",
+                ]
             ).map((highlight, index) => (
               <li
                 key={`${highlight}-${index}`}
@@ -296,9 +300,12 @@ function SubscriptionPage() {
         <div className="flex items-start gap-3.5">
           <CircleHelp className="mt-0.5 h-5 w-5 shrink-0 text-[#c2410c]" />
           <div>
-            <h2 className="text-sm font-extrabold text-[#7c2d12]">Need a custom enterprise plan?</h2>
+            <h2 className="text-sm font-extrabold text-[#7c2d12]">
+              Need a custom enterprise plan?
+            </h2>
             <p className="mt-0.5 text-xs text-[#9a3412]">
-              Contact our dedicated team to adjust storage, custom domains, or setup multi-brand workspaces.
+              Contact our dedicated team to adjust storage, custom domains, or setup multi-brand
+              workspaces.
             </p>
           </div>
         </div>
@@ -451,7 +458,9 @@ function SubscriptionConfirmation({
           <strong className="text-[#0f172a]">{interval}</strong> billing cycle.
         </p>
         <div className="mt-5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
-          <p className="text-[11px] font-bold uppercase tracking-wide text-[#64748b]">New recurring price</p>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-[#64748b]">
+            New recurring price
+          </p>
           <p className="mt-1 text-2xl font-black text-[#0f172a]">
             {discountInfo && !discountInfo.error ? (
               <span className="line-through text-slate-400 text-sm mr-2 font-semibold">

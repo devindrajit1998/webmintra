@@ -96,7 +96,11 @@ export function SectionTitle({
       <h3 className="font-display text-[11px] font-extrabold tracking-[0.12em] text-foreground uppercase">
         {children}
       </h3>
-      {hint ? <span className="truncate rounded-md bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">{hint}</span> : null}
+      {hint ? (
+        <span className="truncate rounded-md bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+          {hint}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -121,9 +125,7 @@ export function TextInput({
   return (
     <label className="block space-y-1.5">
       {label ? (
-        <span className="block text-[11px] font-bold text-foreground/80">
-          {label}
-        </span>
+        <span className="block text-[11px] font-bold text-foreground/80">{label}</span>
       ) : null}
       {multiline ? (
         <textarea

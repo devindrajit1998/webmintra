@@ -202,10 +202,11 @@ function CouponsPage() {
                     </div>
                   </div>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${status === "active"
-                      ? "border border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
-                      : "border border-slate-200 bg-slate-100 text-slate-600"
-                      }`}
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
+                      status === "active"
+                        ? "border border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
+                        : "border border-slate-200 bg-slate-100 text-slate-600"
+                    }`}
                   >
                     {status}
                   </span>

@@ -55,12 +55,17 @@ export function PublicHeader({ isLandingPage = false }: PublicHeaderProps) {
                 <Link
                   to="/templates"
                   className={`landing-nav-link ${
-                    currentPath.startsWith("/templates") ? "text-[#0f172a] font-bold" : "text-[#475569]"
+                    currentPath.startsWith("/templates")
+                      ? "text-[#0f172a] font-bold"
+                      : "text-[#475569]"
                   }`}
                 >
                   Templates
                 </Link>
-                <a href="#solutions" className="landing-nav-link text-[#475569] hover:text-[#0f172a]">
+                <a
+                  href="#solutions"
+                  className="landing-nav-link text-[#475569] hover:text-[#0f172a]"
+                >
                   Solutions
                 </a>
                 <a href="#pricing" className="landing-nav-link text-[#475569] hover:text-[#0f172a]">
@@ -104,7 +109,9 @@ export function PublicHeader({ isLandingPage = false }: PublicHeaderProps) {
                 <Link
                   to="/templates"
                   className={`landing-nav-link ${
-                    currentPath.startsWith("/templates") ? "text-[#0f172a] font-bold" : "text-[#475569]"
+                    currentPath.startsWith("/templates")
+                      ? "text-[#0f172a] font-bold"
+                      : "text-[#475569]"
                   }`}
                 >
                   Templates

@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { getSubscriptions, updateSubscription, cancelSubscription, getPlans } from "@/lib/admin-api";
+import {
+  getSubscriptions,
+  updateSubscription,
+  cancelSubscription,
+  getPlans,
+} from "@/lib/admin-api";
 import { TableSkeleton } from "@/components/ui/SaaSSkeletons";
 import {
   Loader2,
@@ -33,7 +38,14 @@ type SubscriptionRow = {
   notes?: string;
   autoRenew?: boolean;
   tenant?: { id?: string; businessName?: string; name?: string; email?: string };
-  plan?: { id?: string; slug?: string; name?: string; price?: number; interval?: string; currency?: string };
+  plan?: {
+    id?: string;
+    slug?: string;
+    name?: string;
+    price?: number;
+    interval?: string;
+    currency?: string;
+  };
 };
 
 function SubscriptionsPage() {
@@ -108,10 +120,14 @@ function SubscriptionsPage() {
                       </td>
                       <td className="px-6 py-4">
                         <p className="font-bold text-[#0f172a]">
-                          {sub.plan?.slug === "pro" ? "Business" : sub.plan?.name || "Standard Plan"}
+                          {sub.plan?.slug === "pro"
+                            ? "Business"
+                            : sub.plan?.name || "Standard Plan"}
                         </p>
                         <p className="text-xs font-semibold text-[#059669]">
-                          {sub.plan?.price !== undefined ? `₹${sub.plan.price.toLocaleString("en-IN")}` : "Free"}
+                          {sub.plan?.price !== undefined
+                            ? `₹${sub.plan.price.toLocaleString("en-IN")}`
+                            : "Free"}
                           {sub.plan?.interval ? ` / ${sub.plan.interval}` : ""}
                         </p>
                       </td>
@@ -295,7 +311,9 @@ function ManageSubscriptionDrawer({
               </div>
               <div className="text-right">
                 <span className="text-lg font-extrabold text-[#059669]">
-                  {sub.plan?.price !== undefined ? `₹${sub.plan.price.toLocaleString("en-IN")}` : "Free"}
+                  {sub.plan?.price !== undefined
+                    ? `₹${sub.plan.price.toLocaleString("en-IN")}`
+                    : "Free"}
                 </span>
               </div>
             </div>
@@ -318,7 +336,9 @@ function ManageSubscriptionDrawer({
 
           {/* Status Changer */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-[#0f172a]">Subscription Lifecycle Status</label>
+            <label className="text-xs font-bold text-[#0f172a]">
+              Subscription Lifecycle Status
+            </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
@@ -380,7 +400,11 @@ function ManageSubscriptionDrawer({
               type="button"
               disabled={cancelMutation.isPending || sub.status === "cancelled"}
               onClick={() => {
-                if (confirm(`Are you sure you want to cancel the subscription for ${sub.tenant?.name || "this tenant"}?`)) {
+                if (
+                  confirm(
+                    `Are you sure you want to cancel the subscription for ${sub.tenant?.name || "this tenant"}?`,
+                  )
+                ) {
                   cancelMutation.mutate(cancelReason);
                 }
               }}

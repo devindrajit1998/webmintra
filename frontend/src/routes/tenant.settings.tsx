@@ -131,7 +131,8 @@ function TenantSettingsPage() {
             Account Settings
           </h1>
           <p className="mt-1 text-sm text-[#64748b]">
-            Manage your personal profile details, authentication credentials, and security preferences.
+            Manage your personal profile details, authentication credentials, and security
+            preferences.
           </p>
         </div>
       </section>
@@ -307,7 +308,9 @@ function TenantSettingsPage() {
                   : "Submitting a request does not immediately delete your account. An administrator will review it before any permanent deletion occurs."}
               </p>
               {deletionRequest?.reason ? (
-                <p className="mt-2 text-xs font-semibold text-[#64748b]">Reason: {deletionRequest.reason}</p>
+                <p className="mt-2 text-xs font-semibold text-[#64748b]">
+                  Reason: {deletionRequest.reason}
+                </p>
               ) : null}
             </div>
 

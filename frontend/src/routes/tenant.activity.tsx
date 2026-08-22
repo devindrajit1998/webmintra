@@ -63,7 +63,8 @@ function ActivityPage() {
               Activity History
             </h1>
             <p className="mt-1 text-sm text-[#64748b]">
-              Review account changes, team member actions, and events performed across your workspace.
+              Review account changes, team member actions, and events performed across your
+              workspace.
             </p>
           </div>
           <button
@@ -168,7 +169,9 @@ function ActivityPage() {
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 text-xs leading-relaxed text-[#64748b]">{log.description}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-[#64748b]">
+                      {log.description}
+                    </p>
                   </div>
                   <time
                     title={format(new Date(log.createdAt), "PPpp")}

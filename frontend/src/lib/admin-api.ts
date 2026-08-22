@@ -115,7 +115,10 @@ export const getSubscriptions = (params?: { page?: number; limit?: number; statu
 export const updateSubscription = (id: string, data: any) =>
   adminRequest<any>(`/subscriptions/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 export const cancelSubscription = (id: string, reason?: string) =>
-  adminRequest<any>(`/subscriptions/${id}/cancel`, { method: "POST", body: JSON.stringify({ reason }) });
+  adminRequest<any>(`/subscriptions/${id}/cancel`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
 
 // ── Plans ─────────────────────────────────────────────────────
 export const getPlans = (params?: { page?: number; limit?: number; status?: string }) =>
@@ -188,11 +191,9 @@ export const getBlogPosts = (params?: {
   featured?: boolean;
 }) => adminRequest<{ posts: any[]; pagination: any }>(`/blog/posts${buildQuery(params)}`);
 
-export const getBlogPost = (id: string) =>
-  adminRequest<{ post: any }>(`/blog/posts/${id}`);
+export const getBlogPost = (id: string) => adminRequest<{ post: any }>(`/blog/posts/${id}`);
 
-export const getBlogCategories = () =>
-  adminRequest<{ categories: any[] }>("/blog/categories");
+export const getBlogCategories = () => adminRequest<{ categories: any[] }>("/blog/categories");
 
 export const createBlogCategory = (data: {
   name: string;
@@ -213,7 +214,7 @@ export const updateBlogCategory = (
     description?: string;
     sortOrder?: number;
     isActive?: boolean;
-  }
+  },
 ) =>
   adminRequest<{ category: any }>(`/blog/categories/${id}`, {
     method: "PATCH",

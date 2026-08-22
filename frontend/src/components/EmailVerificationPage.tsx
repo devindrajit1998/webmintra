@@ -118,16 +118,9 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
     <div className="landing-page min-h-screen overflow-x-hidden tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
       <header className="landing-nav-glass fixed top-0 z-50 w-full">
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 transition hover:opacity-90"
-          >
+          <Link to="/" className="flex items-center gap-2.5 transition hover:opacity-90">
             {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt={siteName}
-                className="h-8 w-auto object-contain"
-              />
+              <img src={logoUrl} alt={siteName} className="h-8 w-auto object-contain" />
             ) : (
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#ea580c] to-[#059669] text-white shadow-xs font-bold text-sm">
                 W
@@ -141,7 +134,8 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
             to="/"
             className="inline-flex items-center gap-2 rounded-lg border border-[#cbd5e1] bg-white px-3.5 py-1.5 text-xs font-bold text-[#475569] shadow-2xs transition hover:bg-[#f8fafc] hover:text-[#0f172a]"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Back to home</span>
+            <ArrowLeft className="h-3.5 w-3.5" />{" "}
+            <span className="hidden sm:inline">Back to home</span>
           </Link>
         </div>
       </header>
@@ -158,7 +152,8 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
               <span className="text-[#059669]">always in your control.</span>
             </h2>
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-[#475569]">
-              Edit content, preview every change, and publish when you are ready without waiting for a developer.
+              Edit content, preview every change, and publish when you are ready without waiting for
+              a developer.
             </p>
             <div className="tiranga-border-top mt-8 max-w-xl overflow-hidden rounded-2xl border border-[#cbd5e1] bg-white p-2.5 shadow-xl">
               <div className="flex h-10 items-center justify-between border-b border-[#e2e8f0] px-3">
@@ -187,11 +182,13 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
               </div>
             </div>
             <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-xs font-bold text-[#475569]">
-              {["✓ No coding", "✓ 14-day free trial", "✓ 100% Data Stored in India 🇮🇳"].map((item) => (
-                <li key={item} className="flex items-center gap-1">
-                  {item}
-                </li>
-              ))}
+              {["✓ No coding", "✓ 14-day free trial", "✓ 100% Data Stored in India 🇮🇳"].map(
+                (item) => (
+                  <li key={item} className="flex items-center gap-1">
+                    {item}
+                  </li>
+                ),
+              )}
             </ul>
           </aside>
 
@@ -207,7 +204,10 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
             <h1 id={titleId} className="mt-1.5 text-2xl sm:text-3xl font-extrabold text-[#0f172a]">
               {text.title}
             </h1>
-            <p id={descriptionId} className="mt-2 text-xs sm:text-sm leading-relaxed text-[#64748b]">
+            <p
+              id={descriptionId}
+              className="mt-2 text-xs sm:text-sm leading-relaxed text-[#64748b]"
+            >
               {text.description}
             </p>
             {notice && (
@@ -271,7 +271,10 @@ export function EmailVerificationPage({ purpose }: { purpose: VerificationPurpos
                         }}
                         onPaste={(e) => {
                           e.preventDefault();
-                          const pasted = e.clipboardData.getData("text").replace(/[^0-9]/g, "").slice(0, 6);
+                          const pasted = e.clipboardData
+                            .getData("text")
+                            .replace(/[^0-9]/g, "")
+                            .slice(0, 6);
                           if (pasted) {
                             setCode(pasted);
                             const targetIndex = Math.min(pasted.length, 5);

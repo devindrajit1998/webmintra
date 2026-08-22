@@ -31,14 +31,13 @@ export function BrandLogo({
     }
 
     return (
-      <span className="tracking-tight lowercase font-extrabold text-[#0f172a]">
-        {siteName}
-      </span>
+      <span className="tracking-tight lowercase font-extrabold text-[#0f172a]">{siteName}</span>
     );
   };
 
   const imgHeight = size === "sm" ? "h-6" : size === "lg" ? "h-9" : "h-8";
-  const iconSize = size === "sm" ? "h-6 w-6 text-xs" : size === "lg" ? "h-9 w-9 text-base" : "h-8 w-8 text-sm";
+  const iconSize =
+    size === "sm" ? "h-6 w-6 text-xs" : size === "lg" ? "h-9 w-9 text-base" : "h-8 w-8 text-sm";
   const textClass = size === "sm" ? "text-lg" : size === "lg" ? "text-2xl" : "text-[21px]";
 
   return (

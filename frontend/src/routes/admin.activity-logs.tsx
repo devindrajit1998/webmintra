@@ -51,7 +51,9 @@ function ActivityLogsPage() {
     <div className="mx-auto w-full max-w-[1600px]">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Activity Logs</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+            Activity Logs
+          </h1>
           <p className="mt-1 text-xs font-medium text-[#64748b]">
             Comprehensive audit trail of platform events.
           </p>
@@ -134,15 +136,21 @@ function ActivityLogsPage() {
                       <div className="flex items-center gap-2">
                         {log.role === "admin" && <Shield className="h-3.5 w-3.5 text-[#ea580c]" />}
                         <div>
-                          <p className="text-xs font-semibold text-[#0b192c]">{log.userId || "System"}</p>
-                          <p className="text-[10px] font-medium text-[#64748b] capitalize">{log.role || "User"}</p>
+                          <p className="text-xs font-semibold text-[#0b192c]">
+                            {log.userId || "System"}
+                          </p>
+                          <p className="text-[10px] font-medium text-[#64748b] capitalize">
+                            {log.role || "User"}
+                          </p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       {log.targetId ? (
                         <div>
-                          <p className="text-xs font-semibold text-[#0b192c]">{log.targetModel || "Item"}</p>
+                          <p className="text-xs font-semibold text-[#0b192c]">
+                            {log.targetModel || "Item"}
+                          </p>
                           <p className="text-[10px] font-mono text-[#64748b]">{log.targetId}</p>
                         </div>
                       ) : (
@@ -150,7 +158,9 @@ function ActivityLogsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-xs font-mono font-medium text-[#0b192c]">{log.ipAddress || "-"}</p>
+                      <p className="text-xs font-mono font-medium text-[#0b192c]">
+                        {log.ipAddress || "-"}
+                      </p>
                       <p className="text-[10px] text-[#64748b] line-clamp-1" title={log.userAgent}>
                         {log.userAgent?.split(" ")[0] || "-"}
                       </p>
@@ -162,7 +172,10 @@ function ActivityLogsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-xs font-medium text-[#64748b]">
+                  <td
+                    colSpan={5}
+                    className="px-6 py-12 text-center text-xs font-medium text-[#64748b]"
+                  >
                     No activity logs found.
                   </td>
                 </tr>
@@ -174,7 +187,8 @@ function ActivityLogsPage() {
         {data?.pagination && data.pagination.pages > 1 && (
           <div className="flex items-center justify-between border-t border-[#e2e8f0] bg-[#f8fafc] px-6 py-3.5">
             <span className="text-xs font-medium text-[#64748b]">
-              Showing page <strong className="text-[#0b192c]">{page}</strong> of <strong className="text-[#0b192c]">{data.pagination.pages}</strong>
+              Showing page <strong className="text-[#0b192c]">{page}</strong> of{" "}
+              <strong className="text-[#0b192c]">{data.pagination.pages}</strong>
             </span>
             <div className="flex gap-2">
               <button

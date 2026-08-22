@@ -8,7 +8,7 @@ export function Shimmer({ className, ...props }: React.HTMLAttributes<HTMLDivEle
     <div
       className={cn(
         "relative overflow-hidden rounded-xl bg-slate-200/75 dark:bg-slate-800/80 before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_1.8s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/40 dark:before:via-white/10 before:to-transparent",
-        className
+        className,
       )}
       {...props}
     />
@@ -22,7 +22,7 @@ export function PageLoader({ text = "Loading workspace..." }: { text?: string })
       <div className="relative flex flex-col items-center">
         {/* Glowing aura */}
         <div className="absolute -inset-4 rounded-full bg-gradient-to-r from-[#ea580c]/20 via-[#059669]/20 to-[#0284c7]/20 blur-xl animate-pulse" />
-        
+
         {/* Animated Brand Logo Container */}
         <div className="relative flex items-center justify-center p-4">
           <BrandLogo size="lg" />
@@ -67,13 +67,7 @@ export function StatCardsSkeleton({ count = 4 }: { count?: number }) {
 }
 
 // ── SaaS Table Skeleton (e.g. Users, Websites, Orders, Invoices) ────
-export function TableSkeleton({
-  rows = 5,
-  columns = 5,
-}: {
-  rows?: number;
-  columns?: number;
-}) {
+export function TableSkeleton({ rows = 5, columns = 5 }: { rows?: number; columns?: number }) {
   return (
     <div className="w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
       {/* Table Header Skeleton */}
@@ -99,10 +93,7 @@ export function TableSkeleton({
       {/* Row Items */}
       <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div
-            key={rowIndex}
-            className="grid grid-cols-12 items-center gap-4 px-6 py-4"
-          >
+          <div key={rowIndex} className="grid grid-cols-12 items-center gap-4 px-6 py-4">
             {Array.from({ length: columns }).map((_, colIndex) => (
               <div
                 key={colIndex}
@@ -112,7 +103,11 @@ export function TableSkeleton({
                 <Shimmer
                   className={cn(
                     "h-4 rounded-md",
-                    colIndex === 0 ? "w-3/4" : colIndex === columns - 1 ? "w-6 h-6 rounded-lg ml-auto" : "w-2/3"
+                    colIndex === 0
+                      ? "w-3/4"
+                      : colIndex === columns - 1
+                        ? "w-6 h-6 rounded-lg ml-auto"
+                        : "w-2/3",
                   )}
                 />
               </div>
@@ -135,7 +130,7 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
         >
           {/* Card Media Preview */}
           <Shimmer className="aspect-video w-full rounded-none" />
-          
+
           {/* Card Body */}
           <div className="p-5 space-y-3">
             <div className="flex items-center justify-between">
@@ -144,7 +139,7 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
             </div>
             <Shimmer className="h-3 w-full rounded-md" />
             <Shimmer className="h-3 w-4/5 rounded-md" />
-            
+
             <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <Shimmer className="h-8 w-20 rounded-xl" />
               <Shimmer className="h-8 w-24 rounded-xl" />

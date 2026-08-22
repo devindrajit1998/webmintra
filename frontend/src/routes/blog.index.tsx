@@ -30,7 +30,10 @@ export const Route = createFileRoute("/blog/")({
   head: ({ loaderData }) => {
     const settings = loaderData?.settings || {};
     const siteName = String(settings["site.name"] || "WebMintra");
-    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(/\/$/, "");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(
+      /\/$/,
+      "",
+    );
     const pageUrl = `${canonicalBase}/blog`;
     const title = `Official Blog - Website Tips, Case Studies & Guides | ${siteName}`;
     const description = `Explore the latest articles on web design, local SEO, online business scaling, and digital growth from ${siteName}.`;
@@ -130,7 +133,8 @@ function PublicBlogPage() {
             Guides for Small Business Growth
           </h1>
           <p className="mt-3 text-sm sm:text-base text-[#475569] max-w-xl mx-auto">
-            Actionable strategies on Google Maps SEO, WhatsApp lead generation, and website growth for Indian entrepreneurs.
+            Actionable strategies on Google Maps SEO, WhatsApp lead generation, and website growth
+            for Indian entrepreneurs.
           </p>
         </div>
 
@@ -150,10 +154,11 @@ function PublicBlogPage() {
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${selectedCategory === "all"
+              className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
+                selectedCategory === "all"
                   ? "bg-[#059669] text-white shadow-xs"
                   : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-                }`}
+              }`}
             >
               All Articles
             </button>
@@ -161,10 +166,11 @@ function PublicBlogPage() {
               <button
                 key={c._id}
                 onClick={() => setSelectedCategory(c.slug)}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${selectedCategory === c.slug
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
+                  selectedCategory === c.slug
                     ? "bg-[#059669] text-white shadow-xs"
                     : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-                  }`}
+                }`}
               >
                 {c.name}
               </button>

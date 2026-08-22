@@ -192,7 +192,9 @@ export function AdminSeoPage() {
           <p className="mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#059669]">
             <SearchCheck className="h-4 w-4" /> Public website
           </p>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Search Optimization</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+            Search Optimization
+          </h1>
           <p className="mt-1 text-xs font-medium text-[#64748b]">
             Control how the WebMintra landing page appears in search and social results.
           </p>
@@ -289,7 +291,10 @@ export function AdminSeoPage() {
               />
             </Field>
           </Panel>
-          <Panel icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />} title="Organization data">
+          <Panel
+            icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />}
+            title="Organization data"
+          >
             <Field label="Organization name" error={errors.organizationName}>
               <input
                 value={form.organizationName}
@@ -308,8 +313,14 @@ export function AdminSeoPage() {
               compact
             />
           </Panel>
-          <Panel icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />} title="Search Engine Verification">
-            <Field label="Google Search Console verification code" error={errors.googleSiteVerification}>
+          <Panel
+            icon={<SearchCheck className="h-4 w-4 text-[#ea580c]" />}
+            title="Search Engine Verification"
+          >
+            <Field
+              label="Google Search Console verification code"
+              error={errors.googleSiteVerification}
+            >
               <input
                 value={form.googleSiteVerification}
                 placeholder="e.g. 4v9hQz_abc123..."
@@ -359,7 +370,9 @@ export function AdminSeoPage() {
                 )}
               </div>
               <div className="border-t border-[#e2e8f0] bg-white p-4">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">{hostname}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
+                  {hostname}
+                </p>
                 <p className="mt-1 line-clamp-2 text-sm font-bold text-[#0b192c]">
                   {form.title || "Landing page title"}
                 </p>
@@ -370,12 +383,15 @@ export function AdminSeoPage() {
             </div>
           </Preview>
           <div
-            className={`rounded-xl border px-4 py-3 text-xs font-semibold ${form.allowIndexing
+            className={`rounded-xl border px-4 py-3 text-xs font-semibold ${
+              form.allowIndexing
                 ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
                 : "border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]"
-              }`}
+            }`}
           >
-            {form.allowIndexing ? "✓ Landing page can be indexed by search engines" : "⚠️ Landing page is set to noindex"}
+            {form.allowIndexing
+              ? "✓ Landing page can be indexed by search engines"
+              : "⚠️ Landing page is set to noindex"}
           </div>
         </aside>
       </div>
@@ -508,4 +524,3 @@ function ImageField({
 function input(error?: string) {
   return `w-full rounded-lg border bg-white px-3 py-2 text-xs font-medium text-[#0b192c] outline-none shadow-2xs transition placeholder:text-[#94a3b8] ${error ? "border-[#f87171] focus:border-[#ef4444] focus:ring-2 focus:ring-[#ef4444]/15" : "border-[#cbd5e1] focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"}`;
 }
-

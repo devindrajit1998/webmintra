@@ -252,7 +252,9 @@ export function LandingPage() {
                 </h1>
 
                 <p className="mt-5 text-[16px] sm:text-[17.5px] text-[#475569] leading-relaxed max-w-lg">
-                  Launch a high-converting website with <strong>direct WhatsApp leads</strong>, <strong>instant UPI payments</strong>, and <strong>free .in domain</strong>. No coding or developers needed.
+                  Launch a high-converting website with <strong>direct WhatsApp leads</strong>,{" "}
+                  <strong>instant UPI payments</strong>, and <strong>free .in domain</strong>. No
+                  coding or developers needed.
                 </p>
 
                 {/* CTAs */}
@@ -355,7 +357,8 @@ export function LandingPage() {
                             {heroHeadingText}
                           </h2>
                           <p className="mt-2 text-[11px] text-[#64748b] leading-relaxed">
-                            Dr. Neha Sharma, MDS & Team. Modern pain-free dentistry with instant WhatsApp appointment booking.
+                            Dr. Neha Sharma, MDS & Team. Modern pain-free dentistry with instant
+                            WhatsApp appointment booking.
                           </p>
                           <div className="mt-4 flex items-center gap-2">
                             <span className="rounded-lg bg-[#25D366] hover:bg-[#20bd5a] px-3 py-1.5 text-[10px] font-bold text-white shadow-sm flex items-center gap-1.5">
@@ -397,7 +400,9 @@ export function LandingPage() {
                           </div>
 
                           <div>
-                            <span className="text-[9px] font-bold text-[#64748b] block mb-1">Text Color</span>
+                            <span className="text-[9px] font-bold text-[#64748b] block mb-1">
+                              Text Color
+                            </span>
                             <div className="flex items-center gap-1.5">
                               {["#0f172a", "#ea580c", "#059669", "#1d4ed8"].map((c) => (
                                 <button
@@ -445,7 +450,8 @@ export function LandingPage() {
         <section id="solutions" className="border-b border-[#e2e8f0] bg-[#f8faf9] py-8">
           <div className="mx-auto max-w-7xl px-6 text-center">
             <p className="text-[11.5px] font-extrabold uppercase tracking-wider text-[#64748b]">
-              TRUSTED BY THOUSANDS OF BUSINESSES ACROSS <span className="text-[#059669]">INDIA</span>
+              TRUSTED BY THOUSANDS OF BUSINESSES ACROSS{" "}
+              <span className="text-[#059669]">INDIA</span>
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-[13px] font-bold text-[#334155]">
               <span className="inline-flex items-center gap-2 rounded-full border border-[#e2e8f0] bg-white px-3.5 py-1.5 shadow-2xs transition hover:border-[#ea580c] hover:text-[#ea580c]">
@@ -480,7 +486,6 @@ export function LandingPage() {
         <section className="px-6 py-16 lg:py-20 bg-white border-b border-[#e2e8f0]">
           <div className="mx-auto max-w-6xl">
             <div className="grid lg:grid-cols-[1fr_auto_1fr_1.15fr] gap-5 lg:gap-6 items-stretch">
-              
               {/* Left Box: The Old Way (Orange tone) */}
               <div className="flex flex-col justify-between rounded-2xl border border-[#fed7aa] bg-[#fffaf5] p-7 shadow-xs">
                 <div>
@@ -492,19 +497,27 @@ export function LandingPage() {
                   </h3>
                   <ul className="mt-5 space-y-3 text-[13px] text-[#475569] font-medium">
                     <li className="flex items-start gap-2.5">
-                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">✕</span>
+                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
+                        ✕
+                      </span>
                       <span>Depend on developers for every small change</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">✕</span>
+                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
+                        ✕
+                      </span>
                       <span>Long timelines and back-and-forth revisions</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">✕</span>
+                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
+                        ✕
+                      </span>
                       <span>High development and maintenance cost</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">✕</span>
+                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
+                        ✕
+                      </span>
                       <span>Not built for your business needs</span>
                     </li>
                   </ul>
@@ -584,7 +597,6 @@ export function LandingPage() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -605,7 +617,6 @@ export function LandingPage() {
             </div>
 
             <div className="mt-12 grid gap-6 md:grid-cols-3 items-stretch">
-              
               {/* Card 01: Choose */}
               <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#059669]/40 transition-all duration-200">
                 <div>
@@ -625,7 +636,9 @@ export function LandingPage() {
                 <div className="mt-6 aspect-[16/10] rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-2.5 overflow-hidden flex flex-col justify-between shadow-2xs">
                   <div className="flex items-center justify-between pb-1.5 border-b border-[#e2e8f0]">
                     <span className="text-[10px] font-bold text-[#0f172a]">Template Gallery</span>
-                    <span className="text-[9px] text-[#059669] font-bold bg-[#ecfdf5] px-1.5 py-0.5 rounded border border-[#a7f3d0]">12+ Ready</span>
+                    <span className="text-[9px] text-[#059669] font-bold bg-[#ecfdf5] px-1.5 py-0.5 rounded border border-[#a7f3d0]">
+                      12+ Ready
+                    </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 my-auto">
                     <div className="rounded-lg border border-[#e2e8f0] bg-white p-1.5 shadow-2xs">
@@ -635,7 +648,9 @@ export function LandingPage() {
                           alt="Dental"
                           className="h-full w-full object-cover"
                         />
-                        <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#c2410c]">Dental</span>
+                        <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#c2410c]">
+                          Dental
+                        </span>
                       </div>
                       <div className="h-1.5 w-3/4 bg-[#e2e8f0] rounded" />
                     </div>
@@ -646,7 +661,9 @@ export function LandingPage() {
                           alt="Gym"
                           className="h-full w-full object-cover"
                         />
-                        <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#047857]">Gym</span>
+                        <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#047857]">
+                          Gym
+                        </span>
                       </div>
                       <div className="h-1.5 w-3/4 bg-[#e2e8f0] rounded" />
                     </div>
@@ -673,7 +690,9 @@ export function LandingPage() {
                 <div className="mt-6 aspect-[16/10] rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-2.5 overflow-hidden flex flex-col justify-between shadow-2xs">
                   <div className="flex items-center justify-between pb-1.5 border-b border-[#e2e8f0]">
                     <span className="text-[10px] font-bold text-[#0f172a]">Visual Editor</span>
-                    <span className="text-[9px] text-[#ea580c] font-bold bg-[#fff7ed] px-1.5 py-0.5 rounded border border-[#fed7aa]">● Live</span>
+                    <span className="text-[9px] text-[#ea580c] font-bold bg-[#fff7ed] px-1.5 py-0.5 rounded border border-[#fed7aa]">
+                      ● Live
+                    </span>
                   </div>
                   <div className="rounded-lg border border-dashed border-[#ea580c] bg-[#fffaf5] p-2 text-center my-auto shadow-2xs">
                     <span className="text-[10px] font-extrabold text-[#0f172a] block">
@@ -720,7 +739,6 @@ export function LandingPage() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -737,7 +755,8 @@ export function LandingPage() {
                   Designed for every type of business
                 </h2>
                 <p className="mt-2 text-sm text-[#64748b] max-w-xl">
-                  Pick a ready-to-launch website layout tailored with industry-specific sections, appointment forms & WhatsApp routing.
+                  Pick a ready-to-launch website layout tailored with industry-specific sections,
+                  appointment forms & WhatsApp routing.
                 </p>
               </div>
               <Link
@@ -780,7 +799,7 @@ export function LandingPage() {
                         alt={t.title}
                         className="h-full w-full object-cover group-hover:scale-108 transition-transform duration-300"
                       />
-                      
+
                       {/* Category Tag */}
                       <span className="absolute top-1.5 left-1.5 rounded-md bg-black/60 backdrop-blur-xs px-2 py-0.5 text-[8px] font-bold text-white shadow-xs">
                         {t.category || "General"}
@@ -834,7 +853,6 @@ export function LandingPage() {
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-5">
-              
               {/* Feature 1: Mobile */}
               <div className="landing-feature-card p-5 space-y-3 flex flex-col justify-between">
                 <div>
@@ -939,7 +957,6 @@ export function LandingPage() {
                   WhatsApp Ready →
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -989,7 +1006,9 @@ export function LandingPage() {
               <div className="rounded-2xl border border-[#e2e8f0] bg-[#fafcfb] p-7 shadow-sm flex flex-col justify-between hover:border-[#cbd5e1] hover:shadow-md transition">
                 <div>
                   <h3 className="text-lg font-bold text-[#0f172a]">Starter</h3>
-                  <p className="text-xs text-[#64748b] mt-0.5">Ideal for single-location shops & clinics.</p>
+                  <p className="text-xs text-[#64748b] mt-0.5">
+                    Ideal for single-location shops & clinics.
+                  </p>
 
                   <div className="my-5">
                     <span className="text-4xl font-extrabold text-[#0f172a]">
@@ -1009,7 +1028,8 @@ export function LandingPage() {
                       <Check className="h-3.5 w-3.5 text-[#059669]" /> 5 GB High-Speed Edge Storage
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Free Automated SSL Certificate
+                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Free Automated SSL
+                      Certificate
                     </li>
                   </ul>
                 </div>
@@ -1030,7 +1050,9 @@ export function LandingPage() {
 
                 <div>
                   <h3 className="text-lg font-bold text-[#0f172a]">Growth</h3>
-                  <p className="text-xs text-[#64748b] mt-0.5">Best for multi-service businesses & agencies.</p>
+                  <p className="text-xs text-[#64748b] mt-0.5">
+                    Best for multi-service businesses & agencies.
+                  </p>
 
                   <div className="my-5">
                     <span className="text-4xl font-extrabold text-[#0f172a]">
@@ -1041,19 +1063,23 @@ export function LandingPage() {
 
                   <ul className="space-y-2.5 text-xs font-semibold text-[#0f172a] mb-7">
                     <li className="flex items-center gap-2">
-                      <Check className="h-3.5 w-3.5 text-[#059669]" /> 5 Websites + Custom .in / .com Domains
+                      <Check className="h-3.5 w-3.5 text-[#059669]" /> 5 Websites + Custom .in /
+                      .com Domains
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Unlimited WhatsApp & Email Leads
+                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Unlimited WhatsApp & Email
+                      Leads
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="h-3.5 w-3.5 text-[#059669]" /> 20 GB Edge SSD Storage
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Google Search Console & SEO Tools
+                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Google Search Console & SEO
+                      Tools
                     </li>
                     <li className="flex items-center gap-2">
-                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Priority 24/7 WhatsApp & Phone Support
+                      <Check className="h-3.5 w-3.5 text-[#059669]" /> Priority 24/7 WhatsApp &
+                      Phone Support
                     </li>
                   </ul>
                 </div>
@@ -1070,7 +1096,8 @@ export function LandingPage() {
             {/* Indian Payments & Invoicing Strip */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium text-[#64748b]">
               <span className="flex items-center gap-1.5">
-                <span className="font-bold text-[#0f172a]">⚡ Supported Payments:</span> UPI (GPay, PhonePe, Paytm), RuPay, NetBanking & Cards
+                <span className="font-bold text-[#0f172a]">⚡ Supported Payments:</span> UPI (GPay,
+                PhonePe, Paytm), RuPay, NetBanking & Cards
               </span>
               <span className="flex items-center gap-1 text-[#059669] font-bold">
                 🧾 100% GST Invoice with Input Tax Credit (ITC)
@@ -1139,32 +1166,41 @@ export function LandingPage() {
             </div>
 
             {(() => {
-              const faqsToRender = dynamicFaqs && dynamicFaqs.length > 0 ? dynamicFaqs : [
-                {
-                  question: "Do I need any coding skills?",
-                  answer: "Zero coding or technical knowledge required. You can edit any text, image, price, or button just by clicking on it.",
-                },
-                {
-                  question: "Can I use my own domain name?",
-                  answer: "Yes! You can connect any custom .in, .com, or .org domain with 1-click DNS connection.",
-                },
-                {
-                  question: "Is hosting included?",
-                  answer: "Yes, high-speed managed cloud hosting with automated SSL encryption and daily backups is included in every plan.",
-                },
-                {
-                  question: "Can I change my template later?",
-                  answer: "Yes, you can switch or customize your template layout at any point from your dashboard.",
-                },
-                {
-                  question: "Will my website work on mobile devices?",
-                  answer: "Every Webmintra template is 100% mobile-responsive and loads fast on smartphones and tablets.",
-                },
-                {
-                  question: "Do you offer customer support?",
-                  answer: "Yes, our dedicated support team is available via WhatsApp, email, and live help center guides.",
-                },
-              ];
+              const faqsToRender =
+                dynamicFaqs && dynamicFaqs.length > 0
+                  ? dynamicFaqs
+                  : [
+                      {
+                        question: "Do I need any coding skills?",
+                        answer:
+                          "Zero coding or technical knowledge required. You can edit any text, image, price, or button just by clicking on it.",
+                      },
+                      {
+                        question: "Can I use my own domain name?",
+                        answer:
+                          "Yes! You can connect any custom .in, .com, or .org domain with 1-click DNS connection.",
+                      },
+                      {
+                        question: "Is hosting included?",
+                        answer:
+                          "Yes, high-speed managed cloud hosting with automated SSL encryption and daily backups is included in every plan.",
+                      },
+                      {
+                        question: "Can I change my template later?",
+                        answer:
+                          "Yes, you can switch or customize your template layout at any point from your dashboard.",
+                      },
+                      {
+                        question: "Will my website work on mobile devices?",
+                        answer:
+                          "Every Webmintra template is 100% mobile-responsive and loads fast on smartphones and tablets.",
+                      },
+                      {
+                        question: "Do you offer customer support?",
+                        answer:
+                          "Yes, our dedicated support team is available via WhatsApp, email, and live help center guides.",
+                      },
+                    ];
 
               const mid = Math.ceil(faqsToRender.length / 2);
               const leftCol = faqsToRender.slice(0, mid);
@@ -1183,9 +1219,7 @@ export function LandingPage() {
                           <span>{faq.question}</span>
                           <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
                         </summary>
-                        <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                          {faq.answer}
-                        </p>
+                        <p className="mt-2 text-xs text-[#64748b] leading-relaxed">{faq.answer}</p>
                       </details>
                     ))}
                   </div>
@@ -1201,9 +1235,7 @@ export function LandingPage() {
                           <span>{faq.question}</span>
                           <Plus className="h-3.5 w-3.5 text-[#64748b] transition-transform group-open:rotate-45" />
                         </summary>
-                        <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                          {faq.answer}
-                        </p>
+                        <p className="mt-2 text-xs text-[#64748b] leading-relaxed">{faq.answer}</p>
                       </details>
                     ))}
                   </div>
@@ -1294,7 +1326,6 @@ export function LandingPage() {
       <footer className="border-t border-[#e2e8f0] bg-white pt-14 pb-10 text-[#475569]">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-            
             {/* Brand column (2 spans on desktop) */}
             <div className="lg:col-span-2 pr-4 space-y-4">
               <a
@@ -1327,7 +1358,8 @@ export function LandingPage() {
                 </span>
               </a>
               <p className="text-xs leading-relaxed text-[#64748b] max-w-sm">
-                Empowering Indian business owners, doctors, consultants, and creators to launch fast, beautiful websites without writing a single line of code.
+                Empowering Indian business owners, doctors, consultants, and creators to launch
+                fast, beautiful websites without writing a single line of code.
               </p>
 
               {/* Made in India badge */}
@@ -1506,25 +1538,30 @@ export function LandingPage() {
                 </li>
               </ul>
             </div>
-
           </div>
 
           {/* Sub-Footer Bottom Bar */}
           <div className="mt-12 pt-6 border-t border-[#e2e8f0] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11.5px] text-[#64748b]">
             <p>
-              © {new Date().getFullYear()} {isMounted ? siteName : "Webmintra"}. All rights reserved.
+              © {new Date().getFullYear()} {isMounted ? siteName : "Webmintra"}. All rights
+              reserved.
             </p>
             <div className="flex items-center gap-5 font-medium">
-              <Link to="/privacy-policy" className="hover:text-[#0f172a]">Privacy</Link>
+              <Link to="/privacy-policy" className="hover:text-[#0f172a]">
+                Privacy
+              </Link>
               <span>·</span>
-              <Link to="/terms-and-conditions" className="hover:text-[#0f172a]">Terms</Link>
+              <Link to="/terms-and-conditions" className="hover:text-[#0f172a]">
+                Terms
+              </Link>
               <span>·</span>
-              <Link to="/contact" className="hover:text-[#0f172a]">Support</Link>
+              <Link to="/contact" className="hover:text-[#0f172a]">
+                Support
+              </Link>
               <span>·</span>
               <span className="text-[#059669] font-bold">100% Data Stored in India 🇮🇳</span>
             </div>
           </div>
-
         </div>
       </footer>
 

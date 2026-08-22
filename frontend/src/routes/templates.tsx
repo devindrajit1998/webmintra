@@ -112,7 +112,8 @@ export function PublicTemplatesCatalogPage() {
             Choose Your Business Website
           </h1>
           <p className="mt-3 text-sm sm:text-base text-[#475569] max-w-xl mx-auto">
-            Engineered for high local conversion with direct WhatsApp lead routing, instant UPI checkout, and fast Indian edge hosting.
+            Engineered for high local conversion with direct WhatsApp lead routing, instant UPI
+            checkout, and fast Indian edge hosting.
           </p>
         </div>
 
@@ -151,10 +152,11 @@ export function PublicTemplatesCatalogPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${selectedCategory.toLowerCase() === cat.toLowerCase()
+                className={`whitespace-nowrap rounded-full px-4 py-1.5 text-xs font-bold transition-all shadow-2xs ${
+                  selectedCategory.toLowerCase() === cat.toLowerCase()
                     ? "bg-[#059669] text-white shadow-xs"
                     : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:border-[#cbd5e1]"
-                  }`}
+                }`}
               >
                 {cat}
               </button>
@@ -181,7 +183,8 @@ export function PublicTemplatesCatalogPage() {
             <Layers className="h-12 w-12 text-[#94a3b8] mx-auto mb-4" />
             <h3 className="text-xl font-bold text-[#0f172a]">No matching templates found</h3>
             <p className="text-sm text-[#64748b] mt-1 max-w-md mx-auto">
-              Try adjusting your category filter or search keywords to explore available business designs.
+              Try adjusting your category filter or search keywords to explore available business
+              designs.
             </p>
             <button
               onClick={() => {
@@ -350,10 +353,11 @@ export function PublicTemplatesCatalogPage() {
                             key={p.name}
                             type="button"
                             onClick={() => setPreviewActivePage(p.name)}
-                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${isActive
+                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                              isActive
                                 ? "bg-[#059669] text-white shadow-sm border border-emerald-400/30"
                                 : "text-slate-200 hover:text-white hover:bg-slate-800"
-                              }`}
+                            }`}
                             style={{ color: isActive ? "#ffffff" : "#cbd5e1" }}
                           >
                             <FileText className="h-3.5 w-3.5 opacity-80" />
@@ -413,12 +417,13 @@ export function PublicTemplatesCatalogPage() {
               {/* Iframe Viewport Frame */}
               <div className="flex-1 flex justify-center w-full min-h-0">
                 <div
-                  className={`h-full rounded-2xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${previewDevice === "desktop"
+                  className={`h-full rounded-2xl overflow-hidden bg-white border border-slate-700 shadow-2xl transition-all duration-300 ${
+                    previewDevice === "desktop"
                       ? "w-full"
                       : previewDevice === "tablet"
                         ? "w-[768px]"
                         : "w-[375px]"
-                    }`}
+                  }`}
                 >
                   <iframe
                     srcDoc={previewHtml}

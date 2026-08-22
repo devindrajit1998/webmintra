@@ -2,17 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getPublicBlogPost, getPublicSettings } from "@/lib/public-api";
 import { getAuthenticatedUser, routeForRole, type SessionUser } from "@/lib/auth-api";
-import {
-  Calendar,
-  User,
-  Clock,
-  ArrowLeft,
-  Tag,
-  Key,
-  Sparkles,
-  Loader2,
-  Menu,
-} from "lucide-react";
+import { Calendar, User, Clock, ArrowLeft, Tag, Key, Sparkles, Loader2, Menu } from "lucide-react";
 import { useState } from "react";
 import { PublicHeader } from "@/components/PublicHeader";
 import { PublicFooter } from "@/components/PublicFooter";
@@ -33,19 +23,32 @@ export const Route = createFileRoute("/blog_/$slug")({
     const post = loaderData?.post;
     const settings = loaderData?.settings || {};
     const siteName = String(settings["site.name"] || "WebMintra");
-    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(/\/$/, "");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(
+      /\/$/,
+      "",
+    );
     const pageUrl = `${canonicalBase}/blog/${params.slug}`;
 
     if (!post) {
       return {
-        meta: [{ title: `Article Not Found | ${siteName}` }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: `Article Not Found | ${siteName}` },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
 
     const title = `${post.seo?.title || post.title} | ${siteName}`;
     const description = post.seo?.description || post.excerpt || `${post.title} on ${siteName}`;
-    const ogImage = post.seo?.ogImage || post.coverImage || settings["seo.socialImageUrl"] || settings["brand.logoUrl"] || "";
-    const publishedIso = post.publishedAt ? new Date(post.publishedAt).toISOString() : new Date().toISOString();
+    const ogImage =
+      post.seo?.ogImage ||
+      post.coverImage ||
+      settings["seo.socialImageUrl"] ||
+      settings["brand.logoUrl"] ||
+      "";
+    const publishedIso = post.publishedAt
+      ? new Date(post.publishedAt).toISOString()
+      : new Date().toISOString();
 
     const jsonLdArticle = {
       "@context": "https://schema.org",
@@ -62,7 +65,9 @@ export const Route = createFileRoute("/blog_/$slug")({
       publisher: {
         "@type": "Organization",
         name: siteName,
-        ...(settings["brand.logoUrl"] ? { logo: { "@type": "ImageObject", url: settings["brand.logoUrl"] } } : {}),
+        ...(settings["brand.logoUrl"]
+          ? { logo: { "@type": "ImageObject", url: settings["brand.logoUrl"] } }
+          : {}),
       },
       mainEntityOfPage: {
         "@type": "WebPage",
@@ -211,12 +216,16 @@ function SingleBlogPostPage() {
             <div className="flex flex-wrap items-center gap-4 text-xs text-[#64748b]">
               <div className="flex items-center gap-1.5">
                 <User className="h-3.5 w-3.5 text-[#ea580c]" />
-                <span className="font-bold text-[#0b192c]">{post.author?.name || "WebMintra Admin"}</span>
+                <span className="font-bold text-[#0b192c]">
+                  {post.author?.name || "WebMintra Admin"}
+                </span>
               </div>
               <span>•</span>
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-3.5 w-3.5 text-[#059669]" />
-                <span>{post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ""}</span>
+                <span>
+                  {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ""}
+                </span>
               </div>
               <span>•</span>
               <div className="flex items-center gap-1.5">
@@ -285,7 +294,8 @@ function SingleBlogPostPage() {
               Ready to Launch Your Business Website?
             </h2>
             <p className="mt-1.5 text-xs sm:text-sm text-[#047857] max-w-lg mx-auto">
-              Choose a professional template and launch your mobile-responsive website in minutes with zero coding.
+              Choose a professional template and launch your mobile-responsive website in minutes
+              with zero coding.
             </p>
             <Link
               to={primaryRoute}

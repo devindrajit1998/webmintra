@@ -105,7 +105,8 @@ function KnowledgeBasePage() {
             Knowledge Base
           </h1>
           <p className="mt-1 text-sm text-[#64748b]">
-            Find step-by-step guides, documentation, and answers for managing your WebMintra workspace.
+            Find step-by-step guides, documentation, and answers for managing your WebMintra
+            workspace.
           </p>
         </div>
       </section>
@@ -190,7 +191,9 @@ function KnowledgeBasePage() {
               <div className="mb-3 flex items-center gap-2 px-1">
                 <FolderOpen className="h-4 w-4 text-[#059669]" />
                 <h2 className="text-sm font-extrabold text-[#0f172a]">{name}</h2>
-                <span className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[10px] font-bold text-[#64748b]">{items.length}</span>
+                <span className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[10px] font-bold text-[#64748b]">
+                  {items.length}
+                </span>
               </div>
               <div className="divide-y divide-[#f1f5f9] overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
                 {items.map((article) => (
@@ -208,11 +211,16 @@ function KnowledgeBasePage() {
                         {article.title}
                       </h3>
                       <p className="mt-0.5 line-clamp-1 text-xs text-[#64748b]">
-                        {article.excerpt || (article as any).summary || (article.content ? article.content.slice(0, 140) : "Open this article to read the full guide.")}
+                        {article.excerpt ||
+                          (article as any).summary ||
+                          (article.content
+                            ? article.content.slice(0, 140)
+                            : "Open this article to read the full guide.")}
                       </p>
                       <div className="mt-2 flex items-center gap-3 text-[10px] font-semibold text-[#94a3b8]">
                         <span className="inline-flex items-center gap-1">
-                          <Eye className="h-3.5 w-3.5" /> {article.viewCount ?? (article as any).views ?? 0} views
+                          <Eye className="h-3.5 w-3.5" />{" "}
+                          {article.viewCount ?? (article as any).views ?? 0} views
                         </span>
                         {article.updatedAt && (
                           <span>Updated {format(new Date(article.updatedAt), "MMM d, yyyy")}</span>
@@ -294,11 +302,14 @@ function ArticleReader({
               {article.title}
             </h1>
             {(article.excerpt || (article as any).summary) && (
-              <p className="mt-3 text-xs leading-relaxed text-[#64748b]">{article.excerpt || (article as any).summary}</p>
+              <p className="mt-3 text-xs leading-relaxed text-[#64748b]">
+                {article.excerpt || (article as any).summary}
+              </p>
             )}
             <div className="mt-4 flex flex-wrap gap-4 text-[11px] font-semibold text-[#94a3b8]">
               <span className="flex items-center gap-1">
-                <Eye className="h-3.5 w-3.5" /> {article.viewCount ?? (article as any).views ?? 0} views
+                <Eye className="h-3.5 w-3.5" /> {article.viewCount ?? (article as any).views ?? 0}{" "}
+                views
               </span>
               {article.updatedAt && (
                 <span>Updated {format(new Date(article.updatedAt), "MMMM d, yyyy")}</span>
@@ -454,7 +465,9 @@ function State({
     <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border border-[#e2e8f0] bg-white p-8 text-center shadow-xs">
       {icon}
       <h2 className="mt-3.5 text-base font-extrabold text-[#0f172a]">{title}</h2>
-      {description && <p className="mt-1 max-w-sm text-xs leading-relaxed text-[#64748b]">{description}</p>}
+      {description && (
+        <p className="mt-1 max-w-sm text-xs leading-relaxed text-[#64748b]">{description}</p>
+      )}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

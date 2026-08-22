@@ -134,7 +134,11 @@ export function TenantLayout({ user, dashboard, websites, onSignOut }: TenantLay
           </button>
         </div>
         <TenantNavGroup label="Workspace" items={mainNavigation} collapsed={sidebarCollapsed} />
-        <TenantNavGroup label="Account & GST" items={accountNavigation} collapsed={sidebarCollapsed} />
+        <TenantNavGroup
+          label="Account & GST"
+          items={accountNavigation}
+          collapsed={sidebarCollapsed}
+        />
 
         <div
           className={`mt-auto overflow-hidden transition-all duration-300 ${sidebarCollapsed ? "max-h-0 opacity-0" : "max-h-40 opacity-100"}`}
@@ -195,7 +199,7 @@ export function TenantLayout({ user, dashboard, websites, onSignOut }: TenantLay
           >
             <Menu className="h-4 w-4" />
           </button>
-          
+
           <div className="hidden md:flex items-center gap-2">
             <span className="rounded-full bg-[#fff7ed] border border-[#fed7aa] px-2.5 py-0.5 text-[11px] font-bold text-[#c2410c] flex items-center gap-1 shadow-2xs">
               <span>🇮🇳</span> Mumbai Edge Node
@@ -273,7 +277,8 @@ export function TenantDashboardIndex() {
                 </span>
               </p>
               <p className="text-xs text-[#64748b] mt-0.5">
-                Full access to edit, publish, connect your .in domain, and receive WhatsApp enquiries directly.
+                Full access to edit, publish, connect your .in domain, and receive WhatsApp
+                enquiries directly.
               </p>
             </div>
           </div>
@@ -310,10 +315,30 @@ export function TenantDashboardIndex() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi icon={<Globe2 className="h-5 w-5" />} label="Total Websites" value={websites.length} tone="cyan" />
-        <Kpi icon={<Sparkles className="h-5 w-5" />} label="Live Published" value={published} tone="emerald" />
-        <Kpi icon={<FileText className="h-5 w-5" />} label="Draft Projects" value={drafts} tone="amber" />
-        <Kpi icon={<Image className="h-5 w-5" />} label="Cloud Storage" value="0 MB" tone="violet" />
+        <Kpi
+          icon={<Globe2 className="h-5 w-5" />}
+          label="Total Websites"
+          value={websites.length}
+          tone="cyan"
+        />
+        <Kpi
+          icon={<Sparkles className="h-5 w-5" />}
+          label="Live Published"
+          value={published}
+          tone="emerald"
+        />
+        <Kpi
+          icon={<FileText className="h-5 w-5" />}
+          label="Draft Projects"
+          value={drafts}
+          tone="amber"
+        />
+        <Kpi
+          icon={<Image className="h-5 w-5" />}
+          label="Cloud Storage"
+          value="0 MB"
+          tone="violet"
+        />
       </section>
 
       <section className="grid items-start gap-6 xl:grid-cols-12">
@@ -390,7 +415,10 @@ function TenantNavGroup({
             key={itemLabel}
             title={collapsed ? itemLabel : undefined}
             className={`flex w-full items-center ${collapsed ? "justify-center" : "gap-2.5"} rounded-xl px-3 py-2 text-left text-xs font-semibold transition text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] overflow-hidden`}
-            activeProps={{ className: "!bg-[#ecfdf5] !text-[#047857] !font-bold border-l-4 !border-[#ea580c] shadow-2xs" }}
+            activeProps={{
+              className:
+                "!bg-[#ecfdf5] !text-[#047857] !font-bold border-l-4 !border-[#ea580c] shadow-2xs",
+            }}
             activeOptions={{ exact: to === "/tenant" }}
           >
             <Icon className="h-4 w-4 shrink-0" />
@@ -425,7 +453,9 @@ function Kpi({
   }[tone];
   return (
     <article className="tiranga-border-top flex min-h-24 items-center gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
-      <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${color}`}>
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${color}`}
+      >
         {icon}
       </span>
       <div>
@@ -503,9 +533,12 @@ function EmptyWebsites() {
       <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
         <Globe2 className="h-6 w-6" />
       </span>
-      <h3 className="mt-4 text-base font-extrabold text-[#0b192c]">Your Indian Business Site is Ready to Create</h3>
+      <h3 className="mt-4 text-base font-extrabold text-[#0b192c]">
+        Your Indian Business Site is Ready to Create
+      </h3>
       <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-[#64748b]">
-        Pick a template to build your clinic, restaurant, or business landing page with instant WhatsApp leads.
+        Pick a template to build your clinic, restaurant, or business landing page with instant
+        WhatsApp leads.
       </p>
     </div>
   );
@@ -620,7 +653,9 @@ function AnalyticsCard() {
     <section className="h-full rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
       <div className="flex items-center justify-between border-b border-[#f1f5f9] pb-3">
         <div>
-          <h2 className="text-sm font-extrabold text-[#0b192c]">Website Traffic & WhatsApp Leads</h2>
+          <h2 className="text-sm font-extrabold text-[#0b192c]">
+            Website Traffic & WhatsApp Leads
+          </h2>
           <p className="mt-0.5 text-xs text-[#64748b]">
             Publish your website to start tracking visitor engagement.
           </p>
@@ -654,7 +689,10 @@ function ActivityCard({ websites }: { websites: Website[] }) {
       <div className="mt-4 space-y-3">
         {websites.length ? (
           websites.slice(0, 3).map((website) => (
-            <div className="flex gap-3 items-center rounded-xl border border-[#f1f5f9] p-2.5 bg-[#f8fafc]" key={website.id}>
+            <div
+              className="flex gap-3 items-center rounded-xl border border-[#f1f5f9] p-2.5 bg-[#f8fafc]"
+              key={website.id}
+            >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
                 <Globe2 className="h-4 w-4" />
               </span>

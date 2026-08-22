@@ -150,7 +150,9 @@ function RootApp() {
 
     // Google Search Console Site Verification
     if (settings["seo.googleSiteVerification"]) {
-      let meta: HTMLMetaElement | null = document.querySelector("meta[name='google-site-verification']");
+      let meta: HTMLMetaElement | null = document.querySelector(
+        "meta[name='google-site-verification']",
+      );
       if (!meta) {
         meta = document.createElement("meta");
         meta.name = "google-site-verification";
@@ -172,7 +174,7 @@ function RootApp() {
   }, [settings]);
 
   const hostname = typeof window !== "undefined" ? window.location.hostname.toLowerCase() : "";
-  
+
   // List of main root domains / subdomains that serve the WebMintra platform application (not a customer site)
   const isMainPlatformHost = (host: string): boolean => {
     // Plain localhost (e.g., localhost:8080 or 127.0.0.1:8080) is the platform app
@@ -199,11 +201,14 @@ function RootApp() {
         host.endsWith(".vercel.app")
       );
     }
-    return host === "webmintra.in" || host.endsWith(".onrender.com") || host.endsWith(".vercel.app");
+    return (
+      host === "webmintra.in" || host.endsWith(".onrender.com") || host.endsWith(".vercel.app")
+    );
   };
 
   const isSubdomain = !isMainPlatformHost(hostname);
-  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const searchParams =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
   const previewSiteId = searchParams?.get("preview_site");
 
   if (isSubdomain) {

@@ -1,12 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  getAdminFaqs,
-  createAdminFaq,
-  updateAdminFaq,
-  deleteAdminFaq,
-} from "@/lib/admin-api";
+import { getAdminFaqs, createAdminFaq, updateAdminFaq, deleteAdminFaq } from "@/lib/admin-api";
 import {
   HelpCircle,
   Plus,
@@ -99,7 +94,9 @@ export function AdminFaqsPage() {
     onError: (err: any) => toast.error(err.message || "Failed to update status"),
   });
 
-  const categories = Array.from(new Set(faqs.map((f: any) => f.category || "General"))).filter(Boolean);
+  const categories = Array.from(new Set(faqs.map((f: any) => f.category || "General"))).filter(
+    Boolean,
+  );
 
   const filteredFaqs = faqs.filter((faq: any) => {
     const matchesSearch =
@@ -164,7 +161,8 @@ export function AdminFaqsPage() {
             FAQ Management
           </h1>
           <p className="mt-1 text-xs text-[#64748b]">
-            Manage questions and answers displayed in the "Everything you need to know" landing section.
+            Manage questions and answers displayed in the "Everything you need to know" landing
+            section.
           </p>
         </div>
         <button
@@ -224,7 +222,9 @@ export function AdminFaqsPage() {
             <HelpCircle className="h-10 w-10 text-[#94a3b8] mx-auto mb-3" />
             <h3 className="text-sm font-bold text-[#0b192c]">No FAQs Found</h3>
             <p className="text-xs text-[#64748b] mt-1">
-              {searchQuery ? "No questions match your search query." : "Click Add FAQ to create your first question."}
+              {searchQuery
+                ? "No questions match your search query."
+                : "Click Add FAQ to create your first question."}
             </p>
           </div>
         ) : (
@@ -243,12 +243,8 @@ export function AdminFaqsPage() {
                       Order: {faq.sortOrder ?? idx + 1}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-[#0b192c]">
-                    {faq.question}
-                  </h3>
-                  <p className="text-xs text-[#475569] leading-relaxed">
-                    {faq.answer}
-                  </p>
+                  <h3 className="text-sm font-bold text-[#0b192c]">{faq.question}</h3>
+                  <p className="text-xs text-[#475569] leading-relaxed">{faq.answer}</p>
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
@@ -265,7 +261,11 @@ export function AdminFaqsPage() {
                         : "border-[#cbd5e1] bg-white text-[#64748b]"
                     }`}
                   >
-                    {faq.isPublished ? <CheckCircle className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                    {faq.isPublished ? (
+                      <CheckCircle className="h-3 w-3" />
+                    ) : (
+                      <XCircle className="h-3 w-3" />
+                    )}
                     {faq.isPublished ? "Live" : "Draft"}
                   </button>
 
@@ -314,9 +314,7 @@ export function AdminFaqsPage() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-[#475569] mb-1">
-                  Question *
-                </label>
+                <label className="block text-xs font-bold text-[#475569] mb-1">Question *</label>
                 <input
                   type="text"
                   required
@@ -328,9 +326,7 @@ export function AdminFaqsPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#475569] mb-1">
-                  Answer *
-                </label>
+                <label className="block text-xs font-bold text-[#475569] mb-1">Answer *</label>
                 <textarea
                   required
                   rows={4}
@@ -343,9 +339,7 @@ export function AdminFaqsPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#475569] mb-1">
-                    Category
-                  </label>
+                  <label className="block text-xs font-bold text-[#475569] mb-1">Category</label>
                   <input
                     type="text"
                     value={formData.category}
@@ -355,13 +349,13 @@ export function AdminFaqsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#475569] mb-1">
-                    Sort Order
-                  </label>
+                  <label className="block text-xs font-bold text-[#475569] mb-1">Sort Order</label>
                   <input
                     type="number"
                     value={formData.sortOrder}
-                    onChange={(e) => setFormData({ ...formData, sortOrder: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, sortOrder: Number(e.target.value) })
+                    }
                     className="w-full h-9 rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-medium text-[#0b192c] outline-none transition focus:border-[#ea580c]"
                   />
                 </div>

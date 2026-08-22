@@ -100,9 +100,7 @@ export function RichCKEditor({
   return (
     <div
       className={`flex flex-col rounded-xl border border-[#cbd5e1] bg-white shadow-2xs transition focus-within:border-[#ea580c] focus-within:ring-2 focus-within:ring-[#ea580c]/10 ${
-        isFullscreen
-          ? "fixed inset-4 z-50 shadow-2xl bg-white flex flex-col"
-          : "relative w-full"
+        isFullscreen ? "fixed inset-4 z-50 shadow-2xl bg-white flex flex-col" : "relative w-full"
       }`}
     >
       {/* CKEditor Classic Toolbar & Mode Switcher */}
@@ -349,7 +347,11 @@ export function RichCKEditor({
             className="rounded-lg border border-[#cbd5e1] bg-white p-1.5 text-[#64748b] hover:bg-[#e2e8f0] hover:text-[#0b192c] transition"
             title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
           >
-            {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+            {isFullscreen ? (
+              <Minimize2 className="h-3.5 w-3.5" />
+            ) : (
+              <Maximize2 className="h-3.5 w-3.5" />
+            )}
           </button>
         </div>
       </div>

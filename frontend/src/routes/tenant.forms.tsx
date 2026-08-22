@@ -182,9 +182,7 @@ function FormsPage() {
                       {column.replaceAll("_", " ")}
                     </th>
                   ))}
-                  <th className="whitespace-nowrap px-6 py-4 text-right">
-                    Submission ID
-                  </th>
+                  <th className="whitespace-nowrap px-6 py-4 text-right">Submission ID</th>
                   <th className="whitespace-nowrap px-6 py-4 text-right">Actions</th>
                 </tr>
               </thead>
@@ -195,12 +193,17 @@ function FormsPage() {
                       {format(new Date(submission.createdAt), "MMM d, yyyy h:mm a")}
                     </td>
                     {columns.map((column) => (
-                      <td key={column} className="max-w-xs truncate px-6 py-4 text-xs font-bold text-[#0f172a]">
+                      <td
+                        key={column}
+                        className="max-w-xs truncate px-6 py-4 text-xs font-bold text-[#0f172a]"
+                      >
                         {formatValue(submission.data[column])}
                       </td>
                     ))}
                     <td className="whitespace-nowrap px-6 py-4 text-right text-xs">
-                      <span className="font-mono font-bold text-[#64748b]">#{submission._id.slice(-8)}</span>
+                      <span className="font-mono font-bold text-[#64748b]">
+                        #{submission._id.slice(-8)}
+                      </span>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right">
                       <DropdownMenu>
@@ -217,13 +220,22 @@ function FormsPage() {
                           align="end"
                           className="border-[#e2e8f0] bg-white text-[#0f172a] shadow-xl"
                         >
-                          <DropdownMenuItem onSelect={() => setViewSubmission(submission)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onSelect={() => setViewSubmission(submission)}
+                            className="cursor-pointer"
+                          >
                             <Eye className="mr-2 h-4 w-4 text-[#059669]" /> View details
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => copySubmission(submission)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onSelect={() => copySubmission(submission)}
+                            className="cursor-pointer"
+                          >
                             <Copy className="mr-2 h-4 w-4 text-[#0284c7]" /> Copy JSON
                           </DropdownMenuItem>
-                          <DropdownMenuItem onSelect={() => downloadSubmission(submission)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onSelect={() => downloadSubmission(submission)}
+                            className="cursor-pointer"
+                          >
                             <Download className="mr-2 h-4 w-4 text-[#ea580c]" /> Download JSON
                           </DropdownMenuItem>
                           <DropdownMenuItem
@@ -249,7 +261,9 @@ function FormsPage() {
             <div className="flex items-start justify-between gap-4 border-b border-[#f1f5f9] pb-4">
               <div>
                 <h2 className="text-base font-extrabold text-[#0f172a]">Submission Details</h2>
-                <p className="mt-0.5 font-mono text-xs font-bold text-[#64748b]">{viewSubmission._id}</p>
+                <p className="mt-0.5 font-mono text-xs font-bold text-[#64748b]">
+                  {viewSubmission._id}
+                </p>
               </div>
               <button
                 type="button"

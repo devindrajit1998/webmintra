@@ -115,7 +115,9 @@ function BlogPage() {
               onSubmit={handleSubmit}
               className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs animate-in zoom-in-95"
             >
-              <h2 className="font-display text-base font-extrabold text-[#0f172a] mb-4">Create New Blog Post</h2>
+              <h2 className="font-display text-base font-extrabold text-[#0f172a] mb-4">
+                Create New Blog Post
+              </h2>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="text-xs font-bold text-[#0f172a]">
                   Title *
@@ -232,13 +234,18 @@ function BlogPage() {
                       <td colSpan={4} className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center justify-center gap-3">
                           <Loader2 className="h-6 w-6 animate-spin text-[#059669]" />
-                          <span className="text-xs font-semibold text-[#64748b]">Loading posts...</span>
+                          <span className="text-xs font-semibold text-[#64748b]">
+                            Loading posts...
+                          </span>
                         </div>
                       </td>
                     </tr>
                   ) : posts.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-xs font-semibold text-[#64748b]">
+                      <td
+                        colSpan={4}
+                        className="px-6 py-12 text-center text-xs font-semibold text-[#64748b]"
+                      >
                         No blog posts found for this website.
                       </td>
                     </tr>
@@ -252,7 +259,9 @@ function BlogPage() {
                             </div>
                             <div>
                               <div className="font-bold text-[#0f172a]">{post.title}</div>
-                              <div className="font-mono text-[10px] font-semibold text-[#64748b]">/{post.slug}</div>
+                              <div className="font-mono text-[10px] font-semibold text-[#64748b]">
+                                /{post.slug}
+                              </div>
                             </div>
                           </div>
                         </td>

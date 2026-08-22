@@ -125,15 +125,21 @@ function WebsitesPage() {
 
 function WebsiteCard({ website }: { website: Website }) {
   const isPublished = website.status === "published";
-  const isLocalhost = typeof window !== "undefined" && window.location.hostname.includes("localhost");
-  
+  const isLocalhost =
+    typeof window !== "undefined" && window.location.hostname.includes("localhost");
+
   // Clean business slug derived from website name (e.g. "webmintra", "lens-and-light")
-  const siteSlug = website.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || website.id;
-  
+  const siteSlug =
+    website.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || website.id;
+
   // Full production domain and localhost development link
   const domainString = website.customDomain || `${siteSlug}.webmintra.in`;
-  
-  const port = typeof window !== "undefined" && window.location.port ? `:${window.location.port}` : "";
+
+  const port =
+    typeof window !== "undefined" && window.location.port ? `:${window.location.port}` : "";
   const url = isPublished
     ? website.customDomain
       ? `https://${website.customDomain}`

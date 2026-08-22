@@ -34,7 +34,8 @@ export function PrivacyPolicyPage() {
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0f172a]">Privacy Policy</h1>
             <p className="text-xs text-[#64748b] mt-2">
-              Last Updated: August 2026 • Compliant with Indian IT Act, 2000 & Digital Personal Data Protection (DPDP) Act
+              Last Updated: August 2026 • Compliant with Indian IT Act, 2000 & Digital Personal Data
+              Protection (DPDP) Act
             </p>
           </div>
 
@@ -49,31 +50,36 @@ export function PrivacyPolicyPage() {
                 <h2 className="text-base font-bold text-[#0f172a]">1. Overview</h2>
                 <p>
                   {siteName} (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;platform&rdquo;) values
-                  your privacy and is committed to protecting the personal data of our users, website
-                  owners, and their visitors. This Privacy Policy describes how we collect, use, and
-                  share your information when you use our SaaS website building and hosting services.
+                  your privacy and is committed to protecting the personal data of our users,
+                  website owners, and their visitors. This Privacy Policy describes how we collect,
+                  use, and share your information when you use our SaaS website building and hosting
+                  services.
                 </p>
               </section>
 
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">2. Information We Collect</h2>
-                <p>We collect information necessary to provide and secure our services, including:</p>
+                <p>
+                  We collect information necessary to provide and secure our services, including:
+                </p>
                 <ul className="list-disc pl-5 space-y-1 text-[#64748b]">
                   <li>
                     <strong className="text-[#0f172a]">Account Data:</strong> Name, business name,
                     email address, phone number, and password credentials.
                   </li>
                   <li>
-                    <strong className="text-[#0f172a]">Website Content:</strong> Text, images, logos,
-                    business hours, and pricing lists uploaded to your created sites.
+                    <strong className="text-[#0f172a]">Website Content:</strong> Text, images,
+                    logos, business hours, and pricing lists uploaded to your created sites.
                   </li>
                   <li>
                     <strong className="text-[#0f172a]">Lead & Form Submissions:</strong> Enquiries
-                    submitted by visitors on your published websites are stored securely for your access and routed to WhatsApp.
+                    submitted by visitors on your published websites are stored securely for your
+                    access and routed to WhatsApp.
                   </li>
                   <li>
                     <strong className="text-[#0f172a]">Billing Data:</strong> Transaction references
-                    and subscription IDs processed through RBI-approved Indian payment gateways (e.g. Razorpay, UPI). We never store raw card numbers.
+                    and subscription IDs processed through RBI-approved Indian payment gateways
+                    (e.g. Razorpay, UPI). We never store raw card numbers.
                   </li>
                 </ul>
               </section>
@@ -86,27 +92,31 @@ export function PrivacyPolicyPage() {
                     Host and deliver high-speed, secure websites with automatic SSL certification.
                   </li>
                   <li>
-                    Notify you immediately when prospective customers submit contact and booking requests.
+                    Notify you immediately when prospective customers submit contact and booking
+                    requests.
                   </li>
-                  <li>Provide customer support, GST invoices, onboarding assistance, and service updates.</li>
+                  <li>
+                    Provide customer support, GST invoices, onboarding assistance, and service
+                    updates.
+                  </li>
                 </ul>
               </section>
 
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">4. Data Ownership & Security</h2>
                 <p>
-                  You retain 100% ownership of your business content, images, and visitor lead submissions. All data in transit is encrypted using 256-bit SSL/TLS encryption and stored on secure Indian cloud infrastructure.
+                  You retain 100% ownership of your business content, images, and visitor lead
+                  submissions. All data in transit is encrypted using 256-bit SSL/TLS encryption and
+                  stored on secure Indian cloud infrastructure.
                 </p>
               </section>
 
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">5. Contact Information</h2>
                 <p>
-                  For questions regarding this policy or data deletion requests, email our data protection officer at{" "}
-                  <a
-                    href={`mailto:${supportEmail}`}
-                    className="text-[#059669] underline font-bold"
-                  >
+                  For questions regarding this policy or data deletion requests, email our data
+                  protection officer at{" "}
+                  <a href={`mailto:${supportEmail}`} className="text-[#059669] underline font-bold">
                     {supportEmail}
                   </a>
                   .

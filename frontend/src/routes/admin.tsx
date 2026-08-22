@@ -295,7 +295,10 @@ function SidebarGroup({
             onClick={onClick}
             title={collapsed ? itemLabel : undefined}
             className={`flex w-full items-center ${collapsed ? "justify-center" : "gap-2.5"} rounded-xl px-3 py-2 text-left text-xs font-semibold transition text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] overflow-hidden`}
-            activeProps={{ className: "!bg-[#ecfdf5] !text-[#047857] !font-bold border-l-4 !border-[#ea580c] shadow-2xs" }}
+            activeProps={{
+              className:
+                "!bg-[#ecfdf5] !text-[#047857] !font-bold border-l-4 !border-[#ea580c] shadow-2xs",
+            }}
           >
             <Icon className="h-4 w-4 shrink-0" />
             <span

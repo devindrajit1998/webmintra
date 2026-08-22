@@ -1,6 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Check, ChevronRight, Phone, Search, Sparkles, UploadCloud, Loader2, Image as ImageIcon, X } from "lucide-react";
+import {
+  Check,
+  ChevronRight,
+  Phone,
+  Search,
+  Sparkles,
+  UploadCloud,
+  Loader2,
+  Image as ImageIcon,
+  X,
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getPublicSettings } from "@/lib/public-api";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -131,11 +141,7 @@ export function TenantOnboarding() {
             <span
               key={item}
               className={`h-2 flex-1 rounded-full transition-all duration-300 ${
-                item < step
-                  ? "bg-[#059669]"
-                  : item === step
-                    ? "bg-[#ea580c]"
-                    : "bg-[#e2e8f0]"
+                item < step ? "bg-[#059669]" : item === step ? "bg-[#ea580c]" : "bg-[#e2e8f0]"
               }`}
             />
           ))}
@@ -242,7 +248,9 @@ export function TenantOnboarding() {
                       />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold text-[#065f46] truncate">Logo Uploaded</p>
-                        <p className="text-[10px] text-[#059669] truncate">Ready for your website header</p>
+                        <p className="text-[10px] text-[#059669] truncate">
+                          Ready for your website header
+                        </p>
                       </div>
                       <button
                         type="button"
@@ -321,7 +329,9 @@ export function TenantOnboarding() {
                   <textarea
                     rows={2}
                     value={business.description}
-                    onChange={(e) => setBusiness((prev) => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setBusiness((prev) => ({ ...prev, description: e.target.value }))
+                    }
                     placeholder="Brief description of your business or services..."
                     className="mt-1.5 w-full rounded-xl border border-[#cbd5e1] bg-white p-3 text-sm text-[#0f172a] placeholder:text-[#94a3b8] outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/15 shadow-2xs resize-none"
                   />
@@ -344,9 +354,21 @@ export function TenantOnboarding() {
             >
               <div className="grid gap-3.5 sm:grid-cols-3">
                 {[
-                  { id: "starter", name: "Starter", desc: "1 website · Free .in domain · WhatsApp Leads" },
-                  { id: "growth", name: "Growth", desc: "3 websites · Priority Edge · GST Invoicing" },
-                  { id: "pro", name: "Business Pro", desc: "10 websites · 50 GB storage · VIP Support" },
+                  {
+                    id: "starter",
+                    name: "Starter",
+                    desc: "1 website · Free .in domain · WhatsApp Leads",
+                  },
+                  {
+                    id: "growth",
+                    name: "Growth",
+                    desc: "3 websites · Priority Edge · GST Invoicing",
+                  },
+                  {
+                    id: "pro",
+                    name: "Business Pro",
+                    desc: "10 websites · 50 GB storage · VIP Support",
+                  },
                 ].map((option) => (
                   <button
                     type="button"
@@ -360,11 +382,11 @@ export function TenantOnboarding() {
                   >
                     <div className="flex items-center justify-between">
                       <p className="text-base font-extrabold text-[#0f172a]">{option.name}</p>
-                      {plan === option.id && <span className="text-[#059669] text-xs font-bold">✓ Selected</span>}
+                      {plan === option.id && (
+                        <span className="text-[#059669] text-xs font-bold">✓ Selected</span>
+                      )}
                     </div>
-                    <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
-                      {option.desc}
-                    </p>
+                    <p className="mt-2 text-xs text-[#64748b] leading-relaxed">{option.desc}</p>
                   </button>
                 ))}
               </div>
@@ -414,7 +436,9 @@ export function TenantOnboarding() {
                         <span className="text-2xl">🇮🇳</span>
                       </div>
                       <p className="mt-3 text-sm font-extrabold text-[#0f172a]">{template.name}</p>
-                      <p className="mt-0.5 text-[10px] font-bold text-[#059669] uppercase">{template.category}</p>
+                      <p className="mt-0.5 text-[10px] font-bold text-[#059669] uppercase">
+                        {template.category}
+                      </p>
                       <p className="mt-1.5 text-xs text-[#64748b] line-clamp-2">
                         {template.description}
                       </p>
@@ -449,7 +473,9 @@ function Step({
   return (
     <div className="mt-3">
       <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a]">{title}</h1>
-      <p className="mt-2 max-w-2xl text-xs sm:text-sm text-[#64748b] leading-relaxed">{description}</p>
+      <p className="mt-2 max-w-2xl text-xs sm:text-sm text-[#64748b] leading-relaxed">
+        {description}
+      </p>
       <div className="mt-6 space-y-4">{children}</div>
     </div>
   );

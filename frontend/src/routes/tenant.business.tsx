@@ -128,7 +128,8 @@ function TenantBusinessPage() {
               Business Information
             </h1>
             <p className="mt-1 text-sm text-[#64748b]">
-              Manage the brand identity, logo, and contact details used across your websites and customer emails.
+              Manage the brand identity, logo, and contact details used across your websites and
+              customer emails.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
@@ -146,7 +147,11 @@ function TenantBusinessPage() {
               disabled={!hasChanges || isSaving}
               className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
             >
-              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
               <span>{isSaving ? "Saving..." : "Save Profile"}</span>
             </button>
           </div>
@@ -161,7 +166,9 @@ function TenantBusinessPage() {
               <p className="truncate font-display text-lg font-extrabold text-[#0f172a]">
                 {business.name || "Your Business"}
               </p>
-              <p className="mt-0.5 truncate text-xs font-semibold text-[#64748b]">{business.email || user.email}</p>
+              <p className="mt-0.5 truncate text-xs font-semibold text-[#64748b]">
+                {business.email || user.email}
+              </p>
             </div>
           </div>
           <div className="w-full max-w-sm">

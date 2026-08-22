@@ -480,9 +480,7 @@ function buildTree(doc: Document, repeaters: Repeater[]): SectionNode[] {
     // 3. Humanized ID or Class (e.g. "hero-section" -> "Hero Section")
     const id = el.getAttribute("id");
     if (id && !/^e\d+$/.test(id)) {
-      const cleanId = id
-        .replace(/[-_]/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const cleanId = id.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
       return `#${cleanId}`;
     }
 

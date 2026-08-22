@@ -102,30 +102,33 @@ function SettingsPage() {
       <button
         type="button"
         onClick={() => setActiveView("seo")}
-        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${activeView === "seo"
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "seo"
             ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
             : "text-[#64748b] hover:text-[#0b192c]"
-          }`}
+        }`}
       >
         <SearchCheck className="h-4 w-4" /> Search Optimization
       </button>
       <button
         type="button"
         onClick={() => setActiveView("platform")}
-        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${activeView === "platform"
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "platform"
             ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
             : "text-[#64748b] hover:text-[#0b192c]"
-          }`}
+        }`}
       >
         <SettingsIcon className="h-4 w-4" /> Platform Settings
       </button>
       <button
         type="button"
         onClick={() => setActiveView("content")}
-        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${activeView === "content"
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "content"
             ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
             : "text-[#64748b] hover:text-[#0b192c]"
-          }`}
+        }`}
       >
         <FilePenLine className="h-4 w-4" /> Public Content
       </button>
@@ -140,7 +143,8 @@ function SettingsPage() {
       </div>
     );
 
-  const contentSettings = data?.settings?.filter((setting: any) => setting.group === "content") || [];
+  const contentSettings =
+    data?.settings?.filter((setting: any) => setting.group === "content") || [];
 
   if (activeView === "content")
     return (
@@ -151,7 +155,8 @@ function SettingsPage() {
             Public Content
           </h1>
           <p className="mt-1 text-xs font-medium text-[#64748b]">
-            Edit the legal content published on public policy pages. Changes become visible after saving.
+            Edit the legal content published on public policy pages. Changes become visible after
+            saving.
           </p>
         </div>
 
@@ -210,7 +215,9 @@ function SettingsPage() {
       {viewTabs}
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Platform Settings</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+            Platform Settings
+          </h1>
           <p className="mt-1 text-xs font-medium text-[#64748b]">
             Configure global platform behavior and defaults.
           </p>
@@ -237,7 +244,10 @@ function SettingsPage() {
                 >
                   <div className="flex justify-between items-start gap-6">
                     <div className="flex-1">
-                      <label htmlFor={setting.key} className="text-xs font-bold text-[#0b192c] block">
+                      <label
+                        htmlFor={setting.key}
+                        className="text-xs font-bold text-[#0b192c] block"
+                      >
                         {setting.key
                           .split(".")
                           .pop()
@@ -355,7 +365,8 @@ function SettingsPage() {
                   {setting.key === "platform.maintenanceMode" &&
                     formData[setting.key] === "true" && (
                       <div className="flex items-center gap-2 mt-2 rounded-lg border border-[#fed7aa] bg-[#fff7ed] p-3 text-xs font-semibold text-[#c2410c]">
-                        <AlertTriangle className="h-4 w-4 shrink-0" /> Maintenance mode will block all non-admin access!
+                        <AlertTriangle className="h-4 w-4 shrink-0" /> Maintenance mode will block
+                        all non-admin access!
                       </div>
                     )}
                 </div>

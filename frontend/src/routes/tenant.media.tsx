@@ -263,7 +263,9 @@ function MediaPage() {
             <div className="absolute inset-4 z-20 grid place-items-center rounded-2xl border-2 border-dashed border-[#059669] bg-[#ecfdf5]/95 backdrop-blur-xs">
               <div className="text-center">
                 <Upload className="mx-auto h-10 w-10 text-[#059669] animate-bounce" />
-                <p className="mt-3 text-sm font-extrabold text-[#065f46]">Drop files here to upload</p>
+                <p className="mt-3 text-sm font-extrabold text-[#065f46]">
+                  Drop files here to upload
+                </p>
               </div>
             </div>
           ) : null}
@@ -300,11 +302,15 @@ function MediaPage() {
             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48]">
               <Trash2 className="h-5 w-5" />
             </span>
-            <h2 id="delete-media-title" className="mt-4 font-display text-base font-extrabold text-[#0f172a]">
+            <h2
+              id="delete-media-title"
+              className="mt-4 font-display text-base font-extrabold text-[#0f172a]"
+            >
               Delete media?
             </h2>
             <p className="mt-1 text-xs leading-relaxed text-[#64748b]">
-              "{displayName(pendingDelete)}" will be permanently removed. Existing pages using this file may show a broken image.
+              "{displayName(pendingDelete)}" will be permanently removed. Existing pages using this
+              file may show a broken image.
             </p>
             <div className="mt-6 flex justify-end gap-2.5">
               <button
@@ -463,9 +469,15 @@ function AssetList({
                   </span>
                 </div>
               </td>
-              <td className="px-5 py-3.5 text-xs font-semibold capitalize text-[#64748b]">{asset.mediaType}</td>
-              <td className="px-5 py-3.5 text-xs font-bold text-[#0f172a]">{formatBytes(asset.size)}</td>
-              <td className="px-5 py-3.5 text-xs font-medium text-[#64748b]">{formatDate(asset.createdAt)}</td>
+              <td className="px-5 py-3.5 text-xs font-semibold capitalize text-[#64748b]">
+                {asset.mediaType}
+              </td>
+              <td className="px-5 py-3.5 text-xs font-bold text-[#0f172a]">
+                {formatBytes(asset.size)}
+              </td>
+              <td className="px-5 py-3.5 text-xs font-medium text-[#64748b]">
+                {formatDate(asset.createdAt)}
+              </td>
               <td className="px-5 py-3.5">
                 <div className="flex justify-end gap-1.5">
                   <AssetActions asset={asset} onDelete={() => onDelete(asset)} />
@@ -608,7 +620,9 @@ function EmptyWorkspace() {
     <div className="grid min-h-[60vh] place-items-center rounded-2xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center shadow-xs">
       <div>
         <ImageIcon className="mx-auto h-12 w-12 text-[#cbd5e1]" />
-        <h1 className="mt-4 font-display text-lg font-extrabold text-[#0f172a]">Create a website first</h1>
+        <h1 className="mt-4 font-display text-lg font-extrabold text-[#0f172a]">
+          Create a website first
+        </h1>
         <p className="mt-1 text-xs text-[#64748b]">
           Media files and assets are organized per website in your workspace.
         </p>

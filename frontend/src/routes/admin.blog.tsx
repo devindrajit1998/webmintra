@@ -771,7 +771,11 @@ function BlogPage() {
                       {viewingPost.title}
                     </h1>
                     <p className="text-xs text-[#64748b] mt-2">
-                      Published: {viewingPost.publishedAt ? new Date(viewingPost.publishedAt).toLocaleDateString() : "Unpublished (Draft)"} · Author: {viewingPost.author?.name || "Admin"}
+                      Published:{" "}
+                      {viewingPost.publishedAt
+                        ? new Date(viewingPost.publishedAt).toLocaleDateString()
+                        : "Unpublished (Draft)"}{" "}
+                      · Author: {viewingPost.author?.name || "Admin"}
                     </p>
                   </div>
 
@@ -845,16 +849,22 @@ function BlogPage() {
                     <h4 className="font-bold text-[#0b192c] mb-1">Post Details</h4>
                     <div className="flex justify-between text-[#64748b]">
                       <span>Views:</span>
-                      <span className="font-semibold text-[#0b192c]">{viewingPost.viewCount || 0}</span>
+                      <span className="font-semibold text-[#0b192c]">
+                        {viewingPost.viewCount || 0}
+                      </span>
                     </div>
                     <div className="flex justify-between text-[#64748b]">
                       <span>Reading Time:</span>
-                      <span className="font-semibold text-[#0b192c]">{viewingPost.readTimeMinutes || 3} min</span>
+                      <span className="font-semibold text-[#0b192c]">
+                        {viewingPost.readTimeMinutes || 3} min
+                      </span>
                     </div>
                     <div className="flex justify-between text-[#64748b]">
                       <span>Created:</span>
                       <span className="font-semibold text-[#0b192c]">
-                        {viewingPost.createdAt ? new Date(viewingPost.createdAt).toLocaleDateString() : "-"}
+                        {viewingPost.createdAt
+                          ? new Date(viewingPost.createdAt).toLocaleDateString()
+                          : "-"}
                       </span>
                     </div>
                   </div>
@@ -968,7 +978,9 @@ function BlogPage() {
                   data.posts.map((post: any) => (
                     <tr key={post._id || post.id} className="transition-colors hover:bg-[#f8fafc]">
                       <td className="px-6 py-4">
-                        <p className="font-bold text-xs text-[#0b192c] line-clamp-1">{post.title}</p>
+                        <p className="font-bold text-xs text-[#0b192c] line-clamp-1">
+                          {post.title}
+                        </p>
                         <p className="text-[10px] font-mono text-[#64748b] mt-0.5">/{post.slug}</p>
                       </td>
                       <td className="px-6 py-4 text-xs font-medium text-[#475569]">
@@ -992,7 +1004,7 @@ function BlogPage() {
                               #{t}
                             </span>
                           ))}
-                          {(!post.seo?.keywords?.length && !post.tags?.length) && (
+                          {!post.seo?.keywords?.length && !post.tags?.length && (
                             <span className="text-[10px] text-[#94a3b8]">None</span>
                           )}
                         </div>
@@ -1112,7 +1124,9 @@ function BlogPage() {
                           </div>
                           <div>
                             <p className="font-bold text-xs text-[#0b192c]">{cat.name}</p>
-                            <p className="text-[10px] text-[#64748b]">Order: {cat.sortOrder ?? 0}</p>
+                            <p className="text-[10px] text-[#64748b]">
+                              Order: {cat.sortOrder ?? 0}
+                            </p>
                           </div>
                         </div>
                       </td>
@@ -1122,7 +1136,9 @@ function BlogPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-xs text-[#475569] max-w-xs truncate">
-                        {cat.description || <span className="text-[#94a3b8] italic">No description</span>}
+                        {cat.description || (
+                          <span className="text-[#94a3b8] italic">No description</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         <button
@@ -1260,7 +1276,9 @@ function BlogPage() {
                 <textarea
                   rows={3}
                   value={categoryForm.description}
-                  onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                  onChange={(e) =>
+                    setCategoryForm({ ...categoryForm, description: e.target.value })
+                  }
                   placeholder="Brief description of what articles belong to this topic..."
                   className="w-full rounded-xl border border-[#cbd5e1] bg-white p-3 text-xs font-medium text-[#0b192c] outline-none shadow-2xs transition focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/10"
                 />
@@ -1281,9 +1299,7 @@ function BlogPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#0b192c] mb-1.5">
-                    Status
-                  </label>
+                  <label className="block text-xs font-bold text-[#0b192c] mb-1.5">Status</label>
                   <select
                     value={categoryForm.isActive ? "active" : "inactive"}
                     onChange={(e) =>
@@ -1322,7 +1338,10 @@ function BlogPage() {
       )}
 
       {/* Delete Category Confirmation Dialog */}
-      <AlertDialog open={!!deleteCategoryId} onOpenChange={(open) => !open && setDeleteCategoryId(null)}>
+      <AlertDialog
+        open={!!deleteCategoryId}
+        onOpenChange={(open) => !open && setDeleteCategoryId(null)}
+      >
         <AlertDialogContent className="max-w-md rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xl">
           <AlertDialogHeader>
             <div className="flex items-center gap-3 mb-1">
@@ -1333,11 +1352,14 @@ function BlogPage() {
                 <AlertDialogTitle className="text-base font-bold text-[#0b192c]">
                   Delete Category
                 </AlertDialogTitle>
-                <p className="text-[11px] font-medium text-[#64748b]">This action cannot be undone</p>
+                <p className="text-[11px] font-medium text-[#64748b]">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
             <AlertDialogDescription className="text-xs font-medium text-[#475569] leading-relaxed pt-2">
-              Are you sure you want to permanently delete this blog category? Posts linked to this category will not be deleted.
+              Are you sure you want to permanently delete this blog category? Posts linked to this
+              category will not be deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4 flex gap-2 sm:justify-end">
@@ -1348,7 +1370,9 @@ function BlogPage() {
               onClick={() => deleteCategoryId && deleteCategoryMutation.mutate(deleteCategoryId)}
               className="inline-flex h-9 items-center rounded-xl bg-[#e11d48] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#be123c]"
             >
-              {deleteCategoryMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
+              {deleteCategoryMutation.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : null}
               Delete Category
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -1367,7 +1391,9 @@ function BlogPage() {
                 <AlertDialogTitle className="text-base font-bold text-[#0b192c]">
                   Delete Blog Post
                 </AlertDialogTitle>
-                <p className="text-[11px] font-medium text-[#64748b]">This action cannot be undone</p>
+                <p className="text-[11px] font-medium text-[#64748b]">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
             <AlertDialogDescription className="text-xs font-medium text-[#475569] leading-relaxed pt-2">
@@ -1382,7 +1408,9 @@ function BlogPage() {
               onClick={() => deletePostId && deleteMutation.mutate(deletePostId)}
               className="inline-flex h-9 items-center rounded-xl bg-[#e11d48] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#be123c]"
             >
-              {deleteMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
+              {deleteMutation.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : null}
               Delete Post
             </AlertDialogAction>
           </AlertDialogFooter>

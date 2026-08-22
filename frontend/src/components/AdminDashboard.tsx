@@ -125,7 +125,11 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
             </label>
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <IconButton label="Notifications" icon={<Bell className="h-4 w-4 text-[#475569]" />} badge="4" />
+            <IconButton
+              label="Notifications"
+              icon={<Bell className="h-4 w-4 text-[#475569]" />}
+              badge="4"
+            />
             <IconButton label="Help" icon={<CircleHelp className="h-4 w-4 text-[#475569]" />} />
             <div className="ml-2 flex items-center gap-2.5 border-l border-[#e2e8f0] pl-3">
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#059669] text-xs font-bold text-white shadow-xs">
@@ -142,9 +146,12 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
         <div className="mx-auto max-w-[1600px] p-4 sm:p-6 space-y-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">Admin Overview</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">
+                Admin Overview
+              </h1>
               <p className="mt-1 text-xs sm:text-sm text-[#64748b]">
-                Welcome back, {user.name}. Here&apos;s what&apos;s happening with your Indian business network today.
+                Welcome back, {user.name}. Here&apos;s what&apos;s happening with your Indian
+                business network today.
               </p>
             </div>
             <button
@@ -196,11 +203,15 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
             <article className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Platform Growth</span>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
+                    Platform Growth
+                  </span>
                   <p className="mt-2 text-3xl font-extrabold text-[#0b192c]">
                     {totalUsers.toLocaleString()}
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-[#059669]">Live total registered accounts</p>
+                  <p className="mt-1 text-xs font-semibold text-[#059669]">
+                    Live total registered accounts
+                  </p>
                 </div>
                 <select
                   aria-label="Growth period"
@@ -213,7 +224,9 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
               <GrowthChart />
             </article>
             <article className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm flex flex-col justify-between">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Account Status</h2>
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
+                Account Status
+              </h2>
               <div className="mt-4 flex flex-col sm:flex-row items-center gap-6 justify-around">
                 <Donut value={totalUsers ? Math.round((verified / totalUsers) * 100) : 0} />
                 <div className="space-y-3 text-xs w-full sm:w-auto">
@@ -240,7 +253,10 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
                   <h2 className="text-sm font-extrabold text-[#0b192c]">Recent Tenants</h2>
                   <p className="mt-0.5 text-xs text-[#64748b]">Latest accounts from the platform</p>
                 </div>
-                <a href="/admin-tenants" className="text-xs font-bold text-[#059669] hover:underline">
+                <a
+                  href="/admin-tenants"
+                  className="text-xs font-bold text-[#059669] hover:underline"
+                >
                   View all →
                 </a>
               </div>
@@ -257,10 +273,7 @@ export function AdminDashboard({ user, dashboard, error, onSignOut }: Props) {
                   <tbody className="divide-y divide-[#f1f5f9]">
                     {dashboard?.recentUsers.length ? (
                       dashboard.recentUsers.map((recent) => (
-                        <tr
-                          key={recent.email}
-                          className="hover:bg-[#f8fafc] transition"
-                        >
+                        <tr key={recent.email} className="hover:bg-[#f8fafc] transition">
                           <td className="px-6 py-3.5">
                             <p className="font-bold text-[#0f172a]">{recent.name}</p>
                             <p className="text-[11px] text-[#64748b]">{recent.email}</p>
@@ -441,7 +454,9 @@ function StatCard({
   return (
     <article className="tiranga-border-top rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
       <div className="flex items-center gap-3.5">
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${styles[color]}`}>
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${styles[color]}`}
+        >
           {icon}
         </span>
         <div>

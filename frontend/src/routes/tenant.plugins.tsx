@@ -112,9 +112,7 @@ function TenantPluginsPage() {
   const { websites } = useTenantContext();
   const queryClient = useQueryClient();
 
-  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>(
-    websites[0]?.id || ""
-  );
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>(websites[0]?.id || "");
 
   useEffect(() => {
     if (!selectedWebsiteId && websites.length > 0) {
@@ -139,19 +137,10 @@ function TenantPluginsPage() {
   const installedPlugins = data?.plugins || [];
 
   const toggleMutation = useMutation({
-    mutationFn: ({
-      slug,
-      isEnabled,
-    }: {
-      slug: string;
-      isEnabled: boolean;
-    }) => toggleWebsitePlugin(selectedWebsiteId, slug, isEnabled),
+    mutationFn: ({ slug, isEnabled }: { slug: string; isEnabled: boolean }) =>
+      toggleWebsitePlugin(selectedWebsiteId, slug, isEnabled),
     onSuccess: (_, variables) => {
-      toast.success(
-        variables.isEnabled
-          ? "App activated on your website!"
-          : "App disabled."
-      );
+      toast.success(variables.isEnabled ? "App activated on your website!" : "App disabled.");
       queryClient.invalidateQueries({
         queryKey: ["website-plugins", selectedWebsiteId],
       });
@@ -182,7 +171,8 @@ function TenantPluginsPage() {
               Plugins & Growth Apps
             </h1>
             <p className="mt-1 text-sm text-[#64748b]">
-              Easy plug-and-play tools to connect your custom domain and let customers contact you on WhatsApp. Zero coding needed.
+              Easy plug-and-play tools to connect your custom domain and let customers contact you
+              on WhatsApp. Zero coding needed.
             </p>
           </div>
 
@@ -230,18 +220,14 @@ function TenantPluginsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           {catalog.map((plugin) => {
-            const installed = installedPlugins.find(
-              (p) => p.pluginSlug === plugin.slug
-            );
+            const installed = installedPlugins.find((p) => p.pluginSlug === plugin.slug);
             const isEnabled = installed?.isEnabled ?? false;
 
             return (
               <div
                 key={plugin.slug}
                 className={`relative flex flex-col justify-between rounded-2xl border bg-white p-6 shadow-xs transition-all hover:shadow-md ${
-                  isEnabled
-                    ? "border-[#a7f3d0] ring-1 ring-[#a7f3d0]/60"
-                    : "border-[#e2e8f0]"
+                  isEnabled ? "border-[#a7f3d0] ring-1 ring-[#a7f3d0]/60" : "border-[#e2e8f0]"
                 }`}
               >
                 <div>
@@ -271,9 +257,7 @@ function TenantPluginsPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs font-semibold text-[#64748b]">
-                          {plugin.tagline}
-                        </p>
+                        <p className="text-xs font-semibold text-[#64748b]">{plugin.tagline}</p>
                       </div>
                     </div>
 
@@ -332,7 +316,9 @@ function TenantPluginsPage() {
 
                   {plugin.slug === "custom-domains" && (
                     <div className="mt-4 rounded-xl border border-[#f1f5f9] bg-[#f8fafc] p-3 text-xs text-[#64748b]">
-                      Connect apex or subdomains like <code className="text-[#059669] font-bold">www.yourshop.in</code> with automated SSL lock.
+                      Connect apex or subdomains like{" "}
+                      <code className="text-[#059669] font-bold">www.yourshop.in</code> with
+                      automated SSL lock.
                     </div>
                   )}
                 </div>
@@ -417,9 +403,7 @@ function ConfigPluginModal({
     ...plugin.defaultConfig,
     ...(installed?.config || {}),
   });
-  const [isEnabled, setIsEnabled] = useState<boolean>(
-    installed?.isEnabled ?? true
-  );
+  const [isEnabled, setIsEnabled] = useState<boolean>(installed?.isEnabled ?? true);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -449,9 +433,7 @@ function ConfigPluginModal({
               <h2 className="font-display text-base font-extrabold text-[#0f172a]">
                 Configure {plugin.name}
               </h2>
-              <p className="text-xs text-[#64748b]">
-                Customize your floating WhatsApp chat button
-              </p>
+              <p className="text-xs text-[#64748b]">Customize your floating WhatsApp chat button</p>
             </div>
           </div>
           <button
@@ -469,7 +451,9 @@ function ConfigPluginModal({
           <div className="flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
             <div>
               <p className="text-xs font-extrabold text-[#0f172a]">Activate Widget on Website</p>
-              <p className="text-[11px] text-[#64748b]">Show floating WhatsApp button to all website visitors</p>
+              <p className="text-[11px] text-[#64748b]">
+                Show floating WhatsApp button to all website visitors
+              </p>
             </div>
             <button
               type="button"
@@ -499,18 +483,14 @@ function ConfigPluginModal({
                 <textarea
                   rows={field.rows || 3}
                   value={config[field.name] || ""}
-                  onChange={(e) =>
-                    setConfig((prev) => ({ ...prev, [field.name]: e.target.value }))
-                  }
+                  onChange={(e) => setConfig((prev) => ({ ...prev, [field.name]: e.target.value }))}
                   placeholder={field.placeholder}
                   className="w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2.5 text-xs font-semibold text-[#0f172a] placeholder-[#94a3b8] outline-none focus:border-[#059669]"
                 />
               ) : field.type === "select" ? (
                 <select
                   value={config[field.name] || field.options?.[0]?.value || ""}
-                  onChange={(e) =>
-                    setConfig((prev) => ({ ...prev, [field.name]: e.target.value }))
-                  }
+                  onChange={(e) => setConfig((prev) => ({ ...prev, [field.name]: e.target.value }))}
                   className="h-10 w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer"
                 >
                   {field.options?.map((opt) => (
@@ -524,17 +504,13 @@ function ConfigPluginModal({
                   type={field.type}
                   required={field.required}
                   value={config[field.name] || ""}
-                  onChange={(e) =>
-                    setConfig((prev) => ({ ...prev, [field.name]: e.target.value }))
-                  }
+                  onChange={(e) => setConfig((prev) => ({ ...prev, [field.name]: e.target.value }))}
                   placeholder={field.placeholder}
                   className="h-10 w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 text-xs font-semibold text-[#0f172a] placeholder-[#94a3b8] outline-none focus:border-[#059669]"
                 />
               )}
 
-              {field.helpText && (
-                <p className="text-[11px] text-[#64748b]">{field.helpText}</p>
-              )}
+              {field.helpText && <p className="text-[11px] text-[#64748b]">{field.helpText}</p>}
             </div>
           ))}
 

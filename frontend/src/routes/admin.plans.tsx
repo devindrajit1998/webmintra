@@ -327,9 +327,7 @@ function ToggleRow({
       onClick={() => onChange(!enabled)}
     >
       <div className="flex items-center gap-2.5">
-        <Icon
-          className={`h-4 w-4 shrink-0 ${enabled ? "text-[#059669]" : "text-[#94a3b8]"}`}
-        />
+        <Icon className={`h-4 w-4 shrink-0 ${enabled ? "text-[#059669]" : "text-[#94a3b8]"}`} />
         <div>
           <p className={`text-xs font-bold ${enabled ? "text-[#065f46]" : "text-[#334155]"}`}>
             {label}
@@ -489,20 +487,20 @@ function PlanFormDrawer({
   const [form, setForm] = useState<PlanForm>(
     initial
       ? {
-        name: initial.name,
-        slug: initial.slug,
-        description: initial.description ?? "",
-        pricing: {
-          monthly: initial.pricing?.monthly ?? 499,
-          yearly: initial.pricing?.yearly ?? 4990,
-        },
-        trialDays: initial.trialDays ?? 0,
-        isPublic: initial.isPublic ?? true,
-        sortOrder: initial.sortOrder ?? 0,
-        limits: { ...DEFAULT_LIMITS, ...initial.limits },
-        features: { ...DEFAULT_FEATURES, ...initial.features },
-        seoFeatures: { ...DEFAULT_SEO_FEATURES, ...initial.seoFeatures },
-      }
+          name: initial.name,
+          slug: initial.slug,
+          description: initial.description ?? "",
+          pricing: {
+            monthly: initial.pricing?.monthly ?? 499,
+            yearly: initial.pricing?.yearly ?? 4990,
+          },
+          trialDays: initial.trialDays ?? 0,
+          isPublic: initial.isPublic ?? true,
+          sortOrder: initial.sortOrder ?? 0,
+          limits: { ...DEFAULT_LIMITS, ...initial.limits },
+          features: { ...DEFAULT_FEATURES, ...initial.features },
+          seoFeatures: { ...DEFAULT_SEO_FEATURES, ...initial.seoFeatures },
+        }
       : { ...EMPTY_FORM },
   );
 
@@ -617,9 +615,7 @@ function PlanFormDrawer({
                 </div>
               </div>
               <div>
-                <label className="text-xs font-bold text-[#0f172a]">
-                  Description (optional)
-                </label>
+                <label className="text-xs font-bold text-[#0f172a]">Description (optional)</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
@@ -638,9 +634,7 @@ function PlanFormDrawer({
             </span>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-xs font-bold text-[#0f172a]">
-                  Monthly Price (₹)
-                </label>
+                <label className="text-xs font-bold text-[#0f172a]">Monthly Price (₹)</label>
                 <input
                   type="number"
                   min="0"
@@ -728,72 +722,72 @@ function PlanFormDrawer({
               disabled for emails/AI credits).
             </p>
             <div className="rounded-2xl border border-[#e2e8f0] bg-white px-4 py-1 divide-y divide-[#f1f5f9] shadow-xs">
-                <SelectRow
-                  label="Websites"
-                  icon={Globe}
-                  value={form.limits.websites}
-                  options={WEBSITE_OPTIONS}
-                  unit="websites"
-                  onChange={setLim("websites")}
-                />
-                <SelectRow
-                  label="Pages per website"
-                  icon={FileText}
-                  value={form.limits.pagesPerWebsite}
-                  options={PAGES_OPTIONS}
-                  unit="pages"
-                  onChange={setLim("pagesPerWebsite")}
-                />
-                <SelectRow
-                  label="Custom domains"
-                  icon={Globe}
-                  value={form.limits.customDomains}
-                  options={[0, 1, 2, 5, 10]}
-                  unit="domains"
-                  onChange={setLim("customDomains")}
-                />
-                <SelectRow
-                  label="Storage"
-                  icon={Database}
-                  value={form.limits.storageMb}
-                  options={STORAGE_OPTIONS}
-                  unit="MB"
-                  onChange={setLim("storageMb")}
-                />
-                <SelectRow
-                  label="Bandwidth"
-                  icon={Wifi}
-                  value={form.limits.bandwidthGb}
-                  options={BANDWIDTH_OPTIONS}
-                  unit="GB"
-                  onChange={setLim("bandwidthGb")}
-                />
-                <SelectRow
-                  label="Collaborators"
-                  icon={Users}
-                  value={form.limits.collaborators}
-                  options={COLLAB_OPTIONS}
-                  unit="members"
-                  onChange={setLim("collaborators")}
-                />
-                <SelectRow
-                  label="Emails per month"
-                  icon={Mail}
-                  value={form.limits.emailsPerMonth}
-                  options={EMAIL_OPTIONS}
-                  unit="emails"
-                  onChange={setLim("emailsPerMonth")}
-                />
-                <SelectRow
-                  label="AI credits / month"
-                  icon={Sparkles}
-                  value={form.limits.aiCreditsPerMonth}
-                  options={AI_OPTIONS}
-                  unit="credits"
-                  onChange={setLim("aiCreditsPerMonth")}
-                />
-              </div>
-            </section>
+              <SelectRow
+                label="Websites"
+                icon={Globe}
+                value={form.limits.websites}
+                options={WEBSITE_OPTIONS}
+                unit="websites"
+                onChange={setLim("websites")}
+              />
+              <SelectRow
+                label="Pages per website"
+                icon={FileText}
+                value={form.limits.pagesPerWebsite}
+                options={PAGES_OPTIONS}
+                unit="pages"
+                onChange={setLim("pagesPerWebsite")}
+              />
+              <SelectRow
+                label="Custom domains"
+                icon={Globe}
+                value={form.limits.customDomains}
+                options={[0, 1, 2, 5, 10]}
+                unit="domains"
+                onChange={setLim("customDomains")}
+              />
+              <SelectRow
+                label="Storage"
+                icon={Database}
+                value={form.limits.storageMb}
+                options={STORAGE_OPTIONS}
+                unit="MB"
+                onChange={setLim("storageMb")}
+              />
+              <SelectRow
+                label="Bandwidth"
+                icon={Wifi}
+                value={form.limits.bandwidthGb}
+                options={BANDWIDTH_OPTIONS}
+                unit="GB"
+                onChange={setLim("bandwidthGb")}
+              />
+              <SelectRow
+                label="Collaborators"
+                icon={Users}
+                value={form.limits.collaborators}
+                options={COLLAB_OPTIONS}
+                unit="members"
+                onChange={setLim("collaborators")}
+              />
+              <SelectRow
+                label="Emails per month"
+                icon={Mail}
+                value={form.limits.emailsPerMonth}
+                options={EMAIL_OPTIONS}
+                unit="emails"
+                onChange={setLim("emailsPerMonth")}
+              />
+              <SelectRow
+                label="AI credits / month"
+                icon={Sparkles}
+                value={form.limits.aiCreditsPerMonth}
+                options={AI_OPTIONS}
+                unit="credits"
+                onChange={setLim("aiCreditsPerMonth")}
+              />
+            </div>
+          </section>
 
           {/* Platform Features */}
           <section>
@@ -870,7 +864,9 @@ function PlanFormDrawer({
                   <div className="flex items-center gap-3">
                     <div
                       className={`grid h-8 w-8 place-items-center rounded-xl font-bold ${
-                        seoTier === "basic" ? "bg-[#059669] text-white" : "bg-[#f1f5f9] text-[#64748b]"
+                        seoTier === "basic"
+                          ? "bg-[#059669] text-white"
+                          : "bg-[#f1f5f9] text-[#64748b]"
                       }`}
                     >
                       <Search className="h-4 w-4" />

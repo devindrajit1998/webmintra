@@ -233,7 +233,10 @@ function SupportPage() {
                 icon={<AlertCircle className="h-8 w-8 text-rose-500" />}
                 title="Could not load tickets"
                 action={
-                  <button onClick={() => listQuery.refetch()} className="text-xs font-bold text-[#059669]">
+                  <button
+                    onClick={() => listQuery.refetch()}
+                    className="text-xs font-bold text-[#059669]"
+                  >
                     Try again
                   </button>
                 }
@@ -262,9 +265,7 @@ function SupportPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-bold text-[#0f172a]">
-                        {item.subject}
-                      </p>
+                      <p className="truncate text-xs font-bold text-[#0f172a]">{item.subject}</p>
                       <p className="mt-0.5 font-mono text-[10px] font-bold text-[#64748b]">
                         {item.ticketNumber} · {item.category}
                       </p>
@@ -331,7 +332,8 @@ function SupportPage() {
                       </h2>
                     </div>
                     <p className="mt-0.5 text-[11px] text-[#64748b]">
-                      Created {format(new Date(ticket.createdAt), "PPP")} · Category: {ticket.category}
+                      Created {format(new Date(ticket.createdAt), "PPP")} · Category:{" "}
+                      {ticket.category}
                     </p>
                   </div>
                 </div>
@@ -352,7 +354,9 @@ function SupportPage() {
                 {(ticket.replies ?? []).map((r: any) => (
                   <Message
                     key={r.id}
-                    author={r.author?.role === "admin" ? r.author.name || "WebMintra Support" : "You"}
+                    author={
+                      r.author?.role === "admin" ? r.author.name || "WebMintra Support" : "You"
+                    }
                     content={r.content}
                     date={r.createdAt}
                     isTenant={r.author?.role !== "admin"}
@@ -503,7 +507,9 @@ function StatusBadge({ status }: { status: SupportTicket["status"] }) {
         ? "bg-[#f0f9ff] text-[#0284c7] border border-[#bae6fd]"
         : "bg-[#f8fafc] text-[#64748b] border border-[#e2e8f0]";
   return (
-    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase ${styles}`}>
+    <span
+      className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase ${styles}`}
+    >
       {status.replace(/_/g, " ")}
     </span>
   );

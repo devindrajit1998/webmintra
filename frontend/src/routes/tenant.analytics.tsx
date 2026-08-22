@@ -198,10 +198,14 @@ function MetricCard({
     <article className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#64748b]">{label}</p>
+          <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#64748b]">
+            {label}
+          </p>
           <p className="mt-1 font-display text-3xl font-black text-[#0f172a]">{value}</p>
         </div>
-        <span className={`flex h-10 w-10 items-center justify-center rounded-xl border ${colors[tone]} shadow-2xs`}>
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-xl border ${colors[tone]} shadow-2xs`}
+        >
           <Icon className="h-5 w-5" />
         </span>
       </div>
@@ -226,7 +230,9 @@ function TrafficPanel({
     <section className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between border-b border-[#f1f5f9] pb-4">
         <div>
-          <h2 className="font-display text-base font-extrabold text-[#0f172a]">Website Traffic Trend</h2>
+          <h2 className="font-display text-base font-extrabold text-[#0f172a]">
+            Website Traffic Trend
+          </h2>
           <p className="mt-0.5 text-xs text-[#64748b]">
             Visitors and page views over the last 30 days
           </p>
@@ -243,7 +249,9 @@ function TrafficPanel({
       ) : isError ? (
         <div className="grid min-h-72 place-items-center text-center">
           <div>
-            <p className="text-xs font-bold text-[#e11d48]">Traffic analytics could not be loaded</p>
+            <p className="text-xs font-bold text-[#e11d48]">
+              Traffic analytics could not be loaded
+            </p>
             <button
               type="button"
               onClick={onRetry}
@@ -421,7 +429,9 @@ function WebsitePerformance({
       <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-4 bg-[#f8fafc]">
         <div>
           <h2 className="font-display text-base font-extrabold text-[#0f172a]">Website Status</h2>
-          <p className="mt-0.5 text-xs text-[#64748b]">Publishing state and domain routing coverage</p>
+          <p className="mt-0.5 text-xs text-[#64748b]">
+            Publishing state and domain routing coverage
+          </p>
         </div>
         <Activity className="h-5 w-5 text-[#059669]" />
       </div>
@@ -436,9 +446,7 @@ function WebsitePerformance({
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate text-xs font-bold text-[#0f172a]">
-                      {website.name}
-                    </h3>
+                    <h3 className="truncate text-xs font-bold text-[#0f172a]">{website.name}</h3>
                     <StatusBadge status={website.status} />
                   </div>
                   <p className="mt-1 text-[11px] font-medium text-[#64748b]">

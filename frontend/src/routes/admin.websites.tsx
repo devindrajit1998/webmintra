@@ -114,7 +114,10 @@ function WebsitesPage() {
                         <div>
                           <p className="font-bold text-[#0f172a]">{website.name}</p>
                           <p className="text-xs text-[#64748b]">
-                            Template: <span className="font-medium text-[#334155]">{website.templateName}</span>
+                            Template:{" "}
+                            <span className="font-medium text-[#334155]">
+                              {website.templateName}
+                            </span>
                           </p>
                         </div>
                       </div>

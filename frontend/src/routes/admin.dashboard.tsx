@@ -46,7 +46,9 @@ function DashboardComponent() {
     <div className="mx-auto max-w-[1600px] text-[#0f172a] font-sans space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">Platform Overview</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">
+            Platform Overview
+          </h1>
           <p className="mt-1 text-xs sm:text-sm text-[#64748b]">
             Here&apos;s what&apos;s happening with your Indian business network today.
           </p>
@@ -103,8 +105,12 @@ function DashboardComponent() {
         <article className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Platform Growth</span>
-              <p className="mt-2 text-3xl font-extrabold text-[#0b192c]">{totalUsers.toLocaleString()}</p>
+              <span className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
+                Platform Growth
+              </span>
+              <p className="mt-2 text-3xl font-extrabold text-[#0b192c]">
+                {totalUsers.toLocaleString()}
+              </p>
               <p className="mt-1 text-xs font-semibold text-[#059669] flex items-center gap-1">
                 <span>↗</span> Live registered businesses across India
               </p>
@@ -122,7 +128,9 @@ function DashboardComponent() {
         </article>
 
         <article className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm flex flex-col justify-between">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Account Verification Status</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
+            Account Verification Status
+          </h2>
           <div className="mt-4 flex flex-col sm:flex-row items-center gap-6 justify-around">
             <Donut value={totalUsers ? Math.round((verified / totalUsers) * 100) : 0} />
             <div className="space-y-3 text-xs w-full sm:w-auto">
@@ -148,7 +156,9 @@ function DashboardComponent() {
           <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-4">
             <div>
               <h2 className="text-sm font-extrabold text-[#0b192c]">Recent Indian Businesses</h2>
-              <p className="mt-0.5 text-xs text-[#64748b]">Latest registered workspaces and tenant accounts</p>
+              <p className="mt-0.5 text-xs text-[#64748b]">
+                Latest registered workspaces and tenant accounts
+              </p>
             </div>
             <a href="/admin/tenants" className="text-xs font-bold text-[#059669] hover:underline">
               View all →
@@ -226,7 +236,9 @@ function DashboardComponent() {
                 <Users className="h-4 w-4" />
               </span>
               <span>
-                <span className="block text-xs font-bold text-[#0f172a]">Invite Business Tenant</span>
+                <span className="block text-xs font-bold text-[#0f172a]">
+                  Invite Business Tenant
+                </span>
                 <span className="mt-0.5 block text-[10.5px] text-[#64748b]">
                   Provision a new workspace
                 </span>
@@ -237,7 +249,11 @@ function DashboardComponent() {
               title="Add Template"
               detail="Upload or configure website template"
             />
-            <QuickAction icon={<Tags className="h-4 w-4" />} title="Create Coupon" detail="Add discount code for Indian businesses" />
+            <QuickAction
+              icon={<Tags className="h-4 w-4" />}
+              title="Create Coupon"
+              detail="Add discount code for Indian businesses"
+            />
             <QuickAction
               icon={<Settings className="h-4 w-4" />}
               title="System Settings"
@@ -272,7 +288,9 @@ function StatCard({
   return (
     <article className="tiranga-border-top rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
       <div className="flex items-center gap-3.5">
-        <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${styles[color]}`}>
+        <span
+          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${styles[color]}`}
+        >
           {icon}
         </span>
         <div>

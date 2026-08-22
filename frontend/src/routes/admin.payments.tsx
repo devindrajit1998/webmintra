@@ -44,7 +44,9 @@ function PaymentsPage() {
               <IndianRupee className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">Total Revenue</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                Total Revenue
+              </p>
               <p className="text-xl font-black text-[#0f172a]">
                 ₹
                 {data?.summary?.totalRevenue?.toLocaleString(undefined, {
@@ -61,7 +63,9 @@ function PaymentsPage() {
               <ArrowUpRight className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">Successful Transactions</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                Successful Transactions
+              </p>
               <p className="text-xl font-black text-[#0f172a]">
                 {data?.summary?.totalTransactions?.toLocaleString() ?? 0}
               </p>
@@ -74,7 +78,9 @@ function PaymentsPage() {
               <ArrowDownRight className="h-5 w-5" />
             </span>
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">Refunded</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                Refunded
+              </p>
               <p className="text-xl font-black text-[#0f172a]">
                 ₹
                 {data?.summary?.refundedTotal?.toLocaleString(undefined, {
@@ -149,7 +155,9 @@ function PaymentsPage() {
                   <tr key={payment.id} className="transition-colors hover:bg-[#f8fafc]">
                     <td className="px-6 py-4">
                       <p className="font-bold text-[#0f172a]">{payment.invoiceNumber}</p>
-                      <p className="text-[10px] font-medium text-[#64748b] capitalize">{payment.method}</p>
+                      <p className="text-[10px] font-medium text-[#64748b] capitalize">
+                        {payment.method}
+                      </p>
                     </td>
                     <td className="px-6 py-4">
                       <p className="font-bold text-[#0f172a]">

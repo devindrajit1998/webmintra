@@ -229,7 +229,9 @@ export function ImportWizard({
           <div className="inline-flex items-center gap-1.5 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-[11px] font-bold text-[#ea580c]">
             <Layers className="h-3.5 w-3.5" /> Analyzing Template
           </div>
-          <h2 className="mt-3 text-xl font-bold tracking-tight text-[#0b192c]">Inspecting your HTML code</h2>
+          <h2 className="mt-3 text-xl font-bold tracking-tight text-[#0b192c]">
+            Inspecting your HTML code
+          </h2>
           <p className="mt-1 text-xs font-medium text-[#64748b]">
             Detecting pages, typography, editable elements, forms, repeaters, and theme tokens.
           </p>
@@ -341,7 +343,9 @@ export function ImportWizard({
           </button>
         </div>
 
-        <p className="mt-8 text-[11px] font-medium text-[#94a3b8]">We support HTML files up to 50MB</p>
+        <p className="mt-8 text-[11px] font-medium text-[#94a3b8]">
+          We support HTML files up to 50MB
+        </p>
 
         <input
           ref={inputRef}
@@ -439,7 +443,8 @@ export function ImportReport({
           </div>
           <h1 className="mt-2.5 text-2xl font-bold tracking-tight text-[#0b192c]">Import Report</h1>
           <p className="mt-1 text-xs font-medium text-[#64748b]">
-            {metaTitle || analysis.name} · {analysis.pages.length} page(s) · {analysis.stats["Editable fields"]} editable fields detected
+            {metaTitle || analysis.name} · {analysis.pages.length} page(s) ·{" "}
+            {analysis.stats["Editable fields"]} editable fields detected
           </p>
         </div>
         <div className="flex gap-2.5">
@@ -463,19 +468,66 @@ export function ImportReport({
       {/* Key Metric Highlights */}
       <div className="fade-up mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {[
-          { label: "Pages", val: analysis.stats["Pages"] ?? analysis.pages.length, icon: FileCode2, color: "text-[#0ea5e9]", bg: "bg-[#f0f9ff]", border: "border-[#bae6fd]" },
-          { label: "Editable Fields", val: analysis.stats["Editable fields"] ?? 0, icon: Type, color: "text-[#ea580c]", bg: "bg-[#fff7ed]", border: "border-[#fed7aa]" },
-          { label: "Repeaters", val: analysis.stats["Repeaters"] ?? 0, icon: Rows3, color: "text-[#8b5cf6]", bg: "bg-[#f5f3ff]", border: "border-[#ddd6fe]" },
-          { label: "Images", val: analysis.stats["Images"] ?? 0, icon: Images, color: "text-[#059669]", bg: "bg-[#ecfdf5]", border: "border-[#a7f3d0]" },
-          { label: "Forms & CTAs", val: (analysis.stats["Forms"] ?? 0) + (analysis.stats["CTA buttons"] ?? 0), icon: MousePointerClick, color: "text-[#3b82f6]", bg: "bg-[#eff6ff]", border: "border-[#bfdbfe]" },
-          { label: "Theme Tokens", val: analysis.stats["Theme tokens"] ?? 0, icon: Palette, color: "text-[#d97706]", bg: "bg-[#fffbeb]", border: "border-[#fde68a]" },
+          {
+            label: "Pages",
+            val: analysis.stats["Pages"] ?? analysis.pages.length,
+            icon: FileCode2,
+            color: "text-[#0ea5e9]",
+            bg: "bg-[#f0f9ff]",
+            border: "border-[#bae6fd]",
+          },
+          {
+            label: "Editable Fields",
+            val: analysis.stats["Editable fields"] ?? 0,
+            icon: Type,
+            color: "text-[#ea580c]",
+            bg: "bg-[#fff7ed]",
+            border: "border-[#fed7aa]",
+          },
+          {
+            label: "Repeaters",
+            val: analysis.stats["Repeaters"] ?? 0,
+            icon: Rows3,
+            color: "text-[#8b5cf6]",
+            bg: "bg-[#f5f3ff]",
+            border: "border-[#ddd6fe]",
+          },
+          {
+            label: "Images",
+            val: analysis.stats["Images"] ?? 0,
+            icon: Images,
+            color: "text-[#059669]",
+            bg: "bg-[#ecfdf5]",
+            border: "border-[#a7f3d0]",
+          },
+          {
+            label: "Forms & CTAs",
+            val: (analysis.stats["Forms"] ?? 0) + (analysis.stats["CTA buttons"] ?? 0),
+            icon: MousePointerClick,
+            color: "text-[#3b82f6]",
+            bg: "bg-[#eff6ff]",
+            border: "border-[#bfdbfe]",
+          },
+          {
+            label: "Theme Tokens",
+            val: analysis.stats["Theme tokens"] ?? 0,
+            icon: Palette,
+            color: "text-[#d97706]",
+            bg: "bg-[#fffbeb]",
+            border: "border-[#fde68a]",
+          },
         ].map((card) => {
           const Icon = card.icon;
           return (
-            <div key={card.label} className="flex flex-col justify-between rounded-xl border border-[#e2e8f0] bg-white p-3.5 shadow-xs transition hover:border-[#cbd5e1]">
+            <div
+              key={card.label}
+              className="flex flex-col justify-between rounded-xl border border-[#e2e8f0] bg-white p-3.5 shadow-xs transition hover:border-[#cbd5e1]"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold text-[#64748b] truncate">{card.label}</span>
-                <div className={`grid h-7 w-7 place-items-center rounded-lg border ${card.border} ${card.bg} ${card.color}`}>
+                <div
+                  className={`grid h-7 w-7 place-items-center rounded-lg border ${card.border} ${card.bg} ${card.color}`}
+                >
                   <Icon className="h-3.5 w-3.5" />
                 </div>
               </div>
@@ -572,7 +624,9 @@ export function ImportReport({
                           className="w-full h-9 rounded-lg border border-[#cbd5e1] bg-[#f8fafc] px-3 text-xs font-semibold text-[#0b192c] outline-none transition focus:border-[#ea580c] focus:bg-white focus:ring-2 focus:ring-[#ea580c]/10 cursor-pointer"
                         >
                           <option value="Landing Page">Landing Page</option>
-                          <option value="Portfolio & Photography">Portfolio &amp; Photography</option>
+                          <option value="Portfolio & Photography">
+                            Portfolio &amp; Photography
+                          </option>
                           <option value="Agency & Business">Agency &amp; Business</option>
                           <option value="Restaurant & Cafe">Restaurant &amp; Cafe</option>
                           <option value="Clinic & Healthcare">Clinic &amp; Healthcare</option>
@@ -635,9 +689,14 @@ export function ImportReport({
               </div>
               <div className="space-y-2.5">
                 {analysis.pages.map((p) => (
-                  <div key={p.id} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3.5 shadow-2xs">
+                  <div
+                    key={p.id}
+                    className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3.5 shadow-2xs"
+                  >
                     <div className="flex items-center justify-between gap-3">
-                      <p className="truncate text-xs font-bold text-[#0b192c]">{p.title || p.name}</p>
+                      <p className="truncate text-xs font-bold text-[#0b192c]">
+                        {p.title || p.name}
+                      </p>
                       {p.isHome ? (
                         <span className="rounded-md border border-[#fed7aa] bg-[#fff7ed] px-2 py-0.5 text-[10px] font-bold text-[#c2410c]">
                           Home Page
@@ -740,7 +799,9 @@ export function ImportReport({
                           style={{ background: hex }}
                         />
                         <p className="text-[11px] font-bold text-[#0b192c] capitalize">{k}</p>
-                        <p className="font-mono text-[10px] font-semibold text-[#64748b] uppercase">{hex}</p>
+                        <p className="font-mono text-[10px] font-semibold text-[#64748b] uppercase">
+                          {hex}
+                        </p>
                       </div>
                     );
                   })}
@@ -761,8 +822,13 @@ export function ImportReport({
                   { label: "Border Radius", val: analysis.theme?.radius || "12px" },
                   { label: "Container Max Width", val: analysis.theme?.container || "1140px" },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 shadow-2xs">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">{item.label}</p>
+                  <div
+                    key={item.label}
+                    className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 shadow-2xs"
+                  >
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">
+                      {item.label}
+                    </p>
                     <p className="mt-1 text-xs font-bold text-[#0b192c] truncate">{item.val}</p>
                   </div>
                 ))}
@@ -821,14 +887,18 @@ export function ImportReport({
                     aria-label={off ? "Enable detection" : "Disable detection"}
                     className={cn(
                       "grid h-5 w-5 shrink-0 place-items-center rounded-md border transition",
-                      off ? "border-[#cbd5e1] bg-white" : "border-[#059669] bg-[#059669] text-white",
+                      off
+                        ? "border-[#cbd5e1] bg-white"
+                        : "border-[#059669] bg-[#059669] text-white",
                     )}
                   >
                     {off ? null : <Check className="h-3.5 w-3.5" />}
                   </button>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-bold text-[#0b192c]">{f.label}</p>
-                    <p className="truncate text-[11px] font-medium text-[#64748b]">{f.value || "—"}</p>
+                    <p className="truncate text-[11px] font-medium text-[#64748b]">
+                      {f.value || "—"}
+                    </p>
                   </div>
                   <code className="hidden shrink-0 rounded-md border border-[#e2e8f0] bg-white px-2 py-0.5 font-mono text-[10px] font-semibold text-[#475569] sm:block">
                     &lt;{f.tag}&gt;
@@ -851,9 +921,12 @@ export function ImportReport({
       {tab === "assets" ? (
         <div className="fade-up mt-5 rounded-xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-[#475569]">Assets Found</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#475569]">
+              Assets Found
+            </h3>
             <span className="text-[11px] font-medium text-[#64748b]">
-              {analysis.assets.filter((a) => a.missing).length} missing · {analysis.assets.filter((a) => a.duplicateOf).length} duplicates
+              {analysis.assets.filter((a) => a.missing).length} missing ·{" "}
+              {analysis.assets.filter((a) => a.duplicateOf).length} duplicates
             </span>
           </div>
           <div className="grid max-h-[26rem] gap-2 overflow-y-auto pr-1">
@@ -895,16 +968,25 @@ export function ImportReport({
               ["Warnings", warnings.length, "bg-[#fff7ed] border-[#fed7aa] text-[#c2410c]"],
               ["Suggestions", infos.length, "bg-[#ecfdf5] border-[#a7f3d0] text-[#047857]"],
             ].map(([label, count, style]) => (
-              <div key={label as string} className="rounded-xl border border-[#e2e8f0] bg-white p-4 shadow-xs">
-                <span className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-bold ${style}`}>
+              <div
+                key={label as string}
+                className="rounded-xl border border-[#e2e8f0] bg-white p-4 shadow-xs"
+              >
+                <span
+                  className={`inline-flex rounded-md border px-2 py-0.5 text-[10px] font-bold ${style}`}
+                >
                   {label as string}
                 </span>
-                <p className="font-display mt-2 text-2xl font-black text-[#0b192c]">{count as number}</p>
+                <p className="font-display mt-2 text-2xl font-black text-[#0b192c]">
+                  {count as number}
+                </p>
               </div>
             ))}
           </div>
           <div className="rounded-xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#475569]">Validation Report</h3>
+            <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-[#475569]">
+              Validation Report
+            </h3>
             <div className="max-h-[24rem] space-y-2 overflow-y-auto pr-1">
               {analysis.issues.map((i) => (
                 <div

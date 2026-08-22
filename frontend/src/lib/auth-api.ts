@@ -1110,5 +1110,3 @@ async function pluginRequest<T>(path: string, options: RequestInit = {}): Promis
   if (!response.ok) throw new Error(payload.message ?? "Unable to process plugin request.");
   return payload as T;
 }
-
-

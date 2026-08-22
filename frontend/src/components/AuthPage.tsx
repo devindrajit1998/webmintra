@@ -136,10 +136,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
       {/* Header */}
       <header className="landing-nav-glass fixed top-0 z-50 w-full">
         <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-5 sm:px-6">
-          <Link
-            to="/"
-            className="flex items-center transition hover:opacity-95"
-          >
+          <Link to="/" className="flex items-center transition hover:opacity-95">
             <BrandLogo
               logoUrl={isMounted ? logoUrl : undefined}
               siteName={isMounted ? siteName : "webmintra"}
@@ -166,12 +163,11 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
             </div>
             <h2 className="text-[42px] font-extrabold leading-[1.12] text-[#0f172a] tracking-tight">
               Your business website, <br />
-              <span className="text-[#059669]">
-                always in your control.
-              </span>
+              <span className="text-[#059669]">always in your control.</span>
             </h2>
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-[#475569]">
-              Edit pricing, photos, and timings anytime with simple point-and-click tools. Direct WhatsApp lead alerts and UPI readiness included.
+              Edit pricing, photos, and timings anytime with simple point-and-click tools. Direct
+              WhatsApp lead alerts and UPI readiness included.
             </p>
 
             {/* Interactive Browser Canvas Mockup */}
@@ -204,9 +200,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
                   <span className="inline-block rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-0.5 text-[10px] font-bold text-[#c2410c] mb-1.5">
                     Visual Point & Click
                   </span>
-                  <h3 className="text-xl font-extrabold text-[#0f172a]">
-                    SmileCare Dental Clinic
-                  </h3>
+                  <h3 className="text-xl font-extrabold text-[#0f172a]">SmileCare Dental Clinic</h3>
                   <p className="text-xs text-[#64748b] mt-0.5">
                     Modern pain-free dentistry with instant WhatsApp booking
                   </p>
@@ -254,7 +248,9 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
             >
               {text.title}
             </h1>
-            <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">{text.description}</p>
+            <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
+              {text.description}
+            </p>
 
             {notice && (
               <div
@@ -333,10 +329,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               {mode === "sign-in" && (
                 <>
                   New to {siteName}?{" "}
-                  <Link
-                    to="/create-account"
-                    className="font-bold text-[#059669] hover:underline"
-                  >
+                  <Link to="/create-account" className="font-bold text-[#059669] hover:underline">
                     Create a free account
                   </Link>
                 </>
@@ -344,10 +337,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               {mode === "create-account" && (
                 <>
                   Already have an account?{" "}
-                  <Link
-                    to="/sign-in"
-                    className="font-bold text-[#059669] hover:underline"
-                  >
+                  <Link to="/sign-in" className="font-bold text-[#059669] hover:underline">
                     Sign in here
                   </Link>
                 </>
@@ -355,10 +345,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               {mode === "forgot-password" && (
                 <>
                   Remembered your password?{" "}
-                  <Link
-                    to="/sign-in"
-                    className="font-bold text-[#059669] hover:underline"
-                  >
+                  <Link to="/sign-in" className="font-bold text-[#059669] hover:underline">
                     Return to sign in
                   </Link>
                 </>

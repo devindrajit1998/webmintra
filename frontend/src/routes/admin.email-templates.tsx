@@ -239,8 +239,12 @@ function EmailTemplatesPage() {
       {/* Top Header */}
       <div className="mb-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Email Templates</h1>
-          <p className="mt-1 text-xs font-medium text-[#64748b]">Design and manage system notification & transactional emails.</p>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+            Email Templates
+          </h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
+            Design and manage system notification & transactional emails.
+          </p>
         </div>
         <button
           type="button"
@@ -382,7 +386,8 @@ function EmailTemplatesPage() {
                         type="button"
                         title="Delete Template"
                         onClick={() => {
-                          if (confirm("Are you sure you want to delete this template?")) deleteMutation.mutate(activeTemplateId);
+                          if (confirm("Are you sure you want to delete this template?"))
+                            deleteMutation.mutate(activeTemplateId);
                         }}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs transition hover:bg-[#ffedd5]"
                       >
@@ -407,7 +412,9 @@ function EmailTemplatesPage() {
                   {/* Subject & Preview Inputs */}
                   <div className="grid gap-3 border-b border-[#e2e8f0] p-4 sm:grid-cols-2 bg-white">
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#475569]">Subject Line</label>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-[#475569]">
+                        Subject Line
+                      </label>
                       <input
                         required
                         value={form.subject}
@@ -418,7 +425,8 @@ function EmailTemplatesPage() {
                     </div>
                     <div>
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-[#475569]">
-                        Preview Text <span className="font-normal lowercase text-[#94a3b8]">(optional)</span>
+                        Preview Text{" "}
+                        <span className="font-normal lowercase text-[#94a3b8]">(optional)</span>
                       </label>
                       <input
                         value={form.previewText}
@@ -524,7 +532,9 @@ function EmailTemplatesPage() {
                       <h3 className="text-[11px] font-bold uppercase tracking-wider text-[#475569]">
                         Variables
                       </h3>
-                      <span className="text-[10px] font-semibold text-[#94a3b8]">Click to insert</span>
+                      <span className="text-[10px] font-semibold text-[#94a3b8]">
+                        Click to insert
+                      </span>
                     </div>
 
                     {activeTemplateId === "new" ? (
@@ -591,7 +601,9 @@ function EmailTemplatesPage() {
                 <Mail className="h-10 w-10 opacity-80" />
               </div>
               <p className="text-sm font-semibold text-[#0b192c]">No Template Selected</p>
-              <p className="mt-1 text-xs text-[#64748b]">Select an existing template or create a new one.</p>
+              <p className="mt-1 text-xs text-[#64748b]">
+                Select an existing template or create a new one.
+              </p>
             </div>
           )}
         </div>
@@ -599,4 +611,3 @@ function EmailTemplatesPage() {
     </div>
   );
 }
-

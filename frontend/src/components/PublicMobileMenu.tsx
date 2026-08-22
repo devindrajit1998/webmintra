@@ -86,11 +86,7 @@ export function PublicMobileMenu({
       >
         {/* Drawer Header */}
         <div className="flex h-16 items-center justify-between border-b border-[#e2e8f0] px-5">
-          <Link
-            to="/"
-            onClick={onClose}
-            className="flex items-center transition hover:opacity-90"
-          >
+          <Link to="/" onClick={onClose} className="flex items-center transition hover:opacity-90">
             <BrandLogo logoUrl={logoUrl} siteName={siteName} size="md" />
           </Link>
 

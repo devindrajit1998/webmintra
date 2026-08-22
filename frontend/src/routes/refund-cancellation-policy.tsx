@@ -50,7 +50,9 @@ export function RefundCancellationPolicyPage() {
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">1. 14-Day Free Trial</h2>
                 <p>
-                  Every new {siteName} business workspace includes an unrestricted 14-day free trial. No credit card or upfront payment is required to begin building, customizing templates, and testing your website.
+                  Every new {siteName} business workspace includes an unrestricted 14-day free
+                  trial. No credit card or upfront payment is required to begin building,
+                  customizing templates, and testing your website.
                 </p>
               </section>
 
@@ -66,7 +68,8 @@ export function RefundCancellationPolicyPage() {
                   </li>
                   <li>No further automatic recurring charges will be initiated.</li>
                   <li>
-                    Your website data and uploaded media are preserved safely for 60 days in case you wish to reactivate.
+                    Your website data and uploaded media are preserved safely for 60 days in case
+                    you wish to reactivate.
                   </li>
                 </ul>
               </section>
@@ -74,14 +77,18 @@ export function RefundCancellationPolicyPage() {
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">3. Refund Terms</h2>
                 <p>
-                  If you encounter technical issues that prevent your website from functioning as advertised and our support team is unable to resolve it within 7 business days, you are eligible for a full refund of your most recent subscription cycle.
+                  If you encounter technical issues that prevent your website from functioning as
+                  advertised and our support team is unable to resolve it within 7 business days,
+                  you are eligible for a full refund of your most recent subscription cycle.
                 </p>
               </section>
 
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">4. Refund Processing Time</h2>
                 <p>
-                  Approved refunds are credited back to the original Indian payment method (UPI, Bank Account, NetBanking, Debit/Credit Card) within 5 to 7 business days via our RBI-authorized payment partner.
+                  Approved refunds are credited back to the original Indian payment method (UPI,
+                  Bank Account, NetBanking, Debit/Credit Card) within 5 to 7 business days via our
+                  RBI-authorized payment partner.
                 </p>
               </section>
 
@@ -89,10 +96,7 @@ export function RefundCancellationPolicyPage() {
                 <h2 className="text-base font-bold text-[#0f172a]">5. How to Request Support</h2>
                 <p>
                   To request a billing review or refund, email our accounts team at{" "}
-                  <a
-                    href={`mailto:${supportEmail}`}
-                    className="text-[#059669] underline font-bold"
-                  >
+                  <a href={`mailto:${supportEmail}`} className="text-[#059669] underline font-bold">
                     {supportEmail}
                   </a>{" "}
                   with your registered workspace email and GST invoice number.

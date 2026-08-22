@@ -302,7 +302,9 @@ function SeoPage() {
               <section className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-extrabold uppercase tracking-wide text-[#64748b]">SEO Readiness</p>
+                    <p className="text-xs font-extrabold uppercase tracking-wide text-[#64748b]">
+                      SEO Readiness
+                    </p>
                     <p className="mt-0.5 text-xs font-bold text-[#0f172a]">
                       {passedCount} of {audit.length} checks passed
                     </p>
@@ -318,7 +320,9 @@ function SeoPage() {
             ) : null}
             <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
               <div className="flex items-center justify-between border-b border-[#f1f5f9] p-4 bg-[#f8fafc]">
-                <h2 className="font-display text-xs font-extrabold uppercase tracking-wide text-[#0f172a]">Live Preview</h2>
+                <h2 className="font-display text-xs font-extrabold uppercase tracking-wide text-[#0f172a]">
+                  Live Preview
+                </h2>
                 <div className="flex rounded-xl border border-[#e2e8f0] bg-white p-1 shadow-2xs">
                   <PreviewButton
                     label="Search"
@@ -350,7 +354,9 @@ function SeoPage() {
                 <Globe2 className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-xs font-bold text-[#0f172a]">Custom Domain Settings</span>
+                <span className="block text-xs font-bold text-[#0f172a]">
+                  Custom Domain Settings
+                </span>
                 <span className="mt-0.5 block text-[10px] font-medium text-[#64748b]">
                   Connect your custom domain for clean canonical URLs.
                 </span>
@@ -497,7 +503,9 @@ function SeoEditorSections({
                 <Code2 className="h-5 w-5" />
               </span>
               <span>
-                <span className="block font-display text-sm font-extrabold text-[#0f172a]">Advanced SEO Directives</span>
+                <span className="block font-display text-sm font-extrabold text-[#0f172a]">
+                  Advanced SEO Directives
+                </span>
                 <span className="mt-0.5 block text-xs text-[#64748b]">
                   Crawler indexing instructions and JSON-LD structured data.
                 </span>
@@ -583,7 +591,10 @@ function SitemapSection({
         {pages.map((page) => {
           const included = !sitemap.excludedPageIds.includes(page.id);
           return (
-            <div key={page.id} className="grid items-center gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_110px_140px] hover:bg-[#f8fafc] transition">
+            <div
+              key={page.id}
+              className="grid items-center gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_110px_140px] hover:bg-[#f8fafc] transition"
+            >
               <label className="flex items-center gap-3 text-xs font-bold text-[#0f172a] cursor-pointer">
                 <input
                   type="checkbox"
@@ -600,7 +611,9 @@ function SitemapSection({
                 />
                 <span>
                   <span className="block font-bold text-[#0f172a]">{page.label}</span>
-                  <span className="mt-0.5 block font-mono text-[10px] font-semibold text-[#64748b]">{page.route}</span>
+                  <span className="mt-0.5 block font-mono text-[10px] font-semibold text-[#64748b]">
+                    {page.route}
+                  </span>
                 </span>
               </label>
               <input
@@ -801,7 +814,9 @@ function SectionHeading({
   return (
     <div className="border-b border-[#f1f5f9] p-5 sm:px-6 bg-[#f8fafc]">
       <div className="flex items-center gap-3.5">
-        <span className={`flex h-10 w-10 items-center justify-center rounded-xl border ${color} shadow-2xs`}>
+        <span
+          className={`flex h-10 w-10 items-center justify-center rounded-xl border ${color} shadow-2xs`}
+        >
           {icon}
         </span>
         <div>
@@ -834,7 +849,8 @@ function SeoField({
   inputMode?: "url";
   code?: boolean;
 }) {
-  const lengthTone = maxLength && value.length > maxLength ? "text-rose-600 font-bold" : "text-[#64748b]";
+  const lengthTone =
+    maxLength && value.length > maxLength ? "text-rose-600 font-bold" : "text-[#64748b]";
   const classes = `mt-1.5 w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2.5 text-xs font-semibold text-[#0f172a] outline-none transition placeholder:text-[#94a3b8] focus:border-[#059669] ${code ? "font-mono leading-5" : ""}`;
   return (
     <label className="block">
@@ -907,7 +923,9 @@ function SearchPreview({ form, websiteName }: { form: SeoForm; websiteName: stri
   return (
     <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 shadow-xs text-slate-900">
       <p className="truncate text-xs font-semibold text-[#059669]">{url}</p>
-      <p className="mt-1 line-clamp-1 text-base font-extrabold text-[#1a0dab] hover:underline cursor-pointer">{form.title || websiteName}</p>
+      <p className="mt-1 line-clamp-1 text-base font-extrabold text-[#1a0dab] hover:underline cursor-pointer">
+        {form.title || websiteName}
+      </p>
       <p className="mt-1 line-clamp-3 text-xs leading-5 text-[#475569]">
         {form.description || "Add a meta description to show searchers what this page offers."}
       </p>
@@ -929,7 +947,9 @@ function SocialPreview({ form, websiteName }: { form: SeoForm; websiteName: stri
         </div>
       )}
       <div className="p-3.5 border-t border-[#f1f5f9]">
-        <p className="text-[10px] font-extrabold uppercase tracking-wide text-[#64748b]">{hostnameOf(form.canonical)}</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-wide text-[#64748b]">
+          {hostnameOf(form.canonical)}
+        </p>
         <p className="mt-1 line-clamp-1 text-xs font-extrabold text-[#0f172a]">
           {form.ogTitle || form.title || websiteName}
         </p>
@@ -941,7 +961,12 @@ function SocialPreview({ form, websiteName }: { form: SeoForm; websiteName: stri
   );
 }
 function ScoreRing({ score }: { score: number }) {
-  const color = score >= 75 ? "text-[#059669] border-[#a7f3d0] bg-[#ecfdf5]" : score >= 45 ? "text-[#ea580c] border-[#fed7aa] bg-[#fff7ed]" : "text-[#e11d48] border-[#fecdd3] bg-[#fff1f2]";
+  const color =
+    score >= 75
+      ? "text-[#059669] border-[#a7f3d0] bg-[#ecfdf5]"
+      : score >= 45
+        ? "text-[#ea580c] border-[#fed7aa] bg-[#fff7ed]"
+        : "text-[#e11d48] border-[#fecdd3] bg-[#fff1f2]";
   return (
     <div
       className={`grid h-12 w-12 place-items-center rounded-full border-3 font-display text-xs font-black shadow-2xs ${color}`}
@@ -956,7 +981,11 @@ function AuditRow({ label, detail, status }: AuditItem) {
       <span
         className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${status === "pass" ? "bg-[#059669] text-white" : "bg-[#ea580c] text-white"}`}
       >
-        {status === "pass" ? <Check className="h-2.5 w-2.5" /> : <AlertCircle className="h-2.5 w-2.5" />}
+        {status === "pass" ? (
+          <Check className="h-2.5 w-2.5" />
+        ) : (
+          <AlertCircle className="h-2.5 w-2.5" />
+        )}
       </span>
       <span>
         <span className="block text-[11px] font-bold text-[#0f172a]">{label}</span>
@@ -1175,7 +1204,9 @@ function ErrorState({ message, retry }: { message: string; retry: () => void }) 
     <div className="grid min-h-96 place-items-center rounded-2xl border border-[#fecdd3] bg-[#fff1f2] p-8 text-center">
       <div>
         <AlertCircle className="mx-auto h-8 w-8 text-[#e11d48]" />
-        <h2 className="mt-3 font-display text-base font-extrabold text-[#0f172a]">Unable to load SEO settings</h2>
+        <h2 className="mt-3 font-display text-base font-extrabold text-[#0f172a]">
+          Unable to load SEO settings
+        </h2>
         <p className="mt-1 text-xs text-[#64748b]">{message}</p>
         <button
           type="button"
@@ -1193,7 +1224,9 @@ function NoWebsite() {
     <div className="grid min-h-[60vh] place-items-center rounded-2xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center shadow-xs">
       <div>
         <Sparkles className="mx-auto h-12 w-12 text-[#cbd5e1]" />
-        <h1 className="mt-4 font-display text-lg font-extrabold text-[#0f172a]">Create a website first</h1>
+        <h1 className="mt-4 font-display text-lg font-extrabold text-[#0f172a]">
+          Create a website first
+        </h1>
         <p className="mt-1 text-xs text-[#64748b]">
           SEO settings and indexing rules are configured per website.
         </p>

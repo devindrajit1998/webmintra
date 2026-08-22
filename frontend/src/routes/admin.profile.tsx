@@ -248,7 +248,9 @@ function ProfilePage() {
           <span className="inline-block rounded-full bg-[#fff7ed] border border-[#fed7aa] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-[#c2410c] mb-1.5 shadow-2xs">
             🇮🇳 Account Settings
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">Profile & Security</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0b192c] tracking-tight">
+            Profile & Security
+          </h1>
           <p className="mt-1 text-xs sm:text-sm text-[#64748b]">
             Keep your administrator identity and sign-in credentials current.
           </p>
@@ -334,7 +336,9 @@ function ProfilePage() {
           </section>
 
           <section className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">Account Status</h2>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[#64748b]">
+              Account Status
+            </h2>
             <div className="mt-3.5 space-y-3">
               <StatusRow label="Email Verification" verified={Boolean(profile.isEmailVerified)} />
               {profile.phone ? (
@@ -499,7 +503,9 @@ function ProfilePage() {
                   invalid={!passwordsMatch}
                 />
                 {!passwordsMatch ? (
-                  <p className="mt-1.5 text-xs text-rose-500 font-medium">Passwords do not match.</p>
+                  <p className="mt-1.5 text-xs text-rose-500 font-medium">
+                    Passwords do not match.
+                  </p>
                 ) : null}
               </Field>
               <div className="sm:col-span-2">
@@ -522,7 +528,8 @@ function ProfilePage() {
             </div>
             <FormActions>
               <p className="flex items-center gap-1.5 text-xs text-[#64748b]">
-                <KeyRound className="h-3.5 w-3.5 text-[#ea580c]" /> Changing your password requires your current password.
+                <KeyRound className="h-3.5 w-3.5 text-[#ea580c]" /> Changing your password requires
+                your current password.
               </p>
               <button
                 type="submit"

@@ -252,7 +252,9 @@ function PlanDetail({
     <div className="flex items-center gap-3 bg-[#f8fafc] px-4 py-4">
       <Icon className="h-4 w-4 shrink-0 text-[#94a3b8]" />
       <div className="min-w-0">
-        <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#64748b]">{label}</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#64748b]">
+          {label}
+        </p>
         <p className="mt-0.5 truncate text-xs font-bold text-[#0f172a]">{value}</p>
       </div>
     </div>
@@ -277,7 +279,9 @@ function SummaryMetric({
   };
   return (
     <div className="flex items-center gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
-      <div className={`flex h-11 w-11 items-center justify-center rounded-xl border ${tones[tone]} shadow-2xs`}>
+      <div
+        className={`flex h-11 w-11 items-center justify-center rounded-xl border ${tones[tone]} shadow-2xs`}
+      >
         <Icon className="h-5 w-5" />
       </div>
       <div>
@@ -360,7 +364,9 @@ function InvoiceList({ invoices, planName }: { invoices: BillingInvoice[]; planN
                 <p className="truncate font-mono text-xs font-bold text-[#0f172a]">
                   {invoice.invoiceNumber}
                 </p>
-                <p className="mt-0.5 truncate text-[11px] font-medium text-[#64748b]">{invoice.description}</p>
+                <p className="mt-0.5 truncate text-[11px] font-medium text-[#64748b]">
+                  {invoice.description}
+                </p>
               </div>
               <StatusBadge status={invoice.status} />
             </div>

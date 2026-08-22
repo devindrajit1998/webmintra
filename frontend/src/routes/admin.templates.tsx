@@ -62,7 +62,9 @@ export const Route = createFileRoute("/admin/templates")({
   errorComponent: ({ error, reset }) => (
     <div className="mx-auto max-w-xl py-20 text-center">
       <div className="rounded-2xl border border-[#fed7aa] bg-[#fff7ed] p-8 shadow-xs">
-        <h2 className="text-lg font-bold text-[#0b192c]">Something went wrong loading this template</h2>
+        <h2 className="text-lg font-bold text-[#0b192c]">
+          Something went wrong loading this template
+        </h2>
         <p className="mt-2 text-xs font-medium text-[#64748b]">
           {error?.message || "An error occurred while parsing or rendering the template."}
         </p>
@@ -326,12 +328,16 @@ function AdminTemplatesPage() {
     if (!analysis?.pages?.length) return toast.error("No pages found in analysis");
 
     try {
-      const categoriesList = categoriesData?.categories || (Array.isArray(categoriesData) ? categoriesData : []);
+      const categoriesList =
+        categoriesData?.categories || (Array.isArray(categoriesData) ? categoriesData : []);
       const [homePage, ...additionalPages] = analysis.pages;
       const formData = new FormData();
       formData.append("title", meta?.title || analysis.name || "Imported Template");
       formData.append("category", meta?.category || categoriesList?.[0]?.name || "Landing Page");
-      formData.append("description", meta?.description || `Contains ${analysis.pages.length} page(s).`);
+      formData.append(
+        "description",
+        meta?.description || `Contains ${analysis.pages.length} page(s).`,
+      );
       if (meta?.thumbnailUrl) {
         formData.append("thumbnailUrl", meta.thumbnailUrl);
       }
@@ -400,7 +406,8 @@ function AdminTemplatesPage() {
                   <Upload className="h-5 w-5 text-[#ea580c]" /> Import Template Wizard
                 </h2>
                 <p className="text-[#64748b] text-xs mt-0.5">
-                  Upload HTML files and assets. WebMintra's engine will automatically extract editable fields.
+                  Upload HTML files and assets. WebMintra's engine will automatically extract
+                  editable fields.
                 </p>
               </div>
               <button
@@ -413,7 +420,9 @@ function AdminTemplatesPage() {
           </div>
           <div className="flex-1 overflow-y-auto bg-[#f8fafc]">
             <ImportWizard
-              categories={categoriesData?.categories || (Array.isArray(categoriesData) ? categoriesData : [])}
+              categories={
+                categoriesData?.categories || (Array.isArray(categoriesData) ? categoriesData : [])
+              }
               onComplete={handleWizardComplete}
             />
           </div>
@@ -467,7 +476,9 @@ function AdminTemplatesPage() {
               </div>
               <div className="p-5 flex flex-col flex-1">
                 <div className="flex justify-between items-start mb-2 gap-2">
-                  <h3 className="font-bold text-base text-[#0f172a] line-clamp-1 group-hover:text-[#059669] transition-colors">{template.title}</h3>
+                  <h3 className="font-bold text-base text-[#0f172a] line-clamp-1 group-hover:text-[#059669] transition-colors">
+                    {template.title}
+                  </h3>
                   <span className="rounded-full border border-emerald-200 bg-[#ecfdf5] px-2.5 py-0.5 text-[10px] uppercase font-bold tracking-wider text-[#047857] shrink-0">
                     {template.category}
                   </span>
@@ -521,10 +532,11 @@ function AdminTemplatesPage() {
                         toggleStatusMutation.mutate(template._id);
                       }}
                       disabled={toggleStatusMutation.isPending}
-                      className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 text-xs font-bold transition ${template.isActive === false
+                      className={`flex items-center justify-center gap-1 rounded-lg border py-1.5 text-xs font-bold transition ${
+                        template.isActive === false
                           ? "border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
                           : "border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100"
-                        }`}
+                      }`}
                       title={
                         template.isActive === false
                           ? "Restore to Onboarding"
@@ -626,10 +638,11 @@ function AdminTemplatesPage() {
                             key={p.name}
                             type="button"
                             onClick={() => setPreviewActivePage(p.name)}
-                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${isActive
+                            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all flex items-center gap-1.5 ${
+                              isActive
                                 ? "bg-cyan-500 text-slate-950 font-bold shadow-sm"
                                 : "text-slate-200 hover:text-white hover:bg-slate-800"
-                              }`}
+                            }`}
                             style={{ color: isActive ? "#020617" : "#cbd5e1" }}
                           >
                             <FileText className="h-3.5 w-3.5 opacity-80" />
@@ -893,10 +906,11 @@ function AdminTemplatesPage() {
                   <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-800">
                     <button
                       onClick={() => setActivePage("index.html")}
-                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${activePage === "index.html"
+                      className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                        activePage === "index.html"
                           ? "bg-cyan-500 text-slate-950 shadow-sm"
                           : "text-slate-400 hover:text-white"
-                        }`}
+                      }`}
                     >
                       index.html
                     </button>
@@ -904,10 +918,11 @@ function AdminTemplatesPage() {
                       <button
                         key={p.name}
                         onClick={() => setActivePage(p.name)}
-                        className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${activePage === p.name
+                        className={`px-2.5 py-1 text-xs font-semibold rounded-md transition ${
+                          activePage === p.name
                             ? "bg-cyan-500 text-slate-950 shadow-sm"
                             : "text-slate-400 hover:text-white"
-                          }`}
+                        }`}
                       >
                         {p.name}
                       </button>
@@ -1127,7 +1142,8 @@ function AdminTemplatesPage() {
                     />
                     <p className="text-[11px] text-[#64748b] mt-1.5">
                       Will automatically append{" "}
-                      <span className="font-mono font-semibold text-[#ea580c]">.html</span> if omitted.
+                      <span className="font-mono font-semibold text-[#ea580c]">.html</span> if
+                      omitted.
                     </p>
                   </div>
                 </div>
@@ -1167,10 +1183,8 @@ function AdminTemplatesPage() {
                 </div>
                 <p className="text-xs font-medium text-[#475569] mb-6 leading-relaxed">
                   Are you sure you want to delete{" "}
-                  <span className="font-bold text-[#0b192c] font-mono">
-                    "{deletePagePrompt}"
-                  </span>
-                  ? Any unsaved edits for this page will be discarded.
+                  <span className="font-bold text-[#0b192c] font-mono">"{deletePagePrompt}"</span>?
+                  Any unsaved edits for this page will be discarded.
                 </p>
                 <div className="flex justify-end gap-2">
                   <button
@@ -1225,7 +1239,8 @@ function AdminTemplatesPage() {
                     />
                     <p className="text-[11px] text-[#64748b] mt-1.5">
                       Will automatically append{" "}
-                      <span className="font-mono font-semibold text-[#ea580c]">.html</span> if omitted.
+                      <span className="font-mono font-semibold text-[#ea580c]">.html</span> if
+                      omitted.
                     </p>
                   </div>
                 </div>
@@ -1266,11 +1281,15 @@ function AdminTemplatesPage() {
                 <AlertDialogTitle className="text-base font-bold text-[#0b192c]">
                   Delete Template
                 </AlertDialogTitle>
-                <p className="text-[11px] font-medium text-[#64748b]">This action cannot be undone</p>
+                <p className="text-[11px] font-medium text-[#64748b]">
+                  This action cannot be undone
+                </p>
               </div>
             </div>
             <AlertDialogDescription className="text-xs font-medium text-[#475569] leading-relaxed pt-2">
-              Are you sure you want to delete this template from the catalog? Tenants currently using this template won't be disrupted, but it will no longer be available for new sites.
+              Are you sure you want to delete this template from the catalog? Tenants currently
+              using this template won't be disrupted, but it will no longer be available for new
+              sites.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4 flex gap-2 sm:justify-end">
@@ -1281,7 +1300,9 @@ function AdminTemplatesPage() {
               onClick={confirmDelete}
               className="inline-flex h-9 items-center rounded-xl bg-[#e11d48] px-5 text-xs font-bold text-white shadow-sm transition hover:bg-[#be123c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e11d48]"
             >
-              {deleteMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : null}
+              {deleteMutation.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+              ) : null}
               Delete Template
             </AlertDialogAction>
           </AlertDialogFooter>

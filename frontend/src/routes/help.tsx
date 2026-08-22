@@ -34,7 +34,10 @@ export const Route = createFileRoute("/help")({
     const settings = loaderData?.settings || {};
     const articles = loaderData?.kbData?.articles || [];
     const siteName = String(settings["site.name"] || "WebMintra");
-    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(/\/$/, "");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(
+      /\/$/,
+      "",
+    );
     const pageUrl = `${canonicalBase}/help`;
     const title = `Help Center, Guides & FAQs | ${siteName}`;
     const description = `Find answers, video tutorials, domain setup guides, and troubleshooting resources for ${siteName}.`;
@@ -67,11 +70,14 @@ export const Route = createFileRoute("/help")({
       },
     }));
 
-    const jsonLdFaq = faqItems.length > 0 ? {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: faqItems,
-    } : null;
+    const jsonLdFaq =
+      faqItems.length > 0
+        ? {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqItems,
+          }
+        : null;
 
     return {
       meta: [
@@ -93,10 +99,14 @@ export const Route = createFileRoute("/help")({
           type: "application/ld+json",
           children: JSON.stringify(jsonLdBreadcrumb),
         },
-        ...(jsonLdFaq ? [{
-          type: "application/ld+json",
-          children: JSON.stringify(jsonLdFaq),
-        }] : []),
+        ...(jsonLdFaq
+          ? [
+              {
+                type: "application/ld+json",
+                children: JSON.stringify(jsonLdFaq),
+              },
+            ]
+          : []),
       ],
     };
   },
@@ -151,7 +161,8 @@ export function PublicHelpCenterPage() {
             How can we help your business website?
           </h1>
           <p className="mt-3 text-sm sm:text-base text-[#475569] max-w-lg mx-auto">
-            Step-by-step guides on connecting custom .in domains, setting up WhatsApp lead alerts, and editing content without coding.
+            Step-by-step guides on connecting custom .in domains, setting up WhatsApp lead alerts,
+            and editing content without coding.
           </p>
 
           {/* Large Search Bar */}
@@ -171,10 +182,11 @@ export function PublicHelpCenterPage() {
         <div className="mb-10 flex items-center justify-center gap-2 overflow-x-auto pb-2 scrollbar-none">
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${selectedCategory === "all"
+            className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${
+              selectedCategory === "all"
                 ? "bg-[#059669] text-white shadow-xs"
                 : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-              }`}
+            }`}
           >
             All Guides
           </button>
@@ -182,10 +194,11 @@ export function PublicHelpCenterPage() {
             <button
               key={c._id}
               onClick={() => setSelectedCategory(c.slug)}
-              className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${selectedCategory === c.slug
+              className={`rounded-full px-5 py-2 text-xs font-bold transition shadow-2xs ${
+                selectedCategory === c.slug
                   ? "bg-[#059669] text-white shadow-xs"
                   : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a]"
-                }`}
+              }`}
             >
               {c.name}
             </button>
@@ -207,7 +220,8 @@ export function PublicHelpCenterPage() {
             <BookOpen className="h-12 w-12 text-[#94a3b8] mx-auto mb-4" />
             <h3 className="text-xl font-bold text-[#0f172a]">No tutorials found</h3>
             <p className="text-sm text-[#64748b] mt-1 max-w-md mx-auto">
-              Try searching with another keyword or explore our categories for step-by-step instructions.
+              Try searching with another keyword or explore our categories for step-by-step
+              instructions.
             </p>
           </div>
         ) : (
@@ -236,7 +250,9 @@ export function PublicHelpCenterPage() {
                 </div>
 
                 <div className="mt-5 pt-3.5 border-t border-[#f1f5f9] flex items-center justify-between text-xs">
-                  <span className="text-[11px] font-semibold text-[#94a3b8]">Step-by-step guide</span>
+                  <span className="text-[11px] font-semibold text-[#94a3b8]">
+                    Step-by-step guide
+                  </span>
                   <span className="font-bold text-[#059669] flex items-center gap-1 group-hover:translate-x-0.5 transition">
                     View Tutorial <ChevronRight className="h-3.5 w-3.5" />
                   </span>

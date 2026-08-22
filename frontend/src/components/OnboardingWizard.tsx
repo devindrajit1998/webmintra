@@ -296,7 +296,8 @@ export function OnboardingWizard() {
               <span>🇮🇳</span> <span>Made for Indian Businesses</span>
             </p>
             <p className="text-[11px] text-[#64748b] mt-1 leading-relaxed">
-              100% Data Stored in India. Instant WhatsApp enquiries and UPI/Razorpay integration ready.
+              100% Data Stored in India. Instant WhatsApp enquiries and UPI/Razorpay integration
+              ready.
             </p>
           </div>
         </div>
@@ -436,7 +437,8 @@ function BusinessStep({
         Tell us about your business
       </h1>
       <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
-        This information will appear automatically on your website's header, contact section, and enquiry forms.
+        This information will appear automatically on your website's header, contact section, and
+        enquiry forms.
       </p>
 
       <div className="mt-8 rounded-2xl border border-[#e2e8f0] bg-white p-6 sm:p-8 shadow-sm">
@@ -718,7 +720,8 @@ function TemplateStep({
         Pick your starting design
       </h1>
       <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
-        Select a template layout optimized for your business sector. You can customize all text and images later.
+        Select a template layout optimized for your business sector. You can customize all text and
+        images later.
       </p>
 
       {/* Category filter */}
@@ -856,7 +859,11 @@ function PaymentStep({
         <Sparkles className="h-3.5 w-3.5" /> Step 4 of 4: Setup & Launch
       </span>
       <h1 className="mt-3 font-display text-2xl sm:text-3xl font-black text-[#0f172a] tracking-tight">
-        {hasTrial ? "Start Your 14-Day Free Trial" : isFree ? "Confirm & Launch" : "Review & Subscribe"}
+        {hasTrial
+          ? "Start Your 14-Day Free Trial"
+          : isFree
+            ? "Confirm & Launch"
+            : "Review & Subscribe"}
       </h1>
       <p className="mt-1.5 text-xs sm:text-sm text-[#64748b] leading-relaxed">
         {hasTrial

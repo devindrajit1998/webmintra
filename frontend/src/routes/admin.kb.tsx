@@ -45,8 +45,12 @@ function KnowledgeBasePage() {
     <div className="mx-auto w-full max-w-[1600px]">
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">Knowledge Base</h1>
-          <p className="mt-1 text-xs font-medium text-[#64748b]">Manage help articles and documentation.</p>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+            Knowledge Base
+          </h1>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
+            Manage help articles and documentation.
+          </p>
         </div>
         <button
           type="button"
@@ -207,10 +211,11 @@ function KnowledgeBasePage() {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${article.status === "published"
+                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${
+                          article.status === "published"
                             ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
                             : "border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]"
-                          }`}
+                        }`}
                       >
                         {article.status}
                       </span>
@@ -218,10 +223,16 @@ function KnowledgeBasePage() {
                     <td className="px-6 py-4 text-xs text-slate-400">{article.viewCount || 0}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button className="text-[#64748b] transition hover:text-[#059669]" title="Edit">
+                        <button
+                          className="text-[#64748b] transition hover:text-[#059669]"
+                          title="Edit"
+                        >
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button className="text-[#64748b] transition hover:text-[#c2410c]" title="Delete">
+                        <button
+                          className="text-[#64748b] transition hover:text-[#c2410c]"
+                          title="Delete"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </div>

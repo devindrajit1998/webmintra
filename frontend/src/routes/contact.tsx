@@ -30,7 +30,10 @@ export const Route = createFileRoute("/contact")({
   head: ({ loaderData }) => {
     const settings = loaderData?.settings || {};
     const siteName = String(settings["site.name"] || "WebMintra");
-    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(/\/$/, "");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(
+      /\/$/,
+      "",
+    );
     const pageUrl = `${canonicalBase}/contact`;
     const title = `Contact Us & 24/7 Support | ${siteName}`;
     const description = `Get in touch with the ${siteName} team for sales enquiries, custom domains assistance, or technical website support.`;
@@ -143,7 +146,8 @@ export function PublicContactPage() {
             Get in touch with our team
           </h1>
           <p className="mt-3 text-sm sm:text-base text-[#475569] max-w-lg mx-auto">
-            Have questions about creating your website, custom .in domains, or business plans? We are here to help.
+            Have questions about creating your website, custom .in domains, or business plans? We
+            are here to help.
           </p>
         </div>
 
@@ -162,7 +166,9 @@ export function PublicContactPage() {
                   </div>
                   <div>
                     <p className="font-bold text-[#0f172a]">WhatsApp Support</p>
-                    <p className="text-xs text-[#64748b] mt-0.5">Instant chat with our onboarding team</p>
+                    <p className="text-xs text-[#64748b] mt-0.5">
+                      Instant chat with our onboarding team
+                    </p>
                     <a
                       href="https://wa.me/919876543210"
                       target="_blank"
@@ -194,12 +200,13 @@ export function PublicContactPage() {
                   <div>
                     <p className="font-bold text-[#0f172a]">Headquarters</p>
                     <p className="text-xs text-[#64748b] mt-0.5">Bengaluru & Kolkata, India</p>
-                    <p className="text-[11px] text-[#94a3b8] mt-1">Proudly supporting 28 States & UTs</p>
+                    <p className="text-[11px] text-[#94a3b8] mt-1">
+                      Proudly supporting 28 States & UTs
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Right: Message Form */}
@@ -211,7 +218,8 @@ export function PublicContactPage() {
                 </div>
                 <h3 className="text-2xl font-bold text-[#0f172a]">Enquiry Received!</h3>
                 <p className="mt-2 text-sm text-[#64748b] max-w-md mx-auto leading-relaxed">
-                  Thank you for reaching out. Our support and onboarding team has received your message and will reply to{" "}
+                  Thank you for reaching out. Our support and onboarding team has received your
+                  message and will reply to{" "}
                   <span className="text-[#059669] font-bold">{formData.email}</span> shortly.
                 </p>
                 <button
@@ -282,9 +290,7 @@ export function PublicContactPage() {
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-[#0f172a] block mb-1">
-                      Subject
-                    </label>
+                    <label className="text-xs font-bold text-[#0f172a] block mb-1">Subject</label>
                     <select
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}

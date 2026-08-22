@@ -214,8 +214,8 @@ export function Editor({
       const items = state.repeaters[repeater.id] ?? defaultRepeaterItems(repeater.itemIds);
       const sourceIndex =
         Number.isInteger(requestedSourceIndex) &&
-          requestedSourceIndex >= 0 &&
-          requestedSourceIndex < repeater.itemIds.length
+        requestedSourceIndex >= 0 &&
+        requestedSourceIndex < repeater.itemIds.length
           ? requestedSourceIndex
           : 0;
       const key = `c${Date.now()}-${items.length}`;
@@ -508,7 +508,11 @@ export function Editor({
                     : "border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]",
                 )}
               >
-                {showLeftSidebar ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+                {showLeftSidebar ? (
+                  <PanelLeftClose className="h-4 w-4" />
+                ) : (
+                  <PanelLeft className="h-4 w-4" />
+                )}
                 <span className="hidden sm:inline">Page Structure</span>
               </button>
 
@@ -537,7 +541,8 @@ export function Editor({
                 onClick={() => setLandscape((l) => !l)}
                 className="flex h-8 items-center gap-1.5 rounded-xl border border-[#e2e8f0] bg-white px-2.5 text-xs font-bold text-[#475569] shadow-2xs hover:bg-[#f8fafc] hover:text-[#0f172a] transition cursor-pointer"
               >
-                <RotateCcw className="h-3.5 w-3.5 text-[#059669]" /> {landscape ? "Landscape" : "Portrait"}
+                <RotateCcw className="h-3.5 w-3.5 text-[#059669]" />{" "}
+                {landscape ? "Landscape" : "Portrait"}
               </button>
             </div>
 
@@ -576,7 +581,11 @@ export function Editor({
                 )}
               >
                 <span className="hidden sm:inline">Settings Panel</span>
-                {showRightSidebar ? <PanelRightClose className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
+                {showRightSidebar ? (
+                  <PanelRightClose className="h-4 w-4" />
+                ) : (
+                  <PanelRight className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>
@@ -607,7 +616,11 @@ export function Editor({
             </div>
             <div className="mt-4 flex items-center justify-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-4 py-1.5 text-xs font-bold text-[#065f46] shadow-2xs">
-                <span>💡</span> <span>Click any text or image for Quick Actions · Double-click to type directly on canvas</span>
+                <span>💡</span>{" "}
+                <span>
+                  Click any text or image for Quick Actions · Double-click to type directly on
+                  canvas
+                </span>
               </span>
             </div>
           </div>
@@ -638,7 +651,9 @@ export function Editor({
                     <button
                       key={id}
                       onClick={() => setTab(id)}
-                      title={id === "hidden" && hiddenCount ? `${label} (${hiddenCount} hidden)` : label}
+                      title={
+                        id === "hidden" && hiddenCount ? `${label} (${hiddenCount} hidden)` : label
+                      }
                       className={cn(
                         "relative grid h-7.5 w-7.5 shrink-0 place-items-center rounded-lg transition cursor-pointer",
                         tab === id
@@ -671,71 +686,66 @@ export function Editor({
                 <ElementPanel
                   selected={selected}
                   field={field}
-                edit={selected ? editOf(selected) : {}}
-                patch={patch}
-                onUploadImage={onUploadImage}
-                canEditAltText={
-                  entitlements === undefined ||
-                  entitlements["imageAltText"] === "enabled" ||
-                  entitlements["imageAltText"] === true
-                }
-              />
-            ) : null}
-            {tab === "repeaters" ? (
-              <RepeaterPanel
-                page={page}
-                state={state}
-                commit={commit}
-                focus={focusInPreview}
-                editOf={editOf}
-                patch={patch}
-                addItem={addRepeaterItem}
-              />
-            ) : null}
-            {tab === "theme" ? (
-              <ThemePanel state={state} setTheme={setTheme} commit={commit} analysis={analysis} />
-            ) : null}
-            {tab === "assets" ? (
-              <AssetPanel analysis={analysis} state={state} onReplace={replaceAsset} />
-            ) : null}
-            {tab === "hidden" ? (
-              <HiddenPanel
-                page={page}
-                state={state}
-                patch={patch}
-                focus={focusInPreview}
-              />
-            ) : null}
-            {tab === "seo" ? (
-              <SeoPanel
-                seo={{ ...page.seo, ...(state.seo[page.id] ?? {}) }}
-                onChange={(k, v) =>
-                  commit({
-                    ...state,
-                    seo: { ...state.seo, [page.id]: { ...(state.seo[page.id] ?? {}), [k]: v } },
-                  })
-                }
-              />
-            ) : null}
-            {tab === "nav" ? (
-              <NavPanel page={page} editOf={editOf} patch={patch} focus={focusInPreview} />
-            ) : null}
-            {tab === "validation" ? (
-              <ValidationPanel analysis={analysis} focus={focusInPreview} />
-            ) : null}
-            {tab === "history" ? (
-              <HistoryPanel
-                revisions={revisions}
-                cursor={cursor}
-                length={history.length}
-                onRestore={(s) => {
-                  commit(s);
-                  flash("Revision restored");
-                }}
-              />
-            ) : null}
-          </div>
-        </aside>
+                  edit={selected ? editOf(selected) : {}}
+                  patch={patch}
+                  onUploadImage={onUploadImage}
+                  canEditAltText={
+                    entitlements === undefined ||
+                    entitlements["imageAltText"] === "enabled" ||
+                    entitlements["imageAltText"] === true
+                  }
+                />
+              ) : null}
+              {tab === "repeaters" ? (
+                <RepeaterPanel
+                  page={page}
+                  state={state}
+                  commit={commit}
+                  focus={focusInPreview}
+                  editOf={editOf}
+                  patch={patch}
+                  addItem={addRepeaterItem}
+                />
+              ) : null}
+              {tab === "theme" ? (
+                <ThemePanel state={state} setTheme={setTheme} commit={commit} analysis={analysis} />
+              ) : null}
+              {tab === "assets" ? (
+                <AssetPanel analysis={analysis} state={state} onReplace={replaceAsset} />
+              ) : null}
+              {tab === "hidden" ? (
+                <HiddenPanel page={page} state={state} patch={patch} focus={focusInPreview} />
+              ) : null}
+              {tab === "seo" ? (
+                <SeoPanel
+                  seo={{ ...page.seo, ...(state.seo[page.id] ?? {}) }}
+                  onChange={(k, v) =>
+                    commit({
+                      ...state,
+                      seo: { ...state.seo, [page.id]: { ...(state.seo[page.id] ?? {}), [k]: v } },
+                    })
+                  }
+                />
+              ) : null}
+              {tab === "nav" ? (
+                <NavPanel page={page} editOf={editOf} patch={patch} focus={focusInPreview} />
+              ) : null}
+              {tab === "validation" ? (
+                <ValidationPanel analysis={analysis} focus={focusInPreview} />
+              ) : null}
+              {tab === "history" ? (
+                <HistoryPanel
+                  revisions={revisions}
+                  cursor={cursor}
+                  length={history.length}
+                  onRestore={(s) => {
+                    commit(s);
+                    flash("Revision restored");
+                  }}
+                />
+              ) : null}
+            </div>
+          </aside>
         )}
       </div>
 
@@ -1024,7 +1034,7 @@ function StyleControls({
               s["text-align"] === v && "border-primary bg-primary/12 text-primary",
             )}
           >
-            { }
+            {}
             {(() => {
               const I = Icon as typeof AlignLeft;
               return <I className="h-3.5 w-3.5" />;
@@ -1337,7 +1347,7 @@ function ElementPanel({
                 className={cn(
                   "rounded-lg border border-border px-2 py-2 text-[11px] font-semibold transition hover:border-primary/40",
                   (edit.target ?? field?.attrs["target"] ?? "_self") === t &&
-                  "border-primary bg-primary/12 text-primary",
+                    "border-primary bg-primary/12 text-primary",
                 )}
               >
                 {t === "_self" ? "Same tab" : "New tab"}
@@ -2053,9 +2063,7 @@ function HiddenPanel({
   return (
     <div className="fade-up space-y-4">
       <div className="flex items-center justify-between">
-        <SectionTitle hint={`${hiddenEntries.length} items hidden`}>
-          Hidden from page
-        </SectionTitle>
+        <SectionTitle hint={`${hiddenEntries.length} items hidden`}>Hidden from page</SectionTitle>
         {hiddenEntries.length > 0 && (
           <button
             type="button"
@@ -2073,7 +2081,7 @@ function HiddenPanel({
         <div className="space-y-2">
           {hiddenEntries.map(([id, edit]) => {
             const field = page.fields.find((f) => f.id === id);
-            
+
             // Search tree nodes to get meaningful label if available
             const findTreeNodeLabel = (nodes: typeof page.tree): string | null => {
               for (const n of nodes) {
@@ -2106,9 +2114,7 @@ function HiddenPanel({
                     <span className="rounded-md bg-[#ffedd5] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#c2410c]">
                       {badgeKind}
                     </span>
-                    <span className="truncate text-xs font-bold text-[#7c2d12]">
-                      {title}
-                    </span>
+                    <span className="truncate text-xs font-bold text-[#7c2d12]">{title}</span>
                   </div>
                   {field?.value && field.value !== title && (
                     <p className="mt-1 text-[11px] text-[#9a3412] line-clamp-1 italic">

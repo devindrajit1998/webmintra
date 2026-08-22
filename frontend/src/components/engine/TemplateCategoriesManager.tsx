@@ -86,7 +86,10 @@ export function TemplateCategoriesManager({ onClose }: { onClose: () => void }) 
           <h2 className="text-lg font-bold text-[#0f172a] flex items-center gap-2">
             Manage Categories
           </h2>
-          <button onClick={onClose} className="text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9] p-1.5 rounded-lg transition">
+          <button
+            onClick={onClose}
+            className="text-[#64748b] hover:text-[#0f172a] hover:bg-[#f1f5f9] p-1.5 rounded-lg transition"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>

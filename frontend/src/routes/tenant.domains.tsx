@@ -79,7 +79,8 @@ function DomainsPage() {
               Custom Domains
             </h1>
             <p className="mt-1 text-sm text-[#64748b]">
-              Connect your own custom domains, manage CNAME records, and enable automated SSL certificates.
+              Connect your own custom domains, manage CNAME records, and enable automated SSL
+              certificates.
             </p>
           </div>
         </div>
@@ -87,7 +88,9 @@ function DomainsPage() {
 
       {/* Add Domain Section */}
       <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
-        <h2 className="mb-4 font-display text-base font-extrabold text-[#0f172a]">Add a Custom Domain</h2>
+        <h2 className="mb-4 font-display text-base font-extrabold text-[#0f172a]">
+          Add a Custom Domain
+        </h2>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
           <div className="flex-1 space-y-1.5">
             <label className="text-xs font-bold text-[#0f172a]">Domain Name</label>
@@ -133,7 +136,9 @@ function DomainsPage() {
 
       {/* Domains List */}
       <div>
-        <h2 className="mb-4 font-display text-base font-extrabold text-[#0f172a]">Your Connected Domains</h2>
+        <h2 className="mb-4 font-display text-base font-extrabold text-[#0f172a]">
+          Your Connected Domains
+        </h2>
         {isLoading ? (
           <div className="flex h-40 items-center justify-center rounded-2xl border border-[#e2e8f0] bg-white">
             <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
@@ -141,8 +146,12 @@ function DomainsPage() {
         ) : domains.length === 0 ? (
           <div className="flex h-48 flex-col items-center justify-center rounded-2xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center shadow-xs">
             <Globe className="h-10 w-10 text-[#cbd5e1]" />
-            <h3 className="mt-3 font-display text-base font-extrabold text-[#0f172a]">No Domains Added</h3>
-            <p className="mt-1 text-xs text-[#64748b]">Add your first custom domain above to route traffic to your website.</p>
+            <h3 className="mt-3 font-display text-base font-extrabold text-[#0f172a]">
+              No Domains Added
+            </h3>
+            <p className="mt-1 text-xs text-[#64748b]">
+              Add your first custom domain above to route traffic to your website.
+            </p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -153,7 +162,9 @@ function DomainsPage() {
               >
                 <div className="space-y-2 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="font-display text-base font-extrabold text-[#0f172a]">{domain.domain}</h3>
+                    <h3 className="font-display text-base font-extrabold text-[#0f172a]">
+                      {domain.domain}
+                    </h3>
                     {domain.status === "active" ? (
                       <span className="flex items-center gap-1 rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-2.5 py-0.5 text-[10px] font-extrabold text-[#065f46]">
                         <CheckCircle className="h-3 w-3 text-[#059669]" />
@@ -175,9 +186,12 @@ function DomainsPage() {
 
                   {domain.status === "pending_verification" && (
                     <div className="mt-4 rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-4.5 space-y-3">
-                      <p className="text-xs font-extrabold text-[#c2410c]">DNS Configuration Setup</p>
+                      <p className="text-xs font-extrabold text-[#c2410c]">
+                        DNS Configuration Setup
+                      </p>
                       <p className="text-xs text-[#64748b] leading-relaxed">
-                        Add the following DNS record in your domain registrar (GoDaddy, Namecheap, Cloudflare, Hostinger), then click <strong>Verify DNS</strong>:
+                        Add the following DNS record in your domain registrar (GoDaddy, Namecheap,
+                        Cloudflare, Hostinger), then click <strong>Verify DNS</strong>:
                       </p>
                       <div className="overflow-x-auto rounded-xl border border-[#e2e8f0] bg-white shadow-2xs">
                         <table className="w-full text-xs">
@@ -190,28 +204,42 @@ function DomainsPage() {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[#f1f5f9]">
-                            {domain.domain.startsWith("www.") || domain.domain.split(".").length > 2 ? (
+                            {domain.domain.startsWith("www.") ||
+                            domain.domain.split(".").length > 2 ? (
                               <tr>
-                                <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">CNAME</td>
+                                <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">
+                                  CNAME
+                                </td>
                                 <td className="px-4 py-2.5 font-mono font-semibold text-[#0f172a]">
-                                  {domain.domain.startsWith("www.") ? "www" : domain.domain.split(".")[0]}
+                                  {domain.domain.startsWith("www.")
+                                    ? "www"
+                                    : domain.domain.split(".")[0]}
                                 </td>
                                 <td className="px-4 py-2.5 font-mono font-bold text-[#059669]">
                                   cname.webmintra.in
                                 </td>
-                                <td className="px-4 py-2.5 font-mono text-[#64748b]">Automatic / 1/2 Hour</td>
+                                <td className="px-4 py-2.5 font-mono text-[#64748b]">
+                                  Automatic / 1/2 Hour
+                                </td>
                               </tr>
                             ) : (
                               <>
                                 <tr>
-                                  <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">CNAME</td>
+                                  <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">
+                                    CNAME
+                                  </td>
                                   <td className="px-4 py-2.5 font-mono font-semibold text-[#0f172a]">
-                                    @ <span className="text-[10px] text-[#64748b] font-normal">(or www)</span>
+                                    @{" "}
+                                    <span className="text-[10px] text-[#64748b] font-normal">
+                                      (or www)
+                                    </span>
                                   </td>
                                   <td className="px-4 py-2.5 font-mono font-bold text-[#059669]">
                                     cname.webmintra.in
                                   </td>
-                                  <td className="px-4 py-2.5 font-mono text-[#64748b]">Automatic / 1/2 Hour</td>
+                                  <td className="px-4 py-2.5 font-mono text-[#64748b]">
+                                    Automatic / 1/2 Hour
+                                  </td>
                                 </tr>
                               </>
                             )}
@@ -221,10 +249,21 @@ function DomainsPage() {
                       <div className="rounded-lg bg-white/70 border border-[#fed7aa] p-3 text-[11px] text-[#64748b] space-y-1">
                         <p className="font-bold text-[#0f172a]">💡 Host / Name field tip:</p>
                         <p>
-                          In GoDaddy/Namecheap/Cloudflare, set <strong>Name</strong> to <code className="bg-[#f1f5f9] px-1 py-0.5 rounded font-bold text-[#0f172a]">@</code> (or <code className="bg-[#f1f5f9] px-1 py-0.5 rounded font-bold text-[#0f172a]">www</code>), <strong>NOT</strong> your full domain name.
+                          In GoDaddy/Namecheap/Cloudflare, set <strong>Name</strong> to{" "}
+                          <code className="bg-[#f1f5f9] px-1 py-0.5 rounded font-bold text-[#0f172a]">
+                            @
+                          </code>{" "}
+                          (or{" "}
+                          <code className="bg-[#f1f5f9] px-1 py-0.5 rounded font-bold text-[#0f172a]">
+                            www
+                          </code>
+                          ), <strong>NOT</strong> your full domain name.
                         </p>
                         <p>
-                          Set <strong>Points to / Value</strong> to <code className="bg-[#ecfdf5] text-[#059669] px-1 py-0.5 rounded font-bold">cname.webmintra.in</code>
+                          Set <strong>Points to / Value</strong> to{" "}
+                          <code className="bg-[#ecfdf5] text-[#059669] px-1 py-0.5 rounded font-bold">
+                            cname.webmintra.in
+                          </code>
                         </p>
                       </div>
                     </div>

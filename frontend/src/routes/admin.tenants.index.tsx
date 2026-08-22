@@ -120,7 +120,9 @@ function TenantsPage() {
       <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-[#0f172a]">Tenants</h1>
-          <p className="mt-1 text-xs font-medium text-[#64748b]">Manage business accounts, workspaces, and invitations.</p>
+          <p className="mt-1 text-xs font-medium text-[#64748b]">
+            Manage business accounts, workspaces, and invitations.
+          </p>
         </div>
         <button
           onClick={() => setIsInviteOpen(!isInviteOpen)}
@@ -429,104 +431,104 @@ function TenantsPage() {
                 <tbody className="divide-y divide-[#f1f5f9]">
                   {data?.tenants?.length ? (
                     data.tenants.map((tenant: any) => (
-                    <tr key={tenant.id} className="transition-colors hover:bg-[#f8fafc]">
-                      <td className="px-6 py-4">
-                        <Link
-                          to="/admin/tenants/$id"
-                          params={{ id: tenant.id }}
-                          className="flex items-center gap-3 group"
-                        >
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ecfdf5] border border-[#a7f3d0] font-bold text-[#059669] group-hover:bg-[#059669] group-hover:text-white transition-colors">
-                            {(tenant.businessName || tenant.name || "?").charAt(0).toUpperCase()}
+                      <tr key={tenant.id} className="transition-colors hover:bg-[#f8fafc]">
+                        <td className="px-6 py-4">
+                          <Link
+                            to="/admin/tenants/$id"
+                            params={{ id: tenant.id }}
+                            className="flex items-center gap-3 group"
+                          >
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#ecfdf5] border border-[#a7f3d0] font-bold text-[#059669] group-hover:bg-[#059669] group-hover:text-white transition-colors">
+                              {(tenant.businessName || tenant.name || "?").charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-bold text-[#0f172a] group-hover:text-[#059669] transition-colors">
+                                {tenant.businessName || "No Business Name"}
+                              </p>
+                              <p className="text-xs text-[#64748b]">
+                                {tenant.name} · {tenant.email}
+                              </p>
+                            </div>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-xs font-bold capitalize text-[#c2410c]">
+                            {tenant.plan === "pro" ? "Business" : tenant.plan || "None"}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {tenant.tenantStatus === "active" && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
+                              <UserCheck className="h-3.5 w-3.5" /> Active
+                            </span>
+                          )}
+                          {tenant.tenantStatus === "suspended" && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-xs font-bold text-rose-700">
+                              <UserX className="h-3.5 w-3.5" /> Suspended
+                            </span>
+                          )}
+                          {tenant.tenantStatus === "invitation-sent" && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-700">
+                              <AlertTriangle className="h-3.5 w-3.5" /> Invited
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-xs font-medium text-[#475569]">
+                          {new Date(tenant.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <select
+                              value={tenant.tenantStatus}
+                              onChange={(e) =>
+                                statusMutation.mutate({ id: tenant.id, newStatus: e.target.value })
+                              }
+                              className="rounded-lg border border-[#cbd5e1] bg-white px-2 py-1 text-xs font-medium text-[#334155] focus:border-[#059669] outline-none"
+                              disabled={statusMutation.isPending}
+                            >
+                              <option value="active">Active</option>
+                              <option value="suspended">Suspend</option>
+                              {tenant.tenantStatus === "invitation-sent" && (
+                                <option value="invitation-sent">Invited</option>
+                              )}
+                            </select>
+                            <button
+                              onClick={() => setEditingTenant(tenant)}
+                              className="rounded-lg border border-[#e2e8f0] p-1.5 text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
+                              title="Edit tenant"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => setImpersonateTarget(tenant)}
+                              disabled={impersonateMutation.isPending}
+                              className="rounded-lg border border-amber-200 bg-amber-50 p-1.5 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50 cursor-pointer"
+                              title="Impersonate tenant"
+                            >
+                              <LogIn className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => setDeleteTarget(tenant)}
+                              disabled={deleteMutation.isPending}
+                              className="rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50 cursor-pointer"
+                              title="Delete tenant"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-                          <div>
-                            <p className="font-bold text-[#0f172a] group-hover:text-[#059669] transition-colors">
-                              {tenant.businessName || "No Business Name"}
-                            </p>
-                            <p className="text-xs text-[#64748b]">
-                              {tenant.name} · {tenant.email}
-                            </p>
-                          </div>
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center rounded-full border border-[#fed7aa] bg-[#fff7ed] px-2.5 py-0.5 text-xs font-bold capitalize text-[#c2410c]">
-                          {tenant.plan === "pro" ? "Business" : tenant.plan || "None"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {tenant.tenantStatus === "active" && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-700">
-                            <UserCheck className="h-3.5 w-3.5" /> Active
-                          </span>
-                        )}
-                        {tenant.tenantStatus === "suspended" && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-xs font-bold text-rose-700">
-                            <UserX className="h-3.5 w-3.5" /> Suspended
-                          </span>
-                        )}
-                        {tenant.tenantStatus === "invitation-sent" && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-xs font-bold text-amber-700">
-                            <AlertTriangle className="h-3.5 w-3.5" /> Invited
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-xs font-medium text-[#475569]">
-                        {new Date(tenant.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <select
-                            value={tenant.tenantStatus}
-                            onChange={(e) =>
-                              statusMutation.mutate({ id: tenant.id, newStatus: e.target.value })
-                            }
-                            className="rounded-lg border border-[#cbd5e1] bg-white px-2 py-1 text-xs font-medium text-[#334155] focus:border-[#059669] outline-none"
-                            disabled={statusMutation.isPending}
-                          >
-                            <option value="active">Active</option>
-                            <option value="suspended">Suspend</option>
-                            {tenant.tenantStatus === "invitation-sent" && (
-                              <option value="invitation-sent">Invited</option>
-                            )}
-                          </select>
-                          <button
-                            onClick={() => setEditingTenant(tenant)}
-                            className="rounded-lg border border-[#e2e8f0] p-1.5 text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition-colors"
-                            title="Edit tenant"
-                          >
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setImpersonateTarget(tenant)}
-                            disabled={impersonateMutation.isPending}
-                            className="rounded-lg border border-amber-200 bg-amber-50 p-1.5 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50 cursor-pointer"
-                            title="Impersonate tenant"
-                          >
-                            <LogIn className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => setDeleteTarget(tenant)}
-                            disabled={deleteMutation.isPending}
-                            className="rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50 cursor-pointer"
-                            title="Delete tenant"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-12 text-center text-[#64748b] font-medium">
+                        No tenants found.
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-[#64748b] font-medium">
-                      No tenants found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
           )}
 
           {data?.pagination && data.pagination.pages > 1 && (
@@ -567,7 +569,8 @@ function TenantsPage() {
                 Log in as {impersonateTarget.businessName || impersonateTarget.name}?
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-[#64748b]">
-                You will temporarily enter this tenant's workspace session. To return to the administrator platform, you will need to log back into your admin account.
+                You will temporarily enter this tenant's workspace session. To return to the
+                administrator platform, you will need to log back into your admin account.
               </p>
               <div className="mt-6 flex items-center justify-end gap-3">
                 <button
@@ -589,7 +592,9 @@ function TenantsPage() {
                   ) : (
                     <LogIn className="h-4 w-4" />
                   )}
-                  <span>{impersonateMutation.isPending ? "Logging in..." : "Confirm & Log in"}</span>
+                  <span>
+                    {impersonateMutation.isPending ? "Logging in..." : "Confirm & Log in"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -609,7 +614,8 @@ function TenantsPage() {
                 Delete {deleteTarget.businessName || deleteTarget.name}?
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-[#64748b]">
-                Are you sure you want to permanently delete this tenant and all associated data? This action cannot be undone.
+                Are you sure you want to permanently delete this tenant and all associated data?
+                This action cannot be undone.
               </p>
               <div className="mt-6 flex items-center justify-end gap-3">
                 <button

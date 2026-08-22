@@ -122,13 +122,18 @@ function PagesPage() {
                     <td colSpan={3} className="px-6 py-12 text-center">
                       <div className="flex flex-col items-center justify-center gap-3">
                         <Loader2 className="h-6 w-6 animate-spin text-[#059669]" />
-                        <span className="text-xs font-semibold text-[#64748b]">Loading pages...</span>
+                        <span className="text-xs font-semibold text-[#64748b]">
+                          Loading pages...
+                        </span>
                       </div>
                     </td>
                   </tr>
                 ) : filteredPages.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-6 py-12 text-center text-xs font-semibold text-[#64748b]">
+                    <td
+                      colSpan={3}
+                      className="px-6 py-12 text-center text-xs font-semibold text-[#64748b]"
+                    >
                       No pages found matching your search.
                     </td>
                   </tr>

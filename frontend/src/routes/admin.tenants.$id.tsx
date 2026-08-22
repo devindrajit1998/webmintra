@@ -143,9 +143,7 @@ function TenantDetailsPage() {
         <section className="rounded-xl border border-rose-200 bg-rose-50 p-5">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
-              <h2 className="text-base font-bold text-rose-800">
-                Account deletion requested
-              </h2>
+              <h2 className="text-base font-bold text-rose-800">Account deletion requested</h2>
               <p className="mt-1 text-sm text-[#475569]">
                 Requested {new Date(data.deletionRequest.requestedAt).toLocaleString()}
               </p>
@@ -378,7 +376,9 @@ function TenantDetailsPage() {
                         className="rounded-lg border border-[#e2e8f0] bg-[#fafcfb] p-3 text-sm flex items-center justify-between"
                       >
                         <span className="font-bold text-[#0f172a]">{d.domain}</span>
-                        <span className="text-[10px] font-bold uppercase text-[#059669] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">{d.status}</span>
+                        <span className="text-[10px] font-bold uppercase text-[#059669] bg-[#ecfdf5] px-2 py-0.5 rounded border border-[#a7f3d0]">
+                          {d.status}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -424,7 +424,8 @@ function TenantDetailsPage() {
                 Log in as {tenant.business?.name || tenant.name}?
               </h3>
               <p className="mt-2 text-xs leading-relaxed text-[#64748b]">
-                You will temporarily enter this tenant's workspace session. To return to the administrator platform, you will need to log back into your admin account.
+                You will temporarily enter this tenant's workspace session. To return to the
+                administrator platform, you will need to log back into your admin account.
               </p>
               <div className="mt-6 flex items-center justify-end gap-3">
                 <button
@@ -446,7 +447,9 @@ function TenantDetailsPage() {
                   ) : (
                     <LogIn className="h-4 w-4" />
                   )}
-                  <span>{impersonateMutation.isPending ? "Logging in..." : "Confirm & Log in"}</span>
+                  <span>
+                    {impersonateMutation.isPending ? "Logging in..." : "Confirm & Log in"}
+                  </span>
                 </button>
               </div>
             </div>
