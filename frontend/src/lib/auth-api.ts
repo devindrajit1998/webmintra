@@ -1024,3 +1024,91 @@ export function deleteTenantBlogPost(websiteId: string, postId: string) {
     { method: "DELETE" },
   );
 }
+
+// ── Plugins & Add-ons System ──────────────────────────────────
+export interface PluginCatalogField {
+  name: string;
+  label: string;
+  type: "text" | "textarea" | "tel" | "select" | "color";
+  placeholder?: string;
+  required?: boolean;
+  helpText?: string;
+  rows?: number;
+  options?: { label: string; value: string }[];
+}
+
+export interface PluginCatalogItem {
+  slug: string;
+  name: string;
+  category: string;
+  badge?: string;
+  tagline: string;
+  description: string;
+  icon: string;
+  color: string;
+  isCore?: boolean;
+  deepLink?: string;
+  defaultConfig: Record<string, any>;
+  fields: PluginCatalogField[];
+}
+
+export interface InstalledPlugin {
+  _id?: string;
+  website: string;
+  pluginSlug: string;
+  isEnabled: boolean;
+  config: Record<string, any>;
+  installedAt?: string;
+}
+
+export function getPluginCatalog() {
+  return pluginRequest<{ catalog: PluginCatalogItem[] }>("/catalog");
+}
+
+export function getWebsitePlugins(websiteId: string) {
+  return pluginRequest<{ plugins: InstalledPlugin[]; catalog: PluginCatalogItem[] }>(
+    `/${websiteId}`,
+  );
+}
+
+export function toggleWebsitePlugin(websiteId: string, pluginSlug: string, isEnabled: boolean) {
+  return pluginRequest<{ message: string; plugin: InstalledPlugin }>(`/${websiteId}/toggle`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ pluginSlug, isEnabled }),
+  });
+}
+
+export function saveWebsitePluginConfig(
+  websiteId: string,
+  pluginSlug: string,
+  config: Record<string, any>,
+  isEnabled?: boolean,
+) {
+  return pluginRequest<{ message: string; plugin: InstalledPlugin }>(
+    `/${websiteId}/${pluginSlug}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ config, isEnabled }),
+    },
+  );
+}
+
+async function pluginRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const response = await apiFetch(`${API_URL}/plugins${path}`, {
+    ...options,
+    credentials: "include",
+    headers: {
+      "content-type": "application/json",
+      ...options.headers,
+    },
+  });
+  const payload = await response
+    .json()
+    .catch(() => ({ message: "Unable to process plugin request." }));
+  if (!response.ok) throw new Error(payload.message ?? "Unable to process plugin request.");
+  return payload as T;
+}
+
+

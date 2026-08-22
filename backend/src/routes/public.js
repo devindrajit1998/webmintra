@@ -7,6 +7,8 @@ import { User } from "../models/User.js";
 import { FormSubmission } from "../models/FormSubmission.js";
 import { AnalyticsEvent, ANALYTICS_EVENT_TYPES } from "../models/AnalyticsEvent.js";
 import { Domain } from "../models/Domain.js";
+import { WebsitePlugin } from "../models/WebsitePlugin.js";
+import { generatePluginInjections } from "../lib/plugin-injectors.js";
 import {
   buildPublicPages,
   buildSitemapXml,
@@ -492,12 +494,15 @@ async function renderPage(req, res, next) {
     const owner = await User.findById(website.owner).select("business").lean();
     const baseUrl = publicBaseUrl(req);
     const canonicalUrl = `${baseUrl}${page.route === "/" ? "" : page.route}`;
+    const plugins = await WebsitePlugin.find({ website: website._id, isEnabled: true }).lean();
+
     const html = renderPublishedPage({
       page,
       state,
       canonicalUrl,
       websiteId: website._id,
       fallbackFaviconUrl: owner?.business?.faviconUrl,
+      plugins,
     });
     return res.status(status).type("html").send(html);
   } catch (error) {
@@ -505,7 +510,7 @@ async function renderPage(req, res, next) {
   }
 }
 
-export function renderPublishedPage({ page, state = {}, canonicalUrl, websiteId, fallbackFaviconUrl }) {
+export function renderPublishedPage({ page, state = {}, canonicalUrl, websiteId, fallbackFaviconUrl, plugins = [] }) {
   const dom = new JSDOM(page.htmlContent);
   const document = dom.window.document;
   const edits = pageStateValue(state.edits, page);
@@ -522,10 +527,12 @@ export function renderPublishedPage({ page, state = {}, canonicalUrl, websiteId,
   }
   applySeo(document, mergedPageSeo(state, page), state, canonicalUrl);
 
+  const { headHtml, bodyHtml } = generatePluginInjections(plugins);
+
   let html = `<!DOCTYPE html>${document.documentElement.outerHTML}`;
   if (!html.includes("tailwindcss")) html = html.replace("</head>", '<script src="https://cdn.tailwindcss.com"></script></head>');
-  html = html.replace("</head>", `<style id="te-theme">${themeCss(state.theme || {})}</style></head>`);
-  html = html.replace("</body>", `${analyticsScript(websiteId)}${formScript(websiteId)}</body>`);
+  html = html.replace("</head>", `<style id="te-theme">${themeCss(state.theme || {})}</style>${headHtml}</head>`);
+  html = html.replace("</body>", `${analyticsScript(websiteId)}${formScript(websiteId)}${bodyHtml}</body>`);
   return html;
 }
 

@@ -85,6 +85,8 @@ function TenantsPage() {
   });
 
   const [editingTenant, setEditingTenant] = useState<any>(null);
+  const [impersonateTarget, setImpersonateTarget] = useState<any>(null);
+  const [deleteTarget, setDeleteTarget] = useState<any>(null);
   const editMutation = useMutation({
     mutationFn: (data: any) => updateTenant(editingTenant.id, data),
     onSuccess: () => {
@@ -496,33 +498,17 @@ function TenantsPage() {
                             <Pencil className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Log in as ${tenant.businessName || tenant.name}? You will need to log back in to your admin account later.`,
-                                )
-                              ) {
-                                impersonateMutation.mutate(tenant.id);
-                              }
-                            }}
+                            onClick={() => setImpersonateTarget(tenant)}
                             disabled={impersonateMutation.isPending}
-                            className="rounded-lg border border-amber-200 bg-amber-50 p-1.5 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50"
+                            className="rounded-lg border border-amber-200 bg-amber-50 p-1.5 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50 cursor-pointer"
                             title="Impersonate tenant"
                           >
                             <LogIn className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => {
-                              if (
-                                window.confirm(
-                                  "Are you sure you want to delete this tenant? This action cannot be undone.",
-                                )
-                              ) {
-                                deleteMutation.mutate(tenant.id);
-                              }
-                            }}
+                            onClick={() => setDeleteTarget(tenant)}
                             disabled={deleteMutation.isPending}
-                            className="rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50"
+                            className="rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-700 hover:bg-rose-100 transition-colors disabled:opacity-50 cursor-pointer"
                             title="Delete tenant"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -566,6 +552,93 @@ function TenantsPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Impersonate Confirmation Modal */}
+      {impersonateTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff7ed] border border-[#fed7aa] text-[#c2410c] shadow-2xs mb-4">
+                <LogIn className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-lg font-extrabold text-[#0f172a]">
+                Log in as {impersonateTarget.businessName || impersonateTarget.name}?
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#64748b]">
+                You will temporarily enter this tenant's workspace session. To return to the administrator platform, you will need to log back into your admin account.
+              </p>
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setImpersonateTarget(null)}
+                  disabled={impersonateMutation.isPending}
+                  className="rounded-xl border border-[#e2e8f0] bg-white px-4 py-2 text-xs font-bold text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] transition cursor-pointer shadow-2xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => impersonateMutation.mutate(impersonateTarget.id)}
+                  disabled={impersonateMutation.isPending}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#c2410c] px-5 py-2 text-xs font-extrabold text-white shadow-xs hover:bg-[#9a3412] transition cursor-pointer disabled:opacity-50"
+                >
+                  {impersonateMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogIn className="h-4 w-4" />
+                  )}
+                  <span>{impersonateMutation.isPending ? "Logging in..." : "Confirm & Log in"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#fecdd3] bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48] shadow-2xs mb-4">
+                <Trash2 className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-lg font-extrabold text-[#0f172a]">
+                Delete {deleteTarget.businessName || deleteTarget.name}?
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#64748b]">
+                Are you sure you want to permanently delete this tenant and all associated data? This action cannot be undone.
+              </p>
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={deleteMutation.isPending}
+                  className="rounded-xl border border-[#e2e8f0] bg-white px-4 py-2 text-xs font-bold text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] transition cursor-pointer shadow-2xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteMutation.mutate(deleteTarget.id);
+                    setDeleteTarget(null);
+                  }}
+                  disabled={deleteMutation.isPending}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#e11d48] px-5 py-2 text-xs font-extrabold text-white shadow-xs hover:bg-[#be123c] transition cursor-pointer disabled:opacity-50"
+                >
+                  {deleteMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                  <span>{deleteMutation.isPending ? "Deleting..." : "Delete Tenant"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

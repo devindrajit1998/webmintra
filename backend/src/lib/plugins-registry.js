@@ -1,0 +1,75 @@
+export const PLUGIN_CATALOG = [
+  {
+    slug: "custom-domains",
+    name: "Custom Domain & Branding",
+    category: "Infrastructure",
+    badge: "Core",
+    tagline: "Connect your own www address with automated SSL security.",
+    description:
+      "Replace the default subdomain with your official business domain name (e.g. www.yourcompany.in) to look professional and build trust.",
+    icon: "Globe",
+    color: "emerald",
+    isCore: true,
+    deepLink: "/tenant/domains",
+    defaultConfig: {},
+    fields: [],
+  },
+  {
+    slug: "whatsapp-chat",
+    name: "Floating WhatsApp Chat",
+    category: "Sales & Leads",
+    badge: "Popular",
+    tagline: "Let visitors chat with you on WhatsApp with 1 tap.",
+    description:
+      "Adds a clean floating WhatsApp button on the bottom corner of your website so customers can instantly ask questions, inquire about prices, and place orders directly.",
+    icon: "MessageCircle",
+    color: "green",
+    isCore: false,
+    defaultConfig: {
+      phoneNumber: "",
+      greetingMessage: "Hello! I am interested in your services and would like more details.",
+      buttonPosition: "bottom-right", // bottom-right or bottom-left
+      popupHeader: "Chat with us on WhatsApp",
+      popupSubheader: "Typically replies within a few minutes",
+      callToAction: "Need help? Chat with us",
+      showBadge: true,
+    },
+    fields: [
+      {
+        name: "phoneNumber",
+        label: "WhatsApp Phone Number (with Country Code)",
+        type: "tel",
+        placeholder: "+91 98765 43210",
+        required: true,
+        helpText: "Enter your 10-digit mobile number with +91 country code.",
+      },
+      {
+        name: "greetingMessage",
+        label: "Pre-filled Message",
+        type: "textarea",
+        rows: 2,
+        placeholder: "Hello! I would like to know more about your services.",
+        required: false,
+        helpText: "This text is automatically typed when a customer opens WhatsApp.",
+      },
+      {
+        name: "callToAction",
+        label: "Button Tooltip / Call to Action",
+        type: "text",
+        placeholder: "Need help? Chat with us",
+        required: false,
+        helpText: "Text displayed next to the WhatsApp icon.",
+      },
+      {
+        name: "buttonPosition",
+        label: "Position on Screen",
+        type: "select",
+        options: [
+          { label: "Bottom Right (Recommended)", value: "bottom-right" },
+          { label: "Bottom Left", value: "bottom-left" },
+        ],
+        required: false,
+      },
+    ],
+  },
+];

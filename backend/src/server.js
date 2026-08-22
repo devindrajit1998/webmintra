@@ -25,6 +25,7 @@ import domainsRouter from "./routes/domains.js";
 import onboardingRouter from "./routes/onboarding.js";
 import billingRouter from "./routes/billing.js";
 import workspaceRouter from "./routes/workspace.js";
+import pluginsRouter from "./routes/plugins.js";
 
 // ── Admin Platform Routes ──
 import adminDashboardRouter from "./routes/admin/dashboard.js";
@@ -135,6 +136,7 @@ app.use("/api/domains", domainsRouter);
 app.use("/api/onboarding", onboardingLimiter, onboardingRouter);
 app.use("/api/billing", billingRouter);
 app.use("/api/workspace", workspaceRouter);
+app.use("/api/plugins", pluginsRouter);
 
 // ── Public Settings Endpoint (no auth) ─────────────────────────
 app.use("/api/public/settings", publicSettingsRouter);

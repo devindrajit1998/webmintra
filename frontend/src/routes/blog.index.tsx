@@ -82,7 +82,7 @@ export const Route = createFileRoute("/blog/")({
   component: PublicBlogPage,
 });
 
-export function PublicBlogPage() {
+function PublicBlogPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");

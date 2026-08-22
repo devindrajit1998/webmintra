@@ -61,6 +61,7 @@ import { Route as TenantFormsRouteImport } from './routes/tenant.forms'
 import { Route as TenantKbRouteImport } from './routes/tenant.kb'
 import { Route as TenantMediaRouteImport } from './routes/tenant.media'
 import { Route as TenantPagesRouteImport } from './routes/tenant.pages'
+import { Route as TenantPluginsRouteImport } from './routes/tenant.plugins'
 import { Route as TenantSeoRouteImport } from './routes/tenant.seo'
 import { Route as TenantSettingsRouteImport } from './routes/tenant.settings'
 import { Route as TenantSubscriptionRouteImport } from './routes/tenant.subscription'
@@ -332,6 +333,11 @@ const TenantPagesRoute = TenantPagesRouteImport.update({
   path: '/pages',
   getParentRoute: () => TenantRoute,
 } as any)
+const TenantPluginsRoute = TenantPluginsRouteImport.update({
+  id: '/plugins',
+  path: '/plugins',
+  getParentRoute: () => TenantRoute,
+} as any)
 const TenantSeoRoute = TenantSeoRouteImport.update({
   id: '/seo',
   path: '/seo',
@@ -429,6 +435,7 @@ export interface FileRoutesByFullPath {
   '/tenant/kb': typeof TenantKbRoute
   '/tenant/media': typeof TenantMediaRoute
   '/tenant/pages': typeof TenantPagesRoute
+  '/tenant/plugins': typeof TenantPluginsRoute
   '/tenant/seo': typeof TenantSeoRoute
   '/tenant/settings': typeof TenantSettingsRoute
   '/tenant/subscription': typeof TenantSubscriptionRoute
@@ -491,6 +498,7 @@ export interface FileRoutesByTo {
   '/tenant/kb': typeof TenantKbRoute
   '/tenant/media': typeof TenantMediaRoute
   '/tenant/pages': typeof TenantPagesRoute
+  '/tenant/plugins': typeof TenantPluginsRoute
   '/tenant/seo': typeof TenantSeoRoute
   '/tenant/settings': typeof TenantSettingsRoute
   '/tenant/subscription': typeof TenantSubscriptionRoute
@@ -555,6 +563,7 @@ export interface FileRoutesById {
   '/tenant/kb': typeof TenantKbRoute
   '/tenant/media': typeof TenantMediaRoute
   '/tenant/pages': typeof TenantPagesRoute
+  '/tenant/plugins': typeof TenantPluginsRoute
   '/tenant/seo': typeof TenantSeoRoute
   '/tenant/settings': typeof TenantSettingsRoute
   '/tenant/subscription': typeof TenantSubscriptionRoute
@@ -620,6 +629,7 @@ export interface FileRouteTypes {
     | '/tenant/kb'
     | '/tenant/media'
     | '/tenant/pages'
+    | '/tenant/plugins'
     | '/tenant/seo'
     | '/tenant/settings'
     | '/tenant/subscription'
@@ -682,6 +692,7 @@ export interface FileRouteTypes {
     | '/tenant/kb'
     | '/tenant/media'
     | '/tenant/pages'
+    | '/tenant/plugins'
     | '/tenant/seo'
     | '/tenant/settings'
     | '/tenant/subscription'
@@ -745,6 +756,7 @@ export interface FileRouteTypes {
     | '/tenant/kb'
     | '/tenant/media'
     | '/tenant/pages'
+    | '/tenant/plugins'
     | '/tenant/seo'
     | '/tenant/settings'
     | '/tenant/subscription'
@@ -1146,6 +1158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TenantPagesRouteImport
       parentRoute: typeof TenantRoute
     }
+    '/tenant/plugins': {
+      id: '/tenant/plugins'
+      path: '/plugins'
+      fullPath: '/tenant/plugins'
+      preLoaderRoute: typeof TenantPluginsRouteImport
+      parentRoute: typeof TenantRoute
+    }
     '/tenant/seo': {
       id: '/tenant/seo'
       path: '/seo'
@@ -1283,6 +1302,7 @@ interface TenantRouteChildren {
   TenantKbRoute: typeof TenantKbRoute
   TenantMediaRoute: typeof TenantMediaRoute
   TenantPagesRoute: typeof TenantPagesRoute
+  TenantPluginsRoute: typeof TenantPluginsRoute
   TenantSeoRoute: typeof TenantSeoRoute
   TenantSettingsRoute: typeof TenantSettingsRoute
   TenantSubscriptionRoute: typeof TenantSubscriptionRoute
@@ -1302,6 +1322,7 @@ const TenantRouteChildren: TenantRouteChildren = {
   TenantKbRoute: TenantKbRoute,
   TenantMediaRoute: TenantMediaRoute,
   TenantPagesRoute: TenantPagesRoute,
+  TenantPluginsRoute: TenantPluginsRoute,
   TenantSeoRoute: TenantSeoRoute,
   TenantSettingsRoute: TenantSettingsRoute,
   TenantSubscriptionRoute: TenantSubscriptionRoute,

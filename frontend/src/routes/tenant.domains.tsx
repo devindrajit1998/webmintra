@@ -177,7 +177,7 @@ function DomainsPage() {
                     <div className="mt-4 rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-4.5 space-y-3">
                       <p className="text-xs font-extrabold text-[#c2410c]">DNS Configuration Setup</p>
                       <p className="text-xs text-[#64748b] leading-relaxed">
-                        Add the following <strong>CNAME</strong> record in your domain registrar (GoDaddy, Namecheap, Cloudflare, Hostinger), then click <strong>Verify DNS</strong>:
+                        Add the following DNS record in your domain registrar (GoDaddy, Namecheap, Cloudflare, Hostinger), then click <strong>Verify DNS</strong>:
                       </p>
                       <div className="overflow-x-auto rounded-xl border border-[#e2e8f0] bg-white shadow-2xs">
                         <table className="w-full text-xs">
@@ -185,27 +185,48 @@ function DomainsPage() {
                             <tr>
                               <th className="px-4 py-2.5 text-left">Record Type</th>
                               <th className="px-4 py-2.5 text-left">Host / Name</th>
-                              <th className="px-4 py-2.5 text-left">Points To / Target</th>
+                              <th className="px-4 py-2.5 text-left">Points To / Value</th>
+                              <th className="px-4 py-2.5 text-left">TTL</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[#f1f5f9]">
-                            <tr>
-                              <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">CNAME</td>
-                              <td className="px-4 py-2.5 font-mono font-semibold text-[#0f172a]">
-                                {domain.domain}
-                              </td>
-                              <td className="px-4 py-2.5 font-mono font-bold text-[#059669]">
-                                {window.location.hostname.includes("localhost")
-                                  ? `cname.${window.location.host}`
-                                  : "cname.webmintra.in"}
-                              </td>
-                            </tr>
+                            {domain.domain.startsWith("www.") || domain.domain.split(".").length > 2 ? (
+                              <tr>
+                                <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">CNAME</td>
+                                <td className="px-4 py-2.5 font-mono font-semibold text-[#0f172a]">
+                                  {domain.domain.startsWith("www.") ? "www" : domain.domain.split(".")[0]}
+                                </td>
+                                <td className="px-4 py-2.5 font-mono font-bold text-[#059669]">
+                                  cname.webmintra.in
+                                </td>
+                                <td className="px-4 py-2.5 font-mono text-[#64748b]">Automatic / 1/2 Hour</td>
+                              </tr>
+                            ) : (
+                              <>
+                                <tr>
+                                  <td className="px-4 py-2.5 font-mono font-bold text-[#ea580c]">CNAME</td>
+                                  <td className="px-4 py-2.5 font-mono font-semibold text-[#0f172a]">
+                                    @ <span className="text-[10px] text-[#64748b] font-normal">(or www)</span>
+                                  </td>
+                                  <td className="px-4 py-2.5 font-mono font-bold text-[#059669]">
+                                    cname.webmintra.in
+                                  </td>
+                                  <td className="px-4 py-2.5 font-mono text-[#64748b]">Automatic / 1/2 Hour</td>
+                                </tr>
+                              </>
+                            )}
                           </tbody>
                         </table>
                       </div>
-                      <p className="text-[10px] text-[#64748b] leading-relaxed">
-                        DNS propagation can take between 5 minutes and 24 hours depending on TTL.
-                      </p>
+                      <div className="rounded-lg bg-white/70 border border-[#fed7aa] p-3 text-[11px] text-[#64748b] space-y-1">
+                        <p className="font-bold text-[#0f172a]">💡 Host / Name field tip:</p>
+                        <p>
+                          In GoDaddy/Namecheap/Cloudflare, set <strong>Name</strong> to <code className="bg-[#f1f5f9] px-1 py-0.5 rounded font-bold text-[#0f172a]">@</code> (or <code className="bg-[#f1f5f9] px-1 py-0.5 rounded font-bold text-[#0f172a]">www</code>), <strong>NOT</strong> your full domain name.
+                        </p>
+                        <p>
+                          Set <strong>Points to / Value</strong> to <code className="bg-[#ecfdf5] text-[#059669] px-1 py-0.5 rounded font-bold">cname.webmintra.in</code>
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>

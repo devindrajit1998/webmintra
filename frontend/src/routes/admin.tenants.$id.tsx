@@ -82,6 +82,8 @@ function TenantDetailsPage() {
     onError: (error) => toast.error(error.message),
   });
 
+  const [showImpersonateModal, setShowImpersonateModal] = useState(false);
+
   const impersonateMutation = useMutation({
     mutationFn: impersonateTenant,
     onSuccess: () => {
@@ -128,13 +130,9 @@ function TenantDetailsPage() {
         </div>
         <div className="ml-auto">
           <button
-            onClick={() => {
-              if (window.confirm(`Log in as ${tenant.business?.name || tenant.name}?`)) {
-                impersonateMutation.mutate(tenant.id);
-              }
-            }}
+            onClick={() => setShowImpersonateModal(true)}
             disabled={impersonateMutation.isPending}
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#fff7ed] border border-[#fed7aa] px-4 text-xs font-bold text-[#c2410c] transition hover:bg-[#ffedd5] disabled:opacity-50"
+            className="inline-flex h-9 items-center gap-2 rounded-xl bg-[#fff7ed] border border-[#fed7aa] px-4 text-xs font-bold text-[#c2410c] transition hover:bg-[#ffedd5] disabled:opacity-50 cursor-pointer shadow-2xs"
           >
             <LogIn className="h-4 w-4" /> Impersonate
           </button>
@@ -413,6 +411,48 @@ function TenantDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Impersonate Confirmation Modal */}
+      {showImpersonateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff7ed] border border-[#fed7aa] text-[#c2410c] shadow-2xs mb-4">
+                <LogIn className="h-6 w-6" />
+              </div>
+              <h3 className="font-display text-lg font-extrabold text-[#0f172a]">
+                Log in as {tenant.business?.name || tenant.name}?
+              </h3>
+              <p className="mt-2 text-xs leading-relaxed text-[#64748b]">
+                You will temporarily enter this tenant's workspace session. To return to the administrator platform, you will need to log back into your admin account.
+              </p>
+              <div className="mt-6 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowImpersonateModal(false)}
+                  disabled={impersonateMutation.isPending}
+                  className="rounded-xl border border-[#e2e8f0] bg-white px-4 py-2 text-xs font-bold text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] transition cursor-pointer shadow-2xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => impersonateMutation.mutate(tenant.id)}
+                  disabled={impersonateMutation.isPending}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#c2410c] px-5 py-2 text-xs font-extrabold text-white shadow-xs hover:bg-[#9a3412] transition cursor-pointer disabled:opacity-50"
+                >
+                  {impersonateMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <LogIn className="h-4 w-4" />
+                  )}
+                  <span>{impersonateMutation.isPending ? "Logging in..." : "Confirm & Log in"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

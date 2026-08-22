@@ -138,43 +138,48 @@ router.post("/:domainId/verify", async (req, res, next) => {
     let resolvedRecords = [];
     let failReason = null;
 
-    // Step 1: Try CNAME resolution (works for www.* and subdomains)
-    try {
-      const cnames = await dns.resolveCname(domain.domain);
-      resolvedRecords = cnames.map((c) => ({ type: "CNAME", name: domain.domain, value: c, ttl: 0, verified: false }));
-
-      if (cnames.some((c) => c.toLowerCase() === CNAME_TARGET)) {
-        verified = true;
-        resolvedRecords = resolvedRecords.map((r) => ({
-          ...r,
-          verified: r.value.toLowerCase() === CNAME_TARGET,
-        }));
-      } else {
-        failReason = `CNAME record found but does not point to ${CNAME_TARGET}. Found: ${cnames.join(", ")}`;
-      }
-    } catch (cnameError) {
-      // Step 2: If no CNAME, fall back to A record check (for apex/root domains)
-      // Apex domains cannot use CNAME, so we accept A record pointing to our server IP
+    // Development / Localhost bypass: in local dev, allow simulated verification for testing
+    if (process.env.NODE_ENV !== "production" && (req.headers.host?.includes("localhost") || process.env.DEV_BYPASS_DNS === "true")) {
+      verified = true;
+      resolvedRecords = [{ type: "CNAME", name: domain.domain, value: CNAME_TARGET, ttl: 300, verified: true }];
+    } else {
+      // Step 1: Try CNAME resolution (works for www.* and subdomains)
       try {
-        const serverIp = process.env.SERVER_IP;
-        if (serverIp) {
-          const aRecords = await dns.resolve4(domain.domain);
-          resolvedRecords = aRecords.map((ip) => ({ type: "A", name: domain.domain, value: ip, ttl: 0, verified: false }));
+        const cnames = await dns.resolveCname(domain.domain);
+        resolvedRecords = cnames.map((c) => ({ type: "CNAME", name: domain.domain, value: c, ttl: 0, verified: false }));
 
-          if (aRecords.includes(serverIp)) {
-            verified = true;
-            resolvedRecords = resolvedRecords.map((r) => ({
-              ...r,
-              verified: r.value === serverIp,
-            }));
-          } else {
-            failReason = `A record found but does not point to the server IP (${serverIp}). Found: ${aRecords.join(", ")}`;
-          }
+        if (cnames.some((c) => c.toLowerCase() === CNAME_TARGET)) {
+          verified = true;
+          resolvedRecords = resolvedRecords.map((r) => ({
+            ...r,
+            verified: r.value.toLowerCase() === CNAME_TARGET,
+          }));
         } else {
-          failReason = "No CNAME record found for this domain. Please add a CNAME record pointing to " + CNAME_TARGET;
+          failReason = `CNAME record found but does not point to ${CNAME_TARGET}. Found: ${cnames.join(", ")}`;
         }
-      } catch (aError) {
-        failReason = "Domain DNS could not be resolved. Please ensure the CNAME record is added and has had time to propagate (up to 48 hours).";
+      } catch (cnameError) {
+        // Step 2: If no CNAME, fall back to A record check (for apex/root domains)
+        try {
+          const serverIp = process.env.SERVER_IP;
+          if (serverIp) {
+            const aRecords = await dns.resolve4(domain.domain);
+            resolvedRecords = aRecords.map((ip) => ({ type: "A", name: domain.domain, value: ip, ttl: 0, verified: false }));
+
+            if (aRecords.includes(serverIp)) {
+              verified = true;
+              resolvedRecords = resolvedRecords.map((r) => ({
+                ...r,
+                verified: r.value === serverIp,
+              }));
+            } else {
+              failReason = `A record found but does not point to the server IP (${serverIp}). Found: ${aRecords.join(", ")}`;
+            }
+          } else {
+            failReason = "No CNAME record found for this domain. Please add a CNAME record pointing to " + CNAME_TARGET;
+          }
+        } catch (aError) {
+          failReason = "Domain DNS could not be resolved. Please ensure the CNAME record is added and has had time to propagate (up to 48 hours).";
+        }
       }
     }
 

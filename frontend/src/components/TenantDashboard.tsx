@@ -25,6 +25,7 @@ import {
   Sparkles,
   X,
   BarChart3,
+  Puzzle,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -63,6 +64,7 @@ const mainNavigation = [
   { label: "Business info", icon: FolderOpen, to: "/tenant/business" },
   { label: "Analytics", icon: BarChart3, to: "/tenant/analytics" },
   { label: "Domains", icon: Globe2, to: "/tenant/domains" },
+  { label: "Plugins & Apps", icon: Puzzle, to: "/tenant/plugins" },
 ];
 
 const accountNavigation = [
