@@ -5,6 +5,7 @@ import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 import {
   corsOptions,
   issueCsrfToken,
@@ -87,6 +88,8 @@ app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 app.use(requireTrustedOrigin);
 app.use(requireCsrfToken);
+// Strip MongoDB operators from all incoming request data to prevent NoSQL injection
+app.use(mongoSanitize());
 
 // ── Rate Limiters ───────────────────────────────────────────────
 const authLimiter = rateLimit({

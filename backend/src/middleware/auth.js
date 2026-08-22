@@ -15,6 +15,10 @@ export async function requireAuthenticatedUser(request, response, next) {
     if (!user || !user.isEmailVerified) {
       return response.status(401).json({ message: "Not signed in." });
     }
+    // Reject tokens issued before the last password change
+    if ((payload.tv ?? 0) !== (user.tokenVersion ?? 0)) {
+      return response.status(401).json({ message: "Session expired. Please sign in again." });
+    }
     if (user.role === "tenant" && ["suspended", "archived"].includes(user.tenantStatus))
       return response.status(403).json({ message: "This tenant workspace is not currently active." });
 

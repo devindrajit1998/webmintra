@@ -70,7 +70,7 @@ function logDevelopmentOtp({ email, code, purpose }) {
 
 function setSessionCookie(response, user) {
   const token = jwt.sign(
-    { sub: user.id, email: user.email, role: userRole(user) },
+    { sub: user.id, email: user.email, role: userRole(user), tv: user.tokenVersion ?? 0 },
     process.env.JWT_SECRET,
     { expiresIn: "1h", issuer: "webmintra" },
   );
@@ -266,7 +266,11 @@ router.put("/password", requireAuthenticatedUser, async (request, response, next
     }
 
     request.user.passwordHash = await bcrypt.hash(newPassword, 12);
+    // Invalidate all previously issued JWTs for this user
+    request.user.tokenVersion = (request.user.tokenVersion ?? 0) + 1;
     await request.user.save();
+    // Re-issue a fresh session token with the new tokenVersion
+    setSessionCookie(response, request.user);
 
     return response.json({ message: "Password updated successfully." });
   } catch (error) {
@@ -308,6 +312,8 @@ router.post("/reset-password", async (request, response, next) => {
         });
     user.passwordHash = await bcrypt.hash(password, 12);
     user.passwordReset = {};
+    // Invalidate all previously issued JWTs for this user
+    user.tokenVersion = (user.tokenVersion ?? 0) + 1;
     await user.save();
     setSessionCookie(response, user);
     return response.json({

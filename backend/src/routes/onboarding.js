@@ -269,12 +269,20 @@ router.post("/verify-payment", async (req, res, next) => {
 
     // ── All valid → create records ──────────────────────────────
     const now = new Date();
-    const trialDays = plan.trialDays || 14;
-    const trialEndDate = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+    // Use the plan's exact trialDays — do NOT fall back to 14 for plans with trialDays=0
+    const trialDays = plan.trialDays ?? 0;
+    const trialEndDate = hasTrial
+      ? new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000)
+      : null;
 
     const endDate = new Date(now);
     if (interval === "yearly") endDate.setFullYear(endDate.getFullYear() + 1);
     else endDate.setMonth(endDate.getMonth() + 1);
+
+    // Determine subscription status:
+    //   trialing  → plan has a free trial period
+    //   active    → plan is free (₹0) with no trial, or paid upfront
+    const subscriptionStatus = hasTrial ? "trialing" : "active";
 
     const subscription = await Subscription.create({
       tenant: req.user._id,
@@ -286,7 +294,7 @@ router.post("/verify-payment", async (req, res, next) => {
         currency: plan.currency || "INR",
         limits: plan.limits,
       },
-      status: hasTrial ? "trialing" : isPaidUpfront ? "active" : "trialing",
+      status: subscriptionStatus,
       startDate: now,
       endDate: hasTrial ? trialEndDate : endDate,
       trialEndsAt: hasTrial ? trialEndDate : null,
