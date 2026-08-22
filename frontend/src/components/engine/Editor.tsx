@@ -57,6 +57,9 @@ import {
   Toggle,
 } from "./ui";
 import { cn } from "@/lib/utils";
+import { BrandLogo } from "@/components/BrandLogo";
+import { useQuery } from "@tanstack/react-query";
+import { getPublicSettings } from "@/lib/public-api";
 
 const DEVICES = [
   { id: "desktop", label: "Desktop", w: 1440, icon: Monitor },
@@ -89,6 +92,15 @@ export function Editor({
   onPublish?: (state: EditorState) => void;
   onUploadImage?: (file: File) => Promise<string>;
 }) {
+  const { data: settings = {} } = useQuery({
+    queryKey: ["publicSettings"],
+    queryFn: getPublicSettings,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const logoUrl = settings["brand.logoUrl"] || "";
+  const siteName = settings["brand.siteName"] || "webmintra";
+
   const initial: EditorState = useMemo(
     () => ({
       edits: initialState?.edits ?? {},
@@ -188,8 +200,8 @@ export function Editor({
       const items = state.repeaters[repeater.id] ?? defaultRepeaterItems(repeater.itemIds);
       const sourceIndex =
         Number.isInteger(requestedSourceIndex) &&
-        requestedSourceIndex >= 0 &&
-        requestedSourceIndex < repeater.itemIds.length
+          requestedSourceIndex >= 0 &&
+          requestedSourceIndex < repeater.itemIds.length
           ? requestedSourceIndex
           : 0;
       const key = `c${Date.now()}-${items.length}`;
@@ -268,26 +280,34 @@ export function Editor({
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
       {/* top bar */}
-      <header className="z-20 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border bg-card px-4 py-2.5 sm:flex sm:justify-between">
-        <div className="flex min-w-0 items-center gap-3">
+      <header className="relative z-20 flex flex-wrap items-center justify-between gap-3 border-b border-[#e2e8f0] bg-white px-4 py-2.5 shadow-2xs">
+        {/* Subtle Indian Flag Top Line */}
+        <div className="absolute inset-x-0 top-0 flex h-[2px]" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
+        </div>
+
+        <div className="flex min-w-0 items-center gap-4">
           <button
             onClick={onExit}
-            className="flex min-w-0 items-center gap-2"
-            title="Choose another website"
+            className="flex min-w-0 items-center gap-2.5 text-left group hover:opacity-90 transition cursor-pointer"
+            title="Exit to dashboard"
           >
-            <span className="text-primary grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/12">
-              W
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate font-display text-sm font-bold">WebMintra</span>
-              <span className="block truncate text-[10px] text-muted-foreground">
-                {analysis.name} ·{" "}
-                {savedAt ? `Last saved at ${savedAt}` : "Changes saved automatically"}{" "}
-                {published ? "· Live" : ""}
-              </span>
-            </span>
+            <BrandLogo logoUrl={logoUrl} siteName={siteName} size="sm" />
+            <div className="hidden sm:block border-l border-[#e2e8f0] pl-3">
+              <p className="truncate text-xs font-extrabold text-[#0f172a] max-w-[200px] leading-tight">
+                {analysis.name}
+              </p>
+              <p className="truncate text-[10px] font-medium text-[#64748b]">
+                {savedAt ? `Saved ${savedAt}` : "Autosaved"}{" "}
+                {published ? <span className="font-bold text-[#059669]">· Live</span> : ""}
+              </p>
+            </div>
           </button>
-          <div className="hidden gap-1 lg:flex">
+
+          {/* Page Tabs */}
+          <div className="flex items-center gap-1 overflow-x-auto rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-1">
             {analysis.pages.map((p) => (
               <button
                 key={p.id}
@@ -296,10 +316,10 @@ export function Editor({
                   setSelected(null);
                 }}
                 className={cn(
-                  "rounded-lg px-2.5 py-1.5 text-xs font-semibold transition",
+                  "rounded-lg px-3 py-1 text-xs font-bold transition",
                   p.id === pageId
-                    ? "bg-primary/12 text-primary"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? "bg-white text-[#059669] shadow-2xs border border-[#e2e8f0]"
+                    : "text-[#64748b] hover:text-[#0f172a] hover:bg-white/60",
                 )}
               >
                 {p.name}
@@ -307,30 +327,40 @@ export function Editor({
             ))}
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Btn
-            size="icon"
-            variant="ghost"
-            title="Undo"
-            disabled={cursor === 0}
-            onClick={() => setCursor((c) => c - 1)}
+
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="flex items-center gap-0.5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-1">
+            <button
+              type="button"
+              title="Undo (Ctrl+Z)"
+              disabled={cursor === 0}
+              onClick={() => setCursor((c) => c - 1)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748b] hover:bg-white hover:text-[#0f172a] disabled:opacity-30 transition cursor-pointer"
+            >
+              <Undo2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              title="Redo (Ctrl+Y)"
+              disabled={cursor >= history.length - 1}
+              onClick={() => setCursor((c) => c + 1)}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748b] hover:bg-white hover:text-[#0f172a] disabled:opacity-30 transition cursor-pointer"
+            >
+              <Redo2 className="h-4 w-4" />
+            </button>
+          </div>
+
+          <button
+            type="button"
+            title="Export HTML"
+            onClick={download}
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-[#e2e8f0] bg-white px-3 text-xs font-bold text-[#475569] shadow-2xs hover:bg-[#f8fafc] hover:text-[#0f172a] transition cursor-pointer"
           >
-            <Undo2 className="h-4 w-4" />
-          </Btn>
-          <Btn
-            size="icon"
-            variant="ghost"
-            title="Redo"
-            disabled={cursor >= history.length - 1}
-            onClick={() => setCursor((c) => c + 1)}
-          >
-            <Redo2 className="h-4 w-4" />
-          </Btn>
-          <Btn size="icon" variant="ghost" title="Export page HTML" onClick={download}>
-            <Download className="h-4 w-4" />
-          </Btn>
-          <Btn
-            size="sm"
+            <Download className="h-4 w-4" /> <span className="hidden sm:inline">Export</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => {
               setRevisions((r) => [
                 { label: `Revision ${r.length + 1}`, at: new Date().toLocaleString(), state },
@@ -339,12 +369,13 @@ export function Editor({
               if (onSaveDraft) onSaveDraft(state);
               flash("Version saved");
             }}
+            className="flex h-9 items-center gap-1.5 rounded-xl border border-[#fed7aa] bg-[#fff7ed] px-3.5 text-xs font-bold text-[#c2410c] shadow-2xs hover:bg-[#ffedd5] transition cursor-pointer"
           >
-            <Save className="h-3.5 w-3.5" /> Save a version
-          </Btn>
-          <Btn
-            size="sm"
-            variant="primary"
+            <Save className="h-3.5 w-3.5" /> <span>Save Draft</span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => {
               const errs = analysis.issues.filter((i) => i.severity === "error").length;
               if (errs) {
@@ -358,9 +389,10 @@ export function Editor({
               if (onPublish) onPublish(state);
               flash("Your changes are live");
             }}
+            className="flex h-9 items-center gap-1.5 rounded-xl bg-[#059669] px-4 text-xs font-bold text-white shadow-[0_4px_12px_rgba(5,150,105,0.3)] hover:bg-[#047857] transition cursor-pointer"
           >
-            Make changes live
-          </Btn>
+            <Sparkles className="h-3.5 w-3.5" /> <span>Make Changes Live</span>
+          </button>
         </div>
       </header>
 
@@ -402,66 +434,55 @@ export function Editor({
             )}
           </div>
         </aside>
-
         {/* center: preview */}
-        <main className="flex min-w-0 flex-1 flex-col bg-background">
-          <div className="flex flex-wrap items-center gap-2 border-b border-border bg-card/40 px-3 py-2">
-            <div className="flex items-center gap-0.5 rounded-lg border border-border bg-card p-0.5">
-              {DEVICES.map((d) => (
-                <button
-                  key={d.id}
-                  title={`${d.label} · ${d.w}px`}
-                  onClick={() => setDevice(d.id)}
-                  className={cn(
-                    "grid h-7 w-8 place-items-center rounded-md transition",
-                    device === d.id
-                      ? "bg-primary/15 text-primary"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  <d.icon className={cn("h-3.5 w-3.5", d.id === "mobile-s" && "scale-75")} />
-                </button>
-              ))}
+        <main className="flex min-w-0 flex-1 flex-col bg-[#f8fafc]">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e2e8f0] bg-white px-4 py-2 shadow-2xs">
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-0.5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-1">
+                {DEVICES.map((d) => (
+                  <button
+                    key={d.id}
+                    title={`${d.label} · ${d.w}px`}
+                    onClick={() => setDevice(d.id)}
+                    className={cn(
+                      "grid h-7 w-8 place-items-center rounded-lg transition cursor-pointer",
+                      device === d.id
+                        ? "bg-white text-[#059669] shadow-2xs border border-[#e2e8f0]"
+                        : "text-[#64748b] hover:text-[#0f172a] hover:bg-white/50",
+                    )}
+                  >
+                    <d.icon className={cn("h-3.5 w-3.5", d.id === "mobile-s" && "scale-75")} />
+                  </button>
+                ))}
+              </div>
+
               <button
-                onClick={() => setDevice("custom")}
-                className={cn(
-                  "rounded-md px-2 py-1 text-[11px] font-semibold transition",
-                  device === "custom"
-                    ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
+                type="button"
+                onClick={() => setLandscape((l) => !l)}
+                className="flex h-8 items-center gap-1.5 rounded-xl border border-[#e2e8f0] bg-white px-2.5 text-xs font-bold text-[#475569] shadow-2xs hover:bg-[#f8fafc] hover:text-[#0f172a] transition cursor-pointer"
               >
-                Set width
+                <RotateCcw className="h-3.5 w-3.5 text-[#059669]" /> {landscape ? "Landscape" : "Portrait"}
               </button>
             </div>
-            {device === "custom" ? (
-              <input
-                type="number"
-                value={customWidth}
-                min={280}
-                max={2200}
-                onChange={(e) => setCustomWidth(Number(e.target.value))}
-                className="h-8 w-24 rounded-lg border border-border bg-background px-2 text-xs outline-none"
-              />
-            ) : null}
-            <Btn
-              size="sm"
-              variant={landscape ? "primary" : "default"}
-              onClick={() => setLandscape(!landscape)}
-            >
-              <RotateCcw className="h-3.5 w-3.5" /> {landscape ? "Landscape" : "Portrait"}
-            </Btn>
-            <div className="ml-auto flex items-center gap-2">
-              <Chip>{frameWidth}px</Chip>
-              <div className="w-28">
-                <Slider
-                  label="Zoom"
-                  min={30}
-                  max={110}
-                  value={Math.round(zoom * 100)}
-                  unit="%"
-                  onChange={(v) => setZoom(v / 100)}
+
+            <div className="flex items-center gap-3">
+              <span className="rounded-md border border-[#e2e8f0] bg-[#f8fafc] px-2 py-0.5 font-mono text-[11px] font-bold text-[#0f172a]">
+                {frameWidth}px
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold text-[#64748b]">Zoom</span>
+                <input
+                  type="range"
+                  min={0.4}
+                  max={1.2}
+                  step={0.05}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="h-1.5 w-20 cursor-pointer appearance-none rounded-full bg-slate-200 accent-[#059669]"
                 />
+                <span className="font-mono text-[11px] font-bold text-[#0f172a] w-8">
+                  {Math.round(zoom * 100)}%
+                </span>
               </div>
             </div>
           </div>
@@ -498,29 +519,29 @@ export function Editor({
         </main>
 
         {/* right: property panel */}
-        <aside className="hidden w-[22rem] shrink-0 flex-col border-l border-border bg-card/60 xl:flex">
-          <div className="flex flex-wrap gap-1 border-b border-border p-2">
+        <aside className="hidden w-[22rem] shrink-0 flex-col border-l border-[#e2e8f0] bg-white xl:flex shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-1 border-b border-[#e2e8f0] bg-[#f8fafc] p-2">
             {(
               [
-                ["element", Type],
-                ["repeaters", Rows3],
-                ["theme", Palette],
-                ["assets", ImageIcon],
-                ["seo", Sparkles],
-                ["nav", Link2],
-                ["validation", CircleAlert],
-                ["history", History],
-              ] as [RightTab, typeof Type][]
-            ).map(([id, Icon]) => (
+                ["element", Type, "Edit Element"],
+                ["repeaters", Rows3, "Sections & Cards"],
+                ["theme", Palette, "Theme & Colors"],
+                ["assets", ImageIcon, "Media Assets"],
+                ["seo", Sparkles, "SEO Settings"],
+                ["nav", Link2, "Navigation Menu"],
+                ["validation", CircleAlert, "Check Issues"],
+                ["history", History, "Revisions"],
+              ] as [RightTab, typeof Type, string][]
+            ).map(([id, Icon, label]) => (
               <button
                 key={id}
                 onClick={() => setTab(id)}
-                title={id}
+                title={label}
                 className={cn(
-                  "grid h-8 w-8 place-items-center rounded-lg transition",
+                  "grid h-8 w-8 place-items-center rounded-xl transition cursor-pointer",
                   tab === id
-                    ? "bg-primary/15 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-elevated",
+                    ? "bg-[#059669] text-white shadow-xs"
+                    : "text-[#64748b] hover:text-[#0f172a] hover:bg-white hover:border hover:border-[#e2e8f0]",
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -843,7 +864,7 @@ function StyleControls({
               s["text-align"] === v && "border-primary bg-primary/12 text-primary",
             )}
           >
-            {}
+            { }
             {(() => {
               const I = Icon as typeof AlignLeft;
               return <I className="h-3.5 w-3.5" />;
@@ -1156,7 +1177,7 @@ function ElementPanel({
                 className={cn(
                   "rounded-lg border border-border px-2 py-2 text-[11px] font-semibold transition hover:border-primary/40",
                   (edit.target ?? field?.attrs["target"] ?? "_self") === t &&
-                    "border-primary bg-primary/12 text-primary",
+                  "border-primary bg-primary/12 text-primary",
                 )}
               >
                 {t === "_self" ? "Same tab" : "New tab"}

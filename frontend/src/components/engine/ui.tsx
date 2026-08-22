@@ -92,11 +92,11 @@ export function SectionTitle({
   hint?: string | undefined;
 }) {
   return (
-    <div className="mb-3 flex items-baseline justify-between gap-3">
-      <h3 className="font-display text-xs font-bold tracking-[0.16em] text-muted-foreground uppercase">
+    <div className="mb-2.5 flex items-center justify-between gap-2 border-b border-border/40 pb-1.5">
+      <h3 className="font-display text-[11px] font-extrabold tracking-[0.12em] text-foreground uppercase">
         {children}
       </h3>
-      {hint ? <span className="truncate text-[11px] text-muted-foreground/70">{hint}</span> : null}
+      {hint ? <span className="truncate rounded-md bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">{hint}</span> : null}
     </div>
   );
 }
@@ -117,17 +117,17 @@ export function TextInput({
   type?: string;
 }) {
   const base =
-    "w-full rounded-lg border border-input bg-background/60 px-3 py-2 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/25 placeholder:text-muted-foreground/60";
+    "w-full rounded-xl border border-border/80 bg-background px-3 py-2 text-xs font-medium text-foreground outline-none transition placeholder:text-muted-foreground/50 focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-2xs";
   return (
-    <label className="block">
+    <label className="block space-y-1.5">
       {label ? (
-        <span className="mb-1.5 block text-[11px] font-semibold text-muted-foreground">
+        <span className="block text-[11px] font-bold text-foreground/80">
           {label}
         </span>
       ) : null}
       {multiline ? (
         <textarea
-          rows={4}
+          rows={3}
           className={base}
           value={value}
           placeholder={placeholder}
@@ -155,21 +155,26 @@ export function ColorInput({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const hexVal = /^#[0-9a-f]{6}$/i.test(value) ? value : "#000000";
   return (
-    <div className="flex items-center gap-2.5 rounded-lg border border-border bg-background/50 p-2">
-      <input
-        type="color"
-        value={/^#[0-9a-f]{6}$/i.test(value) ? value : "#000000"}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-8 w-9 shrink-0 cursor-pointer rounded-md border border-border bg-transparent"
-        aria-label={label}
-      />
+    <div className="flex items-center gap-3 rounded-xl border border-border/80 bg-card p-2.5 shadow-2xs hover:border-border transition">
+      <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-lg border border-border/80 shadow-inner">
+        <input
+          type="color"
+          value={hexVal}
+          onChange={(e) => onChange(e.target.value)}
+          className="absolute -inset-2 h-12 w-12 cursor-pointer opacity-0"
+          aria-label={label}
+        />
+        <div className="h-full w-full" style={{ backgroundColor: value || "#000000" }} />
+      </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-semibold text-muted-foreground">{label}</p>
+        <p className="truncate text-[11px] font-bold text-foreground/80">{label}</p>
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-transparent font-mono text-xs text-foreground outline-none"
+          placeholder="#000000"
+          className="w-full bg-transparent font-mono text-xs text-muted-foreground outline-none uppercase font-semibold focus:text-foreground"
         />
       </div>
     </div>
@@ -193,24 +198,30 @@ export function Slider({
   unit?: string;
   onChange: (v: number) => void;
 }) {
+  const percent = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
   return (
-    <div>
-      <div className="mb-1 flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+    <div className="space-y-1.5 rounded-xl border border-border/60 bg-card/60 p-2.5 shadow-2xs">
+      <div className="flex items-center justify-between text-[11px] font-bold text-foreground/80">
         <span>{label}</span>
-        <span className="font-mono text-foreground">
+        <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[10px] font-semibold text-foreground">
           {value}
           {unit}
         </span>
       </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="accent-primary h-1.5 w-full cursor-pointer appearance-none rounded-full bg-elevated"
-      />
+      <div className="relative flex items-center py-1">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          style={{
+            background: `linear-gradient(to right, #059669 ${percent}%, #e2e8f0 ${percent}%)`,
+          }}
+          className="h-2 w-full cursor-pointer appearance-none rounded-full accent-[#059669] transition-all focus:outline-none"
+        />
+      </div>
     </div>
   );
 }
@@ -228,19 +239,19 @@ export function Toggle({
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className="flex w-full items-center justify-between rounded-lg border border-border bg-background/50 px-3 py-2 text-left text-xs font-semibold text-foreground transition hover:border-primary/40"
+      className="flex w-full items-center justify-between rounded-xl border border-border/80 bg-card px-3 py-2.5 text-left text-xs font-bold text-foreground shadow-2xs transition hover:border-[#059669]/50"
     >
-      {label}
+      <span>{label}</span>
       <span
         className={cn(
-          "relative h-4.5 w-8 shrink-0 rounded-full transition",
-          checked ? "bg-primary" : "bg-elevated border border-border",
+          "relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200",
+          checked ? "bg-[#059669]" : "bg-slate-300 border border-slate-300",
         )}
       >
         <span
           className={cn(
-            "absolute top-0.5 h-3.5 w-3.5 rounded-full bg-background transition-all",
-            checked ? "left-4" : "left-0.5",
+            "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-xs transition-transform duration-200",
+            checked ? "left-4.5" : "left-0.5",
           )}
         />
       </span>
