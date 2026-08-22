@@ -149,12 +149,20 @@ export const getDomains = (params?: {
   search?: string;
 }) => adminRequest<any>(`/domains${buildQuery(params)}`);
 
-export const getStorageItems = (params?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  tenantId?: string;
-}) => adminRequest<any>(`/storage${buildQuery(params)}`);
+export const getStorageStats = () => adminRequest<any>("/storage/stats");
+export const getStorageItems = (params?: { type?: string; page?: number; limit?: number }) =>
+  adminRequest<any>(`/storage${buildQuery(params)}`);
+export const uploadStorageItem = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiFetch(`${API_URL}/admin/storage/upload`, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Upload failed");
+  return response.json();
+};
 export const deleteStorageItem = (id: string) =>
   adminRequest<any>(`/storage/${id}`, { method: "DELETE" });
 export const getImageKitStats = () => adminRequest<any>(`/storage/imagekit`);
@@ -163,6 +171,13 @@ export const uploadAdminFile = (file: File) => {
   formData.append("file", file);
   return adminRequest<any>("/upload", { method: "POST", body: formData });
 };
+
+// ── WhatsApp ───────────────────────────────────────────────────
+export const getAdminWhatsAppStatus = () => adminRequest<any>("/whatsapp/status");
+export const reconnectAdminWhatsApp = () => adminRequest<any>("/whatsapp/reconnect", { method: "POST" });
+export const logoutAdminWhatsApp = () => adminRequest<any>("/whatsapp/logout", { method: "POST" });
+export const testAdminWhatsAppMessage = (phone: string) =>
+  adminRequest<any>("/whatsapp/test", { method: "POST", body: JSON.stringify({ phone }) });
 
 // ── Content (Blog, KB, Announcements) ─────────────────────────
 export type BlogPostInput = {

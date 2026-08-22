@@ -55,6 +55,7 @@ import adminTemplateCategoriesRouter from "./routes/admin/templateCategories.js"
 import adminTestimonialsRouter from "./routes/admin/testimonials.js";
 import adminFaqsRouter from "./routes/admin/faqs.js";
 import adminUploadRouter from "./routes/admin/upload.js";
+import adminWhatsAppRouter from "./routes/admin/whatsapp.js";
 import { initCronJobs } from "./services/cron.js";
 import { initWhatsAppClient } from "./services/whatsapp.js";
 
@@ -174,6 +175,7 @@ app.use("/api/admin/template-categories", adminTemplateCategoriesRouter);
 app.use("/api/admin/testimonials", adminTestimonialsRouter);
 app.use("/api/admin/faqs", adminFaqsRouter);
 app.use("/api/admin/upload", adminUploadRouter);
+app.use("/api/admin/whatsapp", adminWhatsAppRouter);
 
 // ── Public APIs ──────────────────────────────────────────────────
 app.use("/api/public", publicSubmissionsLimiter, publicRouter);

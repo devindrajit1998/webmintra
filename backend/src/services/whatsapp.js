@@ -12,20 +12,53 @@ import path from "node:path";
 import fs from "node:fs";
 import pino from "pino";
 
+import QRCode from "qrcode";
+
 let sock = null;
 let isConnecting = false;
 let qrCodeString = null;
-let connectionStatus = "disconnected"; // 'disconnected' | 'connecting' | 'connected'
+let connectionStatus = "disconnected"; // 'disconnected' | 'connecting' | 'waiting_for_qr' | 'connected'
 
 const AUTH_DIR = path.resolve(process.cwd(), ".whatsapp-auth");
 
-export function getWhatsAppStatus() {
+export async function getWhatsAppStatus() {
+  let qrDataUrl = null;
+  if (qrCodeString) {
+    try {
+      qrDataUrl = await QRCode.toDataURL(qrCodeString, { margin: 2, scale: 6 });
+    } catch {}
+  }
+
   return {
     status: connectionStatus,
     hasQr: Boolean(qrCodeString),
     qr: qrCodeString,
+    qrDataUrl,
     isAuthenticated: connectionStatus === "connected",
   };
+}
+
+export async function logoutWhatsApp() {
+  try {
+    if (sock) {
+      await sock.logout().catch(() => {});
+      sock.end();
+      sock = null;
+    }
+    isConnecting = false;
+    connectionStatus = "disconnected";
+    qrCodeString = null;
+    if (fs.existsSync(AUTH_DIR)) {
+      fs.rmSync(AUTH_DIR, { recursive: true, force: true });
+    }
+    // Re-initialize to generate a fresh QR
+    setTimeout(() => {
+      initWhatsAppClient().catch(() => {});
+    }, 1000);
+    return { success: true, message: "WhatsApp logged out and session cleared." };
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
 }
 
 export async function initWhatsAppClient() {

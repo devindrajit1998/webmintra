@@ -13,6 +13,8 @@ import {
   FilePenLine,
 } from "lucide-react";
 import { AdminSeoPage } from "@/components/AdminSeoPage";
+import { AdminWhatsAppCard } from "@/components/AdminWhatsAppCard";
+import { MessageSquare } from "lucide-react";
 
 import { toast } from "sonner";
 export const Route = createFileRoute("/admin/settings")({
@@ -23,7 +25,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
-  const [activeView, setActiveView] = useState<"seo" | "platform" | "content">("seo");
+  const [activeView, setActiveView] = useState<"seo" | "whatsapp" | "platform" | "content">("seo");
 
   const { data, isLoading } = useQuery({
     queryKey: ["adminSettings"],
@@ -112,6 +114,17 @@ function SettingsPage() {
       </button>
       <button
         type="button"
+        onClick={() => setActiveView("whatsapp")}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "whatsapp"
+            ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
+            : "text-[#64748b] hover:text-[#0b192c]"
+        }`}
+      >
+        <MessageSquare className="h-4 w-4" /> WhatsApp Gateway
+      </button>
+      <button
+        type="button"
         onClick={() => setActiveView("platform")}
         className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
           activeView === "platform"
@@ -140,6 +153,14 @@ function SettingsPage() {
       <div className="mx-auto w-full max-w-[1600px]">
         {viewTabs}
         <AdminSeoPage />
+      </div>
+    );
+
+  if (activeView === "whatsapp")
+    return (
+      <div className="mx-auto w-full max-w-[1600px]">
+        {viewTabs}
+        <AdminWhatsAppCard />
       </div>
     );
 
