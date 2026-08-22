@@ -16,6 +16,7 @@ import {
 
 // ── Existing routes (Template Engine ecosystem — DO NOT MODIFY) ──
 import authRouter from "./routes/auth.js";
+import googleAuthRouter from "./routes/google-auth.js";
 import dashboardRouter from "./routes/dashboard.js";
 import websitesRouter from "./routes/websites.js";
 import templatesRouter from "./routes/templates.js";
@@ -130,6 +131,7 @@ app.get("/api/csrf-token", (request, response) => {
   response.json({ csrfToken: issueCsrfToken(request, response) });
 });
 app.use("/api/auth", authLimiter, authRouter);
+app.use("/api/auth", authLimiter, googleAuthRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/websites", websitesRouter);
 app.use("/api/templates", templatesRouter);

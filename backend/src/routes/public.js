@@ -9,6 +9,7 @@ import { AnalyticsEvent, ANALYTICS_EVENT_TYPES } from "../models/AnalyticsEvent.
 import { Domain } from "../models/Domain.js";
 import { WebsitePlugin } from "../models/WebsitePlugin.js";
 import { generatePluginInjections } from "../lib/plugin-injectors.js";
+import { sendWhatsAppNotification } from "../services/whatsapp.js";
 import {
   buildPublicPages,
   buildSitemapXml,
@@ -588,6 +589,22 @@ router.post("/site/:domainOrId/form", async (req, res, next) => {
     if (!website) return res.status(404).json({ message: "Website not found." });
     const cleanData = sanitizeFormData(req.body);
     const submission = await FormSubmission.create({ websiteId: website._id, tenantId: website.owner, data: cleanData });
+
+    // Fire-and-forget WhatsApp notification to the tenant's business phone
+    const owner = await User.findById(website.owner).select("business name").lean();
+    const tenantPhone = owner?.business?.phone || "";
+    if (tenantPhone) {
+      const siteName = owner?.business?.name || website.name || "your website";
+      const fieldSummary = Object.entries(cleanData)
+        .slice(0, 5)
+        .map(([k, v]) => `${k}: ${String(v).slice(0, 80)}`)
+        .join("\n");
+      sendWhatsAppNotification({
+        phone: tenantPhone,
+        message: `🔔 New lead from *${siteName}*!\n\n${fieldSummary}\n\n_Powered by WebMintra_`,
+      }).catch(() => {});
+    }
+
     return res.status(201).json({ message: "Form submitted successfully", id: submission._id });
   } catch (error) {
     return next(error);

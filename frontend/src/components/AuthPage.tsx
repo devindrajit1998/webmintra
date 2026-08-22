@@ -10,8 +10,8 @@ import {
   Mail,
   ShieldCheck,
 } from "lucide-react";
-import { FormEvent, useId, useState, useEffect } from "react";
-import { authRequest, routeForRole, saveSessionUser } from "@/lib/auth-api";
+import { FormEvent, useId, useState, useEffect, useCallback, useRef } from "react";
+import { authRequest, googleSignIn, routeForRole, saveSessionUser } from "@/lib/auth-api";
 import { getPublicSettings } from "@/lib/public-api";
 import { BrandLogo } from "./BrandLogo";
 
@@ -122,6 +122,21 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
         return;
       }
       setNotice(message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleGoogleCredential(credential: string) {
+    setNotice("");
+    setIsSubmitting(true);
+    try {
+      const result = await googleSignIn(credential);
+      if (!result.user) throw new Error("Sign-in failed. Please try again.");
+      saveSessionUser(result.user);
+      await navigate({ to: routeForRole(result.user.role) });
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Google sign-in failed.");
     } finally {
       setIsSubmitting(false);
     }
@@ -325,6 +340,14 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
               </button>
             </form>
 
+            {/* Google Sign-In — only on sign-in and create-account */}
+            {mode !== "forgot-password" && (
+              <GoogleSignInButton
+                onCredential={handleGoogleCredential}
+                disabled={isSubmitting}
+              />
+            )}
+
             <p className="mt-6 border-t border-[#f1f5f9] pt-5 text-center text-xs text-[#64748b]">
               {mode === "sign-in" && (
                 <>
@@ -425,3 +448,96 @@ function PasswordField({
     </div>
   );
 }
+
+// Extend Window to include Google Identity Services types
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: { credential: string }) => void;
+            auto_select?: boolean;
+          }) => void;
+          renderButton: (
+            element: HTMLElement,
+            config: {
+              theme?: string;
+              size?: string;
+              width?: number;
+              text?: string;
+              shape?: string;
+            },
+          ) => void;
+        };
+      };
+    };
+  }
+}
+
+/**
+ * Renders a Google "Sign in with Google" button using the official GSI library.
+ * Only shown when VITE_GOOGLE_CLIENT_ID is set in the frontend env.
+ */
+function GoogleSignInButton({
+  onCredential,
+  disabled,
+}: {
+  onCredential: (credential: string) => void;
+  disabled?: boolean;
+}) {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+  const buttonRef = useRef<HTMLDivElement>(null);
+  const onCredentialRef = useRef(onCredential);
+  onCredentialRef.current = onCredential;
+
+  const initGSI = useCallback(() => {
+    if (!window.google?.accounts?.id || !buttonRef.current || !clientId) return;
+    window.google.accounts.id.initialize({
+      client_id: clientId,
+      callback: (response) => {
+        if (response.credential) onCredentialRef.current(response.credential);
+      },
+    });
+    window.google.accounts.id.renderButton(buttonRef.current, {
+      theme: "outline",
+      size: "large",
+      width: buttonRef.current.offsetWidth || 400,
+      text: "continue_with",
+      shape: "rectangular",
+    });
+  }, [clientId]);
+
+  useEffect(() => {
+    if (!clientId) return;
+    if (window.google?.accounts?.id) {
+      initGSI();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = initGSI;
+    document.head.appendChild(script);
+    return () => {
+      document.head.removeChild(script);
+    };
+  }, [clientId, initGSI]);
+
+  if (!clientId) return null;
+
+  return (
+    <div className={`mt-4 ${disabled ? "pointer-events-none opacity-50" : ""}`}>
+      <div className="relative flex items-center gap-3 py-1">
+        <div className="flex-1 border-t border-[#e2e8f0]" />
+        <span className="shrink-0 text-[11px] font-semibold text-[#94a3b8]">or continue with</span>
+        <div className="flex-1 border-t border-[#e2e8f0]" />
+      </div>
+      {/* The Google GSI library renders the official button inside this div */}
+      <div ref={buttonRef} className="mt-3 w-full overflow-hidden rounded-xl" />
+    </div>
+  );
+}
+

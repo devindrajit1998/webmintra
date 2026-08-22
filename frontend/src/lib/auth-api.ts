@@ -99,6 +99,12 @@ export async function authRequest(
   return payload;
 }
 
+/** Sign in or register using a Google ID token from Google Identity Services */
+export async function googleSignIn(credential: string): Promise<ApiResponse> {
+  return authRequest("/google", { credential });
+}
+
+
 const SESSION_USER_KEY = "webmintra:session-user";
 
 export function saveSessionUser(user: SessionUser) {
