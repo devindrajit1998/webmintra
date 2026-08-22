@@ -462,9 +462,38 @@ function collectAssets(pages: { name: string; doc: Document }[], available: stri
 function buildTree(doc: Document, repeaters: Repeater[]): SectionNode[] {
   const repByContainer = new Map(repeaters.map((r) => [r.containerId, r]));
   const sectionLabel = (el: Element) => {
-    const h = el.querySelector("h1,h2,h3");
+    // 1. Explicit title attribute or data-title / data-section-name / data-name / aria-label
+    const explicit =
+      el.getAttribute("title") ||
+      el.getAttribute("data-title") ||
+      el.getAttribute("data-section") ||
+      el.getAttribute("data-name") ||
+      el.getAttribute("aria-label");
+    if (explicit && explicit.trim()) return truncateLabel(explicit.trim());
+
+    // 2. Heading inside the section
+    const h = el.querySelector("h1,h2,h3,h4");
+    if (h && text(h).trim()) {
+      return truncateLabel(text(h).trim());
+    }
+
+    // 3. Humanized ID or Class (e.g. "hero-section" -> "Hero Section")
     const id = el.getAttribute("id");
-    return (h && text(h).slice(0, 42)) || (id ? `#${id}` : el.tagName.toLowerCase());
+    if (id && !/^e\d+$/.test(id)) {
+      const cleanId = id
+        .replace(/[-_]/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+      return `#${cleanId}`;
+    }
+
+    const tag = el.tagName.toLowerCase();
+    if (tag === "header") return "Header Section";
+    if (tag === "footer") return "Footer Section";
+    if (tag === "nav") return "Navigation Menu";
+    if (tag === "main") return "Main Content";
+    if (tag === "section") return "Content Section";
+
+    return tag;
   };
   const walk = (el: Element, depth: number): SectionNode | null => {
     const rep = repByContainer.get(teid(el));

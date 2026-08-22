@@ -61,56 +61,69 @@ function BillingPage() {
   const nextBillingDate = subscription.trialEndsAt || subscription.renewalDate;
 
   return (
-    <div className="space-y-5 pb-8">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-400">Account</p>
-          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-white">
-            Billing & invoices
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-            Review your plan, upcoming charges, and complete invoice history.
-          </p>
+    <div className="max-w-[1600px] space-y-6 pb-12">
+      {/* Header Section */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white px-5 py-6 shadow-xs sm:px-7">
+        <div className="absolute inset-x-0 top-0 flex h-1" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
         </div>
-        <Link
-          to="/tenant/subscription"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cyan-500 px-4 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#07121f]"
-        >
-          Manage plan <ArrowUpRight className="h-4 w-4" />
-        </Link>
-      </header>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#fff7ed] blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-28 h-48 w-48 rounded-full bg-[#ecfdf5] blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#c2410c]">
+              <WalletCards className="h-3.5 w-3.5" /> Billing & Invoices
+            </div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#0f172a] sm:text-3xl">
+              Billing Overview
+            </h1>
+            <p className="mt-1 text-sm text-[#64748b]">
+              Review your active plan, upcoming charges, payment sources, and invoice history.
+            </p>
+          </div>
+          <Link
+            to="/tenant/subscription"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857]"
+          >
+            Manage plan <ArrowUpRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
 
-      <section className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(280px,0.75fr)]">
-        <div className="overflow-hidden rounded-lg border border-slate-800 bg-[#0b1826]">
-          <div className="flex flex-col gap-5 p-5 sm:p-6">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+      {/* Plan Details & Payment Method */}
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.75fr)]">
+        <div className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+          <div className="flex flex-col gap-5 p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex min-w-0 items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-cyan-500/20 bg-cyan-500/10 text-cyan-300">
-                  <WalletCards className="h-5 w-5" />
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669] shadow-2xs">
+                  <WalletCards className="h-6 w-6" />
                 </div>
                 <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-display text-xl font-bold text-white">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <h2 className="font-display text-xl font-extrabold text-[#0f172a]">
                       {subscription.planName}
                     </h2>
                     <StatusBadge status={subscription.status} />
                   </div>
-                  <p className="mt-1 max-w-xl text-sm leading-6 text-slate-400">
-                    {subscription.description}
+                  <p className="mt-1 max-w-xl text-xs leading-relaxed text-[#64748b]">
+                    {subscription.description || "Active WebMintra workspace subscription."}
                   </p>
                 </div>
               </div>
               <div className="shrink-0 sm:text-right">
-                <p className="text-2xl font-bold text-white">
+                <p className="text-2xl font-black text-[#0f172a]">
                   {formatMoney(subscription.price, subscription.currency)}
                 </p>
-                <p className="mt-1 text-xs capitalize text-slate-500">
+                <p className="mt-0.5 text-xs font-bold capitalize text-[#64748b]">
                   per {subscription.interval.replace("ly", "")}
                 </p>
               </div>
             </div>
 
-            <div className="grid gap-px overflow-hidden rounded-lg border border-slate-800 bg-slate-800 sm:grid-cols-3">
+            <div className="grid gap-px overflow-hidden rounded-xl border border-[#e2e8f0] bg-[#e2e8f0] sm:grid-cols-3">
               <PlanDetail
                 icon={CalendarDays}
                 label={subscription.trialEndsAt ? "Trial ends" : "Next billing date"}
@@ -130,34 +143,35 @@ function BillingPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-800 bg-[#0b1826] p-6">
-          <div className="flex items-center justify-between">
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
+          <div className="flex items-center justify-between border-b border-[#f1f5f9] pb-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#059669]">
                 Payment method
               </p>
-              <h2 className="mt-2 text-base font-semibold text-white">Billing source</h2>
+              <h2 className="mt-0.5 text-base font-extrabold text-[#0f172a]">Billing source</h2>
             </div>
-            <CreditCard className="h-5 w-5 text-slate-500" />
+            <CreditCard className="h-5 w-5 text-[#64748b]" />
           </div>
           {paymentMethod ? (
-            <div className="mt-6">
-              <p className="font-medium text-slate-100">{paymentMethod.label}</p>
-              <p className="mt-1 text-xs text-slate-500">
+            <div className="mt-5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
+              <p className="font-extrabold text-sm text-[#0f172a]">{paymentMethod.label}</p>
+              <p className="mt-1 text-xs text-[#64748b]">
                 Last used {formatDate(paymentMethod.lastUsedAt)}
               </p>
             </div>
           ) : (
-            <div className="mt-6 border-l-2 border-amber-400/60 pl-4">
-              <p className="text-sm font-medium text-slate-200">No saved payment method</p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                A payment method will appear after your first online payment.
+            <div className="mt-5 border-l-3 border-[#ea580c] bg-[#fff7ed] p-4 rounded-r-xl">
+              <p className="text-xs font-bold text-[#7c2d12]">No saved card yet</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-[#9a3412]">
+                Your payment source will appear here automatically after your first online checkout.
               </p>
             </div>
           )}
         </div>
       </section>
 
+      {/* Summary Metrics */}
       <section aria-label="Billing summary" className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <SummaryMetric
           icon={Check}
@@ -179,30 +193,31 @@ function BillingPage() {
         />
       </section>
 
-      <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#0b1826]">
-        <div className="flex flex-col gap-4 border-b border-slate-800 px-5 py-5 lg:flex-row lg:items-center lg:justify-between">
+      {/* Invoices List */}
+      <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+        <div className="flex flex-col gap-4 border-b border-[#f1f5f9] p-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-base font-semibold text-white">Invoice history</h2>
-            <p className="mt-1 text-xs text-slate-500">
-              Receipts and billing documents for this workspace.
+            <h2 className="text-base font-extrabold text-[#0f172a]">Invoice history</h2>
+            <p className="mt-0.5 text-xs text-[#64748b]">
+              Receipts and tax invoices for this workspace.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <label className="relative block sm:w-64">
               <span className="sr-only">Search invoices</span>
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search invoices"
-                className="h-10 w-full rounded-lg border border-slate-700 bg-[#081522] pl-9 pr-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+                placeholder="Search invoices..."
+                className="h-10 w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] pl-10 pr-3 text-xs font-semibold text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#059669] focus:bg-white transition"
               />
             </label>
             <select
               aria-label="Filter invoice status"
               value={status}
               onChange={(event) => setStatus(event.target.value)}
-              className="h-10 rounded-lg border border-slate-700 bg-[#081522] px-3 text-sm text-slate-300 outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
+              className="h-10 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] focus:bg-white transition cursor-pointer"
             >
               <option value="all">All statuses</option>
               <option value="succeeded">Paid</option>
@@ -234,11 +249,11 @@ function PlanDetail({
   value: string;
 }) {
   return (
-    <div className="flex items-center gap-3 bg-[#091725] px-4 py-4">
-      <Icon className="h-4 w-4 shrink-0 text-slate-500" />
+    <div className="flex items-center gap-3 bg-[#f8fafc] px-4 py-4">
+      <Icon className="h-4 w-4 shrink-0 text-[#94a3b8]" />
       <div className="min-w-0">
-        <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-slate-500">{label}</p>
-        <p className="mt-1 truncate text-sm font-medium text-slate-200">{value}</p>
+        <p className="text-[10px] font-extrabold uppercase tracking-[0.1em] text-[#64748b]">{label}</p>
+        <p className="mt-0.5 truncate text-xs font-bold text-[#0f172a]">{value}</p>
       </div>
     </div>
   );
@@ -256,18 +271,18 @@ function SummaryMetric({
   tone: "emerald" | "cyan" | "orange";
 }) {
   const tones = {
-    emerald: "bg-emerald-500/10 text-emerald-400",
-    cyan: "bg-cyan-500/10 text-cyan-400",
-    orange: "bg-orange-500/10 text-orange-400",
+    emerald: "bg-[#ecfdf5] text-[#059669] border-[#a7f3d0]",
+    cyan: "bg-[#f0f9ff] text-[#0284c7] border-[#bae6fd]",
+    orange: "bg-[#fff7ed] text-[#ea580c] border-[#fed7aa]",
   };
   return (
-    <div className="flex items-center gap-4 rounded-lg border border-slate-800 bg-[#0b1826] p-5">
-      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${tones[tone]}`}>
-        <Icon className="h-4 w-4" />
+    <div className="flex items-center gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
+      <div className={`flex h-11 w-11 items-center justify-center rounded-xl border ${tones[tone]} shadow-2xs`}>
+        <Icon className="h-5 w-5" />
       </div>
       <div>
-        <p className="text-xs text-slate-500">{label}</p>
-        <p className="mt-1 text-lg font-bold text-white">{value}</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#64748b]">{label}</p>
+        <p className="mt-0.5 text-2xl font-black text-[#0f172a]">{value}</p>
       </div>
     </div>
   );
@@ -275,9 +290,14 @@ function SummaryMetric({
 
 function StatusBadge({ status }: { status: string }) {
   const label = status === "succeeded" ? "Paid" : sentenceCase(status);
+  const isPaid = status === "succeeded" || status === "active";
   return (
     <span
-      className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusStyles[status] ?? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300"}`}
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold ${
+        isPaid
+          ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#065f46]"
+          : "border-[#fed7aa] bg-[#fff7ed] text-[#c2410c]"
+      }`}
     >
       {label}
     </span>
@@ -291,36 +311,36 @@ function InvoiceList({ invoices, planName }: { invoices: BillingInvoice[]; planN
     <>
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full min-w-[760px] text-left">
-          <thead className="bg-[#081522] text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-500">
+          <thead className="border-b border-[#f1f5f9] bg-[#f8fafc] text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#64748b]">
             <tr>
-              <th className="px-5 py-3">Invoice</th>
-              <th className="px-5 py-3">Date</th>
-              <th className="px-5 py-3">Amount</th>
-              <th className="px-5 py-3">Status</th>
-              <th className="px-5 py-3 text-right">Receipt</th>
+              <th className="px-6 py-3.5">Invoice</th>
+              <th className="px-6 py-3.5">Date</th>
+              <th className="px-6 py-3.5">Amount</th>
+              <th className="px-6 py-3.5">Status</th>
+              <th className="px-6 py-3.5 text-right">Receipt</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800">
+          <tbody className="divide-y divide-[#f1f5f9]">
             {invoices.map((invoice) => (
-              <tr key={invoice.id} className="transition-colors hover:bg-slate-800/20">
-                <td className="px-5 py-4">
-                  <p className="font-mono text-sm font-medium text-slate-200">
+              <tr key={invoice.id} className="transition-colors hover:bg-[#f8fafc]">
+                <td className="px-6 py-4">
+                  <p className="font-mono text-xs font-bold text-[#0f172a]">
                     {invoice.invoiceNumber}
                   </p>
-                  <p className="mt-1 max-w-xs truncate text-xs text-slate-500">
+                  <p className="mt-0.5 max-w-xs truncate text-[11px] font-medium text-[#64748b]">
                     {invoice.description}
                   </p>
                 </td>
-                <td className="px-5 py-4 text-sm text-slate-400">
+                <td className="px-6 py-4 text-xs font-semibold text-[#64748b]">
                   {formatDate(invoice.paidAt || invoice.createdAt)}
                 </td>
-                <td className="px-5 py-4 text-sm font-semibold text-white">
+                <td className="px-6 py-4 text-sm font-black text-[#0f172a]">
                   {formatMoney(invoice.amount, invoice.currency)}
                 </td>
-                <td className="px-5 py-4">
+                <td className="px-6 py-4">
                   <StatusBadge status={invoice.status} />
                 </td>
-                <td className="px-5 py-4 text-right">
+                <td className="px-6 py-4 text-right">
                   <InvoiceActions
                     invoice={invoice}
                     planName={planName}
@@ -332,24 +352,24 @@ function InvoiceList({ invoices, planName }: { invoices: BillingInvoice[]; planN
           </tbody>
         </table>
       </div>
-      <div className="divide-y divide-slate-800 md:hidden">
+      <div className="divide-y divide-[#f1f5f9] md:hidden">
         {invoices.map((invoice) => (
           <article key={invoice.id} className="p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate font-mono text-sm font-medium text-slate-200">
+                <p className="truncate font-mono text-xs font-bold text-[#0f172a]">
                   {invoice.invoiceNumber}
                 </p>
-                <p className="mt-1 truncate text-xs text-slate-500">{invoice.description}</p>
+                <p className="mt-0.5 truncate text-[11px] font-medium text-[#64748b]">{invoice.description}</p>
               </div>
               <StatusBadge status={invoice.status} />
             </div>
-            <div className="mt-4 flex items-end justify-between gap-4">
+            <div className="mt-3 flex items-end justify-between gap-4">
               <div>
-                <p className="text-xs text-slate-500">
+                <p className="text-[11px] font-semibold text-[#64748b]">
                   {formatDate(invoice.paidAt || invoice.createdAt)}
                 </p>
-                <p className="mt-1 font-semibold text-white">
+                <p className="mt-0.5 text-base font-black text-[#0f172a]">
                   {formatMoney(invoice.amount, invoice.currency)}
                 </p>
               </div>

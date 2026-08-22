@@ -175,7 +175,12 @@ function RootApp() {
   
   // List of main root domains / subdomains that serve the WebMintra platform application (not a customer site)
   const isMainPlatformHost = (host: string): boolean => {
-    if (!host || host === "localhost" || host === "127.0.0.1") return true;
+    // Plain localhost (e.g., localhost:8080 or 127.0.0.1:8080) is the platform app
+    if (host === "localhost" || host === "127.0.0.1") return true;
+
+    // Subdomains of localhost (e.g., street-craft.localhost) are customer sites!
+    if (host.endsWith(".localhost")) return false;
+
     if (
       host.startsWith("app.") ||
       host.startsWith("admin.") ||
@@ -202,7 +207,7 @@ function RootApp() {
   const previewSiteId = searchParams?.get("preview_site");
 
   if (isSubdomain) {
-    const subdomain = hostname.split(".")[0];
+    const subdomain = hostname.replace(/\.localhost$/, "").split(".")[0];
     return <PublicSiteViewer subdomain={subdomain} />;
   }
 

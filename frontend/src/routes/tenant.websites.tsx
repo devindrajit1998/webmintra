@@ -133,11 +133,12 @@ function WebsiteCard({ website }: { website: Website }) {
   // Full production domain and localhost development link
   const domainString = website.customDomain || `${siteSlug}.webmintra.in`;
   
+  const port = typeof window !== "undefined" && window.location.port ? `:${window.location.port}` : "";
   const url = isPublished
     ? website.customDomain
       ? `https://${website.customDomain}`
       : isLocalhost
-        ? `${window.location.origin}/?preview_site=${siteSlug}`
+        ? `http://${siteSlug}.localhost${port}`
         : `https://${siteSlug}.webmintra.in`
     : null;
 

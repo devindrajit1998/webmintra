@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -102,55 +102,70 @@ function MediaPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">Media library</h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Upload and reuse images, videos, and documents across your website.
-          </p>
+    <div className="max-w-[1600px] space-y-6 pb-12">
+      {/* Header */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white px-5 py-6 shadow-xs sm:px-7">
+        <div className="absolute inset-x-0 top-0 flex h-1" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            aria-label="Select website"
-            value={activeWebsiteId}
-            onChange={(event) => setSelectedWebsiteId(event.target.value)}
-            className="h-10 min-w-44 rounded-lg border border-slate-700 bg-[#0b1826] px-3 text-xs text-slate-200 outline-none transition focus:border-cyan-400"
-          >
-            {websites.map((website) => (
-              <option key={website.id} value={website.id}>
-                {website.name}
-              </option>
-            ))}
-          </select>
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            className="hidden"
-            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-            onChange={(event) => {
-              if (event.target.files) uploadFiles(event.target.files);
-              event.target.value = "";
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadMutation.isPending}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-emerald-400 px-4 text-xs font-bold text-slate-950 transition hover:bg-emerald-300 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {uploadMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Upload className="h-4 w-4" />
-            )}
-            {uploadMutation.isPending ? "Uploading" : "Upload media"}
-          </button>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#fff7ed] blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-28 h-48 w-48 rounded-full bg-[#ecfdf5] blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#c2410c]">
+              <ImageIcon className="h-3.5 w-3.5" /> Media & Assets
+            </div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#0f172a] sm:text-3xl">
+              Media Library
+            </h1>
+            <p className="mt-1 text-sm text-[#64748b]">
+              Upload, optimize, and reuse images, videos, and documents across your website.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <select
+              aria-label="Select website"
+              value={activeWebsiteId}
+              onChange={(event) => setSelectedWebsiteId(event.target.value)}
+              className="h-10 min-w-44 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 text-xs font-bold text-[#0f172a] outline-none transition focus:border-[#059669] cursor-pointer"
+            >
+              {websites.map((website) => (
+                <option key={website.id} value={website.id}>
+                  {website.name}
+                </option>
+              ))}
+            </select>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              className="hidden"
+              accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+              onChange={(event) => {
+                if (event.target.files) uploadFiles(event.target.files);
+                event.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadMutation.isPending}
+              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857] disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+            >
+              {uploadMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Upload className="h-4 w-4" />
+              )}
+              <span>{uploadMutation.isPending ? "Uploading..." : "Upload Media"}</span>
+            </button>
+          </div>
         </div>
-      </header>
+      </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-3">
         <Summary
           icon={<HardDrive className="h-5 w-5" />}
           label="Storage used"
@@ -171,16 +186,20 @@ function MediaPage() {
         />
       </section>
 
-      <section className="overflow-hidden rounded-xl border border-slate-800 bg-[#0b1826]">
-        <div className="flex flex-col gap-3 border-b border-slate-800 p-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-1" role="group" aria-label="Filter media by type">
+      <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+        <div className="flex flex-col gap-3 border-b border-[#f1f5f9] p-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between bg-[#f8fafc]">
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter media by type">
             {(["all", "image", "video", "document", "audio", "other"] as AssetFilter[]).map(
               (type) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => setFilter(type)}
-                  className={`rounded-md px-3 py-2 text-xs font-medium capitalize transition ${filter === type ? "bg-slate-700 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"}`}
+                  className={`rounded-xl px-3.5 py-2 text-xs font-bold capitalize transition cursor-pointer ${
+                    filter === type
+                      ? "bg-[#059669] text-white shadow-xs"
+                      : "bg-white border border-[#e2e8f0] text-[#64748b] hover:text-[#0f172a]"
+                  }`}
                 >
                   {type === "all" ? `All files (${assets.length})` : type}
                 </button>
@@ -189,25 +208,25 @@ function MediaPage() {
           </div>
           <div className="flex items-center gap-2">
             <label className="relative min-w-0 flex-1 sm:w-64">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search media"
-                className="h-9 w-full rounded-lg border border-slate-700 bg-slate-950/30 pl-9 pr-8 text-xs text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-cyan-400"
+                placeholder="Search media files..."
+                className="h-10 w-full rounded-xl border border-[#e2e8f0] bg-white pl-10 pr-8 text-xs font-semibold text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#059669] transition"
               />
               {search ? (
                 <button
                   type="button"
                   onClick={() => setSearch("")}
                   aria-label="Clear search"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-white"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-[#94a3b8] hover:text-[#0f172a] cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
               ) : null}
             </label>
-            <div className="flex rounded-lg border border-slate-700 p-0.5">
+            <div className="flex rounded-xl border border-[#e2e8f0] bg-white p-1 shadow-2xs">
               <ViewButton
                 label="Grid view"
                 active={view === "grid"}
@@ -238,13 +257,13 @@ function MediaPage() {
             setIsDragging(false);
             uploadFiles(event.dataTransfer.files);
           }}
-          className="relative min-h-96 p-4 sm:p-5"
+          className="relative min-h-96 p-6"
         >
           {isDragging ? (
-            <div className="absolute inset-3 z-20 grid place-items-center rounded-lg border-2 border-dashed border-emerald-400 bg-[#0b1826]/95">
+            <div className="absolute inset-4 z-20 grid place-items-center rounded-2xl border-2 border-dashed border-[#059669] bg-[#ecfdf5]/95 backdrop-blur-xs">
               <div className="text-center">
-                <Upload className="mx-auto h-8 w-8 text-emerald-300" />
-                <p className="mt-3 text-sm font-semibold">Drop files to upload</p>
+                <Upload className="mx-auto h-10 w-10 text-[#059669] animate-bounce" />
+                <p className="mt-3 text-sm font-extrabold text-[#065f46]">Drop files here to upload</p>
               </div>
             </div>
           ) : null}
@@ -272,27 +291,26 @@ function MediaPage() {
 
       {pendingDelete ? (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-slate-950/75 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 grid place-items-center bg-[#0f172a]/60 p-4 backdrop-blur-xs"
           role="dialog"
           aria-modal="true"
           aria-labelledby="delete-media-title"
         >
-          <div className="w-full max-w-sm rounded-xl border border-slate-700 bg-[#0b1826] p-5 shadow-2xl">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-400/10 text-red-300">
+          <div className="w-full max-w-sm rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-2xl animate-in zoom-in-95">
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48]">
               <Trash2 className="h-5 w-5" />
             </span>
-            <h2 id="delete-media-title" className="mt-4 font-display text-lg font-bold">
+            <h2 id="delete-media-title" className="mt-4 font-display text-base font-extrabold text-[#0f172a]">
               Delete media?
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
-              {displayName(pendingDelete)} will be permanently removed. Existing pages using this
-              file may show a broken link.
+            <p className="mt-1 text-xs leading-relaxed text-[#64748b]">
+              "{displayName(pendingDelete)}" will be permanently removed. Existing pages using this file may show a broken image.
             </p>
-            <div className="mt-5 flex justify-end gap-2">
+            <div className="mt-6 flex justify-end gap-2.5">
               <button
                 type="button"
                 onClick={() => setPendingDelete(null)}
-                className="rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-800"
+                className="rounded-xl border border-[#e2e8f0] px-4 py-2 text-xs font-bold text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] cursor-pointer"
               >
                 Cancel
               </button>
@@ -300,14 +318,14 @@ function MediaPage() {
                 type="button"
                 onClick={() => deleteMutation.mutate(pendingDelete)}
                 disabled={deleteMutation.isPending}
-                className="inline-flex items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-xs font-bold text-white hover:bg-red-400 disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl bg-[#e11d48] px-4 py-2 text-xs font-extrabold text-white hover:bg-[#be123c] disabled:opacity-60 cursor-pointer shadow-xs"
               >
                 {deleteMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 )}
-                Delete
+                Delete Media
               </button>
             </div>
           </div>
@@ -329,14 +347,14 @@ function Summary({
   detail: string;
 }) {
   return (
-    <article className="flex min-h-24 items-center gap-4 rounded-xl border border-slate-800 bg-[#0b1826] p-4">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-300">
+    <article className="flex min-h-24 items-center gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#ecfdf5] border border-[#a7f3d0] text-[#059669] shadow-2xs">
         {icon}
       </span>
       <div>
-        <p className="text-[11px] text-slate-500">{label}</p>
-        <p className="mt-0.5 font-display text-xl font-bold">{value}</p>
-        <p className="mt-0.5 text-[10px] text-slate-600">{detail}</p>
+        <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#64748b]">{label}</p>
+        <p className="mt-0.5 font-display text-2xl font-black text-[#0f172a]">{value}</p>
+        <p className="mt-0.5 text-[10px] font-semibold text-[#94a3b8]">{detail}</p>
       </div>
     </article>
   );
@@ -359,7 +377,11 @@ function ViewButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`rounded-md p-2 transition ${active ? "bg-slate-700 text-white" : "text-slate-500 hover:text-slate-200"}`}
+      className={`rounded-lg p-1.5 transition cursor-pointer ${
+        active
+          ? "bg-[#059669] text-white shadow-2xs"
+          : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]"
+      }`}
     >
       {icon}
     </button>
@@ -374,7 +396,7 @@ function AssetGrid({
   onDelete: (asset: MediaAsset) => void;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
       {assets.map((asset) => (
         <AssetTile key={asset._id} asset={asset} onDelete={() => onDelete(asset)} />
       ))}
@@ -384,18 +406,18 @@ function AssetGrid({
 
 function AssetTile({ asset, onDelete }: { asset: MediaAsset; onDelete: () => void }) {
   return (
-    <article className="group min-w-0 overflow-hidden rounded-lg border border-slate-800 bg-slate-950/20 transition hover:border-slate-600">
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-900">
+    <article className="group min-w-0 overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white transition hover:border-[#059669] hover:shadow-md">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#f8fafc] border-b border-[#f1f5f9]">
         <AssetPreview asset={asset} />
-        <div className="absolute inset-x-0 top-0 flex justify-end gap-1 bg-gradient-to-b from-slate-950/80 to-transparent p-2 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
+        <div className="absolute inset-x-0 top-0 flex justify-end gap-1.5 bg-gradient-to-b from-[#0f172a]/70 to-transparent p-2.5 opacity-0 transition group-hover:opacity-100 group-focus-within:opacity-100">
           <AssetActions asset={asset} onDelete={onDelete} />
         </div>
       </div>
-      <div className="p-3">
-        <p className="truncate text-xs font-medium text-slate-200" title={displayName(asset)}>
+      <div className="p-3.5">
+        <p className="truncate text-xs font-bold text-[#0f172a]" title={displayName(asset)}>
           {displayName(asset)}
         </p>
-        <div className="mt-1.5 flex items-center justify-between gap-2 text-[10px] text-slate-500">
+        <div className="mt-1 flex items-center justify-between gap-2 text-[10px] font-semibold text-[#64748b]">
           <span className="capitalize">{asset.mediaType}</span>
           <span>{formatBytes(asset.size)}</span>
         </div>
@@ -415,37 +437,37 @@ function AssetList({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[680px] text-left">
         <thead>
-          <tr className="border-b border-slate-800 text-[10px] uppercase text-slate-500">
-            <th className="pb-3 font-semibold">File</th>
-            <th className="pb-3 font-semibold">Type</th>
-            <th className="pb-3 font-semibold">Size</th>
-            <th className="pb-3 font-semibold">Uploaded</th>
-            <th className="pb-3 text-right font-semibold">Actions</th>
+          <tr className="border-b border-[#f1f5f9] bg-[#f8fafc] text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#64748b]">
+            <th className="px-5 py-3.5">File</th>
+            <th className="px-5 py-3.5">Type</th>
+            <th className="px-5 py-3.5">Size</th>
+            <th className="px-5 py-3.5">Uploaded</th>
+            <th className="px-5 py-3.5 text-right">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-800/70">
+        <tbody className="divide-y divide-[#f1f5f9]">
           {assets.map((asset) => (
-            <tr key={asset._id} className="group">
-              <td className="py-3 pr-4">
+            <tr key={asset._id} className="group hover:bg-[#f8fafc] transition">
+              <td className="px-5 py-3.5">
                 <div className="flex items-center gap-3">
-                  <span className="h-10 w-12 shrink-0 overflow-hidden rounded-md bg-slate-900">
+                  <span className="h-10 w-12 shrink-0 overflow-hidden rounded-lg bg-[#f8fafc] border border-[#e2e8f0]">
                     <AssetPreview asset={asset} />
                   </span>
                   <span className="min-w-0">
-                    <span className="block max-w-xs truncate text-xs font-medium text-slate-200">
+                    <span className="block max-w-xs truncate text-xs font-bold text-[#0f172a]">
                       {displayName(asset)}
                     </span>
-                    <span className="mt-0.5 block max-w-xs truncate text-[10px] text-slate-600">
+                    <span className="mt-0.5 block max-w-xs truncate text-[10px] font-medium text-[#64748b]">
                       {asset.mimeType || "Unknown format"}
                     </span>
                   </span>
                 </div>
               </td>
-              <td className="py-3 text-xs capitalize text-slate-400">{asset.mediaType}</td>
-              <td className="py-3 text-xs text-slate-400">{formatBytes(asset.size)}</td>
-              <td className="py-3 text-xs text-slate-400">{formatDate(asset.createdAt)}</td>
-              <td className="py-3">
-                <div className="flex justify-end gap-1">
+              <td className="px-5 py-3.5 text-xs font-semibold capitalize text-[#64748b]">{asset.mediaType}</td>
+              <td className="px-5 py-3.5 text-xs font-bold text-[#0f172a]">{formatBytes(asset.size)}</td>
+              <td className="px-5 py-3.5 text-xs font-medium text-[#64748b]">{formatDate(asset.createdAt)}</td>
+              <td className="px-5 py-3.5">
+                <div className="flex justify-end gap-1.5">
                   <AssetActions asset={asset} onDelete={() => onDelete(asset)} />
                 </div>
               </td>
@@ -470,8 +492,8 @@ function AssetPreview({ asset }: { asset: MediaAsset }) {
   const Icon =
     asset.mediaType === "video" ? Video : asset.mediaType === "document" ? FileText : File;
   return (
-    <span className="flex h-full w-full items-center justify-center text-slate-600">
-      <Icon className="h-8 w-8" />
+    <span className="flex h-full w-full items-center justify-center text-[#94a3b8]">
+      <Icon className="h-6 w-6" />
     </span>
   );
 }
@@ -490,10 +512,10 @@ function AssetActions({ asset, onDelete }: { asset: MediaAsset; onDelete: () => 
         onClick={copyUrl}
         title="Copy URL"
         aria-label={`Copy URL for ${displayName(asset)}`}
-        className="rounded-md bg-slate-950/75 p-2 text-slate-300 hover:bg-slate-700 hover:text-white"
+        className="rounded-lg bg-white/90 p-1.5 text-[#0f172a] shadow-xs hover:bg-white hover:text-[#059669] cursor-pointer transition"
       >
         {copied ? (
-          <Check className="h-3.5 w-3.5 text-emerald-300" />
+          <Check className="h-3.5 w-3.5 text-[#059669]" />
         ) : (
           <Copy className="h-3.5 w-3.5" />
         )}
@@ -505,7 +527,7 @@ function AssetActions({ asset, onDelete }: { asset: MediaAsset; onDelete: () => 
         rel="noreferrer"
         title="Download"
         aria-label={`Download ${displayName(asset)}`}
-        className="rounded-md bg-slate-950/75 p-2 text-slate-300 hover:bg-slate-700 hover:text-white"
+        className="rounded-lg bg-white/90 p-1.5 text-[#0f172a] shadow-xs hover:bg-white hover:text-[#059669] cursor-pointer transition"
       >
         <Download className="h-3.5 w-3.5" />
       </a>
@@ -514,7 +536,7 @@ function AssetActions({ asset, onDelete }: { asset: MediaAsset; onDelete: () => 
         onClick={onDelete}
         title="Delete"
         aria-label={`Delete ${displayName(asset)}`}
-        className="rounded-md bg-slate-950/75 p-2 text-slate-300 hover:bg-red-500 hover:text-white"
+        className="rounded-lg bg-white/90 p-1.5 text-[#e11d48] shadow-xs hover:bg-[#fff1f2] cursor-pointer transition"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
@@ -526,8 +548,8 @@ function LoadingState() {
   return (
     <div className="grid min-h-80 place-items-center">
       <div className="text-center">
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-cyan-300" />
-        <p className="mt-3 text-xs text-slate-500">Loading media</p>
+        <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#059669]" />
+        <p className="mt-3 text-xs font-semibold text-[#64748b]">Loading media files...</p>
       </div>
     </div>
   );
@@ -537,12 +559,12 @@ function ErrorState({ message, retry }: { message: string; retry: () => void }) 
   return (
     <div className="grid min-h-80 place-items-center text-center">
       <div>
-        <p className="text-sm font-semibold text-slate-200">Unable to load media</p>
-        <p className="mt-2 max-w-md text-xs text-slate-500">{message}</p>
+        <p className="text-sm font-extrabold text-[#0f172a]">Unable to load media</p>
+        <p className="mt-1 max-w-md text-xs text-[#64748b]">{message}</p>
         <button
           type="button"
           onClick={retry}
-          className="mt-4 rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold hover:bg-slate-800"
+          className="mt-4 rounded-xl bg-[#059669] px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#047857] cursor-pointer"
         >
           Try again
         </button>
@@ -555,25 +577,25 @@ function EmptyLibrary({ hasAssets, onUpload }: { hasAssets: boolean; onUpload: (
   return (
     <div className="grid min-h-80 place-items-center text-center">
       <div>
-        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-300">
+        <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#ecfdf5] border border-[#a7f3d0] text-[#059669]">
           {hasAssets ? <Search className="h-6 w-6" /> : <ImageIcon className="h-6 w-6" />}
         </span>
-        <h2 className="mt-4 font-display text-base font-bold">
-          {hasAssets ? "No matching media" : "Your media library is empty"}
+        <h2 className="mt-4 font-display text-base font-extrabold text-[#0f172a]">
+          {hasAssets ? "No matching media found" : "Your media library is empty"}
         </h2>
-        <p className="mx-auto mt-2 max-w-sm text-xs leading-5 text-slate-500">
+        <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-[#64748b]">
           {hasAssets
-            ? "Adjust the search or file type filter."
-            : "Upload files or drag them here to use them in your website."}
+            ? "Try clearing your search keyword or switching file type filters."
+            : "Upload images, banners, or documents or drag them here to use on your websites."}
         </p>
         {!hasAssets ? (
           <button
             type="button"
             onClick={onUpload}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-800"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-[#059669] px-5 py-2.5 text-xs font-extrabold text-white shadow-xs hover:bg-[#047857] cursor-pointer"
           >
             <Upload className="h-4 w-4" />
-            Choose files
+            Upload Files
           </button>
         ) : null}
       </div>
@@ -583,12 +605,12 @@ function EmptyLibrary({ hasAssets, onUpload }: { hasAssets: boolean; onUpload: (
 
 function EmptyWorkspace() {
   return (
-    <div className="grid min-h-[60vh] place-items-center rounded-xl border border-dashed border-slate-700 bg-[#0b1826]/60 text-center">
+    <div className="grid min-h-[60vh] place-items-center rounded-2xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center shadow-xs">
       <div>
-        <ImageIcon className="mx-auto h-10 w-10 text-slate-600" />
-        <h1 className="mt-4 font-display text-xl font-bold">Create a website first</h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Media is organized by website in your workspace.
+        <ImageIcon className="mx-auto h-12 w-12 text-[#cbd5e1]" />
+        <h1 className="mt-4 font-display text-lg font-extrabold text-[#0f172a]">Create a website first</h1>
+        <p className="mt-1 text-xs text-[#64748b]">
+          Media files and assets are organized per website in your workspace.
         </p>
       </div>
     </div>

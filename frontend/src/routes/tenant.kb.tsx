@@ -87,26 +87,39 @@ function KnowledgeBasePage() {
   }
 
   return (
-    <div className="mx-auto space-y-7">
-      <header>
-        <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-cyan-400">
-          <BookOpen className="h-4 w-4" /> Help center
+    <div className="max-w-[1600px] space-y-6 pb-12">
+      {/* Header */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white px-5 py-6 shadow-xs sm:px-7">
+        <div className="absolute inset-x-0 top-0 flex h-1" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
         </div>
-        <h1 className="font-display text-3xl font-bold text-white">Knowledge base</h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Find answers and practical guides for managing your workspace.
-        </p>
-      </header>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#fff7ed] blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-28 h-48 w-48 rounded-full bg-[#ecfdf5] blur-2xl" />
+        <div>
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#c2410c]">
+            <BookOpen className="h-3.5 w-3.5" /> Help Center & Guides
+          </div>
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#0f172a] sm:text-3xl">
+            Knowledge Base
+          </h1>
+          <p className="mt-1 text-sm text-[#64748b]">
+            Find step-by-step guides, documentation, and answers for managing your WebMintra workspace.
+          </p>
+        </div>
+      </section>
 
-      <section className="border-y border-slate-800 bg-[#0b1826] p-5 sm:rounded-lg sm:border sm:p-7">
+      {/* Search Container */}
+      <section className="rounded-2xl border border-[#e2e8f0] bg-white p-5 sm:p-6 shadow-xs">
         <label className="relative mx-auto block">
           <span className="sr-only">Search knowledge base</span>
-          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
+          <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#94a3b8]" />
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search guides, billing, domains, publishing..."
-            className="h-12 w-full rounded-lg border border-slate-700 bg-slate-950/70 pl-12 pr-4 text-sm text-white outline-none transition focus:border-cyan-500"
+            placeholder="Search guides, billing, custom domains, publishing, forms..."
+            className="h-12 w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] pl-12 pr-4 text-xs font-semibold text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#059669] focus:bg-white transition"
           />
         </label>
       </section>
@@ -116,7 +129,11 @@ function KnowledgeBasePage() {
           <button
             type="button"
             onClick={() => setCategory("")}
-            className={`whitespace-nowrap rounded-md border px-3 py-2 text-xs font-medium ${!category ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300" : "border-slate-800 text-slate-400 hover:border-slate-700"}`}
+            className={`whitespace-nowrap rounded-xl border px-4 py-2 text-xs font-bold transition cursor-pointer ${
+              !category
+                ? "border-[#059669] bg-[#059669] text-white shadow-xs"
+                : "border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]"
+            }`}
           >
             All topics
           </button>
@@ -125,7 +142,11 @@ function KnowledgeBasePage() {
               key={item.id}
               type="button"
               onClick={() => setCategory(item.id)}
-              className={`whitespace-nowrap rounded-md border px-3 py-2 text-xs font-medium ${category === item.id ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300" : "border-slate-800 text-slate-400 hover:border-slate-700"}`}
+              className={`whitespace-nowrap rounded-xl border px-4 py-2 text-xs font-bold transition cursor-pointer ${
+                category === item.id
+                  ? "border-[#059669] bg-[#059669] text-white shadow-xs"
+                  : "border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]"
+              }`}
             >
               {item.name}
             </button>
@@ -135,18 +156,18 @@ function KnowledgeBasePage() {
 
       {articlesQuery.isLoading || categoriesQuery.isLoading ? (
         <State
-          icon={<Loader2 className="h-8 w-8 animate-spin text-cyan-400" />}
-          title="Loading documentation"
+          icon={<Loader2 className="h-8 w-8 animate-spin text-[#059669]" />}
+          title="Loading documentation..."
         />
       ) : articlesQuery.isError ? (
         <State
-          icon={<AlertCircle className="h-8 w-8 text-rose-400" />}
+          icon={<AlertCircle className="h-8 w-8 text-rose-500" />}
           title="Documentation could not be loaded"
           description="Check your connection and try again."
           action={
             <button
               onClick={() => articlesQuery.refetch()}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950"
+              className="rounded-xl bg-[#059669] px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#047857] transition cursor-pointer"
             >
               Try again
             </button>
@@ -154,7 +175,7 @@ function KnowledgeBasePage() {
         />
       ) : !articles?.length ? (
         <State
-          icon={<FileQuestion className="h-9 w-9 text-slate-600" />}
+          icon={<FileQuestion className="h-10 w-10 text-[#cbd5e1]" />}
           title="No articles found"
           description={
             search || category
@@ -166,40 +187,39 @@ function KnowledgeBasePage() {
         <div className="space-y-8">
           {Object.entries(grouped).map(([name, items]) => (
             <section key={name}>
-              <div className="mb-3 flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-slate-500" />
-                <h2 className="text-sm font-semibold text-slate-200">{name}</h2>
-                <span className="text-xs text-slate-600">{items.length}</span>
+              <div className="mb-3 flex items-center gap-2 px-1">
+                <FolderOpen className="h-4 w-4 text-[#059669]" />
+                <h2 className="text-sm font-extrabold text-[#0f172a]">{name}</h2>
+                <span className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-[10px] font-bold text-[#64748b]">{items.length}</span>
               </div>
-              <div className="divide-y divide-slate-800 overflow-hidden border-y border-slate-800 bg-[#0b1826] sm:rounded-lg sm:border">
+              <div className="divide-y divide-[#f1f5f9] overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
                 {items.map((article) => (
                   <button
-                    key={article.id}
+                    key={article.id || (article as any)._id}
                     type="button"
-                    onClick={() => setSelectedId(article.id)}
-                    className="group flex w-full items-center gap-4 p-4 text-left transition hover:bg-slate-900/50 sm:p-5"
+                    onClick={() => setSelectedId(article.id || (article as any)._id)}
+                    className="group flex w-full items-center gap-4 p-5 text-left transition hover:bg-[#f8fafc] cursor-pointer"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-slate-700 bg-slate-900 text-slate-400 group-hover:text-cyan-400">
-                      <BookOpen className="h-4 w-4" />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] text-[#059669] group-hover:border-[#a7f3d0] group-hover:bg-[#ecfdf5] transition">
+                      <BookOpen className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="text-sm font-semibold text-slate-200 group-hover:text-white">
+                      <h3 className="truncate text-sm font-bold text-[#0f172a] group-hover:text-[#059669] transition">
                         {article.title}
                       </h3>
-                      <p className="mt-1 line-clamp-1 text-xs text-slate-500">
-                        {article.excerpt || "Open this article to read the full guide."}
+                      <p className="mt-0.5 line-clamp-1 text-xs text-[#64748b]">
+                        {article.excerpt || (article as any).summary || (article.content ? article.content.slice(0, 140) : "Open this article to read the full guide.")}
                       </p>
-                      <div className="mt-2 flex items-center gap-3 text-[10px] text-slate-600">
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-3 w-3" /> {article.viewCount}
+                      <div className="mt-2 flex items-center gap-3 text-[10px] font-semibold text-[#94a3b8]">
+                        <span className="inline-flex items-center gap-1">
+                          <Eye className="h-3.5 w-3.5" /> {article.viewCount ?? (article as any).views ?? 0} views
                         </span>
-                        {article.isFaq && <span>FAQ</span>}
                         {article.updatedAt && (
                           <span>Updated {format(new Date(article.updatedAt), "MMM d, yyyy")}</span>
                         )}
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-slate-600 transition group-hover:translate-x-0.5 group-hover:text-cyan-400" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-[#cbd5e1] group-hover:text-[#059669] transition" />
                   </button>
                 ))}
               </div>
@@ -231,67 +251,73 @@ function ArticleReader({
   onFeedback: (rating: "helpful" | "not_helpful") => void;
 }) {
   return (
-    <div className="mx-auto ">
+    <div className="max-w-[1600px] space-y-6 pb-12">
       <button
         type="button"
         onClick={onBack}
-        className="mb-5 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white"
+        className="inline-flex items-center gap-2 text-xs font-bold text-[#64748b] hover:text-[#059669] transition cursor-pointer"
       >
-        <ArrowLeft className="h-4 w-4" /> Back to knowledge base
+        <ArrowLeft className="h-4 w-4" /> Back to Knowledge Base
       </button>
       {loading ? (
         <State
-          icon={<Loader2 className="h-8 w-8 animate-spin text-cyan-400" />}
-          title="Loading article"
+          icon={<Loader2 className="h-8 w-8 animate-spin text-[#059669]" />}
+          title="Loading article..."
         />
       ) : error || !article ? (
         <State
-          icon={<AlertCircle className="h-8 w-8 text-rose-400" />}
+          icon={<AlertCircle className="h-8 w-8 text-rose-500" />}
           title="Article could not be loaded"
           action={
             <button
               onClick={onRetry}
-              className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-cyan-950"
+              className="rounded-xl bg-[#059669] px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#047857] transition cursor-pointer"
             >
               Try again
             </button>
           }
         />
       ) : (
-        <article className="border-y border-slate-800 bg-[#0b1826] sm:rounded-lg sm:border">
-          <header className="border-b border-slate-800 p-5 sm:p-8">
-            <div className="flex flex-wrap items-center gap-2 text-xs text-cyan-400">
-              <span>{article.category?.name || "General"}</span>
+        <article className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+          <header className="border-b border-[#f1f5f9] p-6 sm:p-8 bg-[#f8fafc]">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#059669]">
+              <span className="rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-3 py-0.5 text-[10px] uppercase tracking-wide">
+                {article.category?.name || "General"}
+              </span>
               {article.isFaq && (
-                <span className="rounded bg-slate-800 px-2 py-0.5 text-slate-400">FAQ</span>
+                <span className="rounded-full bg-[#f1f5f9] border border-[#e2e8f0] px-2.5 py-0.5 text-[10px] text-[#64748b]">
+                  FAQ
+                </span>
               )}
             </div>
-            <h1 className="mt-3 font-display text-2xl font-bold text-white sm:text-3xl">
+            <h1 className="mt-3 font-display text-2xl font-extrabold text-[#0f172a] sm:text-3xl">
               {article.title}
             </h1>
-            {article.excerpt && (
-              <p className="mt-3 text-sm leading-6 text-slate-400">{article.excerpt}</p>
+            {(article.excerpt || (article as any).summary) && (
+              <p className="mt-3 text-xs leading-relaxed text-[#64748b]">{article.excerpt || (article as any).summary}</p>
             )}
-            <div className="mt-4 flex flex-wrap gap-4 text-[11px] text-slate-600">
+            <div className="mt-4 flex flex-wrap gap-4 text-[11px] font-semibold text-[#94a3b8]">
               <span className="flex items-center gap-1">
-                <Eye className="h-3 w-3" /> {article.viewCount} views
+                <Eye className="h-3.5 w-3.5" /> {article.viewCount ?? (article as any).views ?? 0} views
               </span>
-              <span>Updated {format(new Date(article.updatedAt), "MMMM d, yyyy")}</span>
+              {article.updatedAt && (
+                <span>Updated {format(new Date(article.updatedAt), "MMMM d, yyyy")}</span>
+              )}
             </div>
           </header>
-          <div className="px-5 pb-5 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
+          <div className="p-6 sm:p-8">
             <MarkdownContent content={article.content || ""} />
           </div>
-          <footer className="border-t border-slate-800 p-5 sm:px-8">
+          <footer className="border-t border-[#f1f5f9] bg-[#f8fafc] p-6 sm:px-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-200">Was this article helpful?</p>
-                <p className="mt-1 text-xs text-slate-500">
-                  Your feedback helps us improve this documentation.
+                <p className="text-xs font-extrabold text-[#0f172a]">Was this guide helpful?</p>
+                <p className="mt-0.5 text-xs text-[#64748b]">
+                  Your feedback helps us improve our documentation for all businesses.
                 </p>
               </div>
               {feedbackSent ? (
-                <p className="text-sm font-medium text-emerald-400">Feedback received</p>
+                <p className="text-xs font-bold text-[#059669]">✓ Thank you for your feedback!</p>
               ) : (
                 <div className="flex gap-2">
                   <button
@@ -299,7 +325,7 @@ function ArticleReader({
                     disabled={feedbackPending}
                     onClick={() => onFeedback("helpful")}
                     title="Helpful"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-400 disabled:opacity-50"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white text-[#64748b] shadow-2xs hover:border-[#a7f3d0] hover:text-[#059669] disabled:opacity-50 cursor-pointer transition"
                   >
                     <ThumbsUp className="h-4 w-4" />
                   </button>
@@ -308,7 +334,7 @@ function ArticleReader({
                     disabled={feedbackPending}
                     onClick={() => onFeedback("not_helpful")}
                     title="Not helpful"
-                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-700 text-slate-400 hover:border-rose-500/50 hover:text-rose-400 disabled:opacity-50"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e2e8f0] bg-white text-[#64748b] shadow-2xs hover:border-rose-300 hover:text-rose-600 disabled:opacity-50 cursor-pointer transition"
                   >
                     <ThumbsDown className="h-4 w-4" />
                   </button>
@@ -331,7 +357,7 @@ function MarkdownContent({ content }: { content: string }) {
       nodes.push(
         <ul
           key={`list-${nodes.length}`}
-          className="my-4 list-disc space-y-2 pl-6 text-sm leading-7 text-slate-300"
+          className="my-4 list-disc space-y-2 pl-6 text-xs leading-relaxed text-[#334155]"
         >
           {list.map((item, index) => (
             <li key={index}>{inlineMarkdown(item)}</li>
@@ -425,10 +451,10 @@ function State({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-72 flex-col items-center justify-center border-y border-slate-800 bg-[#0b1826] p-8 text-center sm:rounded-lg sm:border">
+    <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border border-[#e2e8f0] bg-white p-8 text-center shadow-xs">
       {icon}
-      <h2 className="mt-4 text-base font-semibold text-slate-200">{title}</h2>
-      {description && <p className="mt-1 max-w-sm text-sm text-slate-500">{description}</p>}
+      <h2 className="mt-3.5 text-base font-extrabold text-[#0f172a]">{title}</h2>
+      {description && <p className="mt-1 max-w-sm text-xs leading-relaxed text-[#64748b]">{description}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );

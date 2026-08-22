@@ -79,6 +79,11 @@ function landingHead(settings: Record<string, unknown> = {}) {
 export const Route = createFileRoute("/")({
   component: Index,
   beforeLoad: () => {
+    const searchParams =
+      typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const isPreview = searchParams?.has("preview_site");
+    if (isPreview) return;
+
     const user = getSessionUser();
     if (user) {
       throw redirect({ to: routeForRole(user.role), replace: true });
@@ -96,6 +101,14 @@ export const Route = createFileRoute("/")({
 function Index() {
   const [analysis, setAnalysis] = useState<TemplateAnalysis | null>(null);
   const [started, setStarted] = useState(false);
+
+  const searchParams =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const previewSite = searchParams?.get("preview_site");
+
+  if (previewSite) {
+    return <PublicSiteViewer subdomain={previewSite} />;
+  }
 
   if (analysis) return <Editor analysis={analysis} onExit={() => setAnalysis(null)} />;
   if (!started) return <LandingPage />;

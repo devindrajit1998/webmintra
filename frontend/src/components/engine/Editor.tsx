@@ -33,6 +33,10 @@ import {
   Type,
   Undo2,
   Video as VideoIcon,
+  PanelLeftClose,
+  PanelLeft,
+  PanelRightClose,
+  PanelRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { renderPage, defaultRepeaterItems } from "@/lib/template-engine/render";
@@ -70,7 +74,15 @@ const DEVICES = [
 ] as const;
 
 type RightTab =
-  "element" | "repeaters" | "theme" | "assets" | "seo" | "nav" | "validation" | "history";
+  | "element"
+  | "repeaters"
+  | "theme"
+  | "assets"
+  | "hidden"
+  | "seo"
+  | "nav"
+  | "validation"
+  | "history";
 
 const baseId = (id: string) => (id.includes("::") ? (id.split("::")[1] ?? id) : id);
 const itemKeyOf = (id: string) => (id.includes("::") ? (id.split("::")[0] ?? "") : "");
@@ -137,6 +149,8 @@ export function Editor({
   const [landscape, setLandscape] = useState(false);
   const [zoom, setZoom] = useState(0.62);
   const [tab, setTab] = useState<RightTab>("element");
+  const [showLeftSidebar, setShowLeftSidebar] = useState(false);
+  const [showRightSidebar, setShowRightSidebar] = useState(true);
   const [treeQuery, setTreeQuery] = useState("");
   const [revisions, setRevisions] = useState<{ label: string; at: string; state: EditorState }[]>(
     [],
@@ -229,9 +243,32 @@ export function Editor({
         setSelected(d.id);
         setTab("element");
       }
-      if (d.type === "text") patch(d.id, { text: String(d.value ?? "") });
+      if (d.type === "deselect") {
+        setSelected(null);
+      }
+      if (d.type === "text") {
+        patch(d.id, { text: String(d.value ?? "") });
+        flash("Text updated");
+      }
+      if (d.type === "image-replace" && typeof d.id === "string" && d.dataUrl) {
+        patch(d.id, { src: d.dataUrl });
+        flash("Photo replaced");
+      }
+      if (d.type === "link-destination" && typeof d.id === "string" && typeof d.href === "string") {
+        patch(d.id, { href: d.href });
+        flash("Link destination updated");
+      }
+      if (d.type === "hide-element" && typeof d.id === "string") {
+        patch(d.id, { hidden: true });
+        flash("Element hidden from page");
+      }
+      if (d.type === "open-tab" && typeof d.tab === "string") {
+        if (d.id) setSelected(d.id);
+        setTab(d.tab as RightTab);
+      }
       if (d.type === "repeater-add" && typeof d.repeaterId === "string") {
         addRepeaterItem(d.repeaterId, Number(d.sourceIndex));
+        flash("Added new card/item");
       }
     };
     window.addEventListener("message", onMsg);
@@ -396,48 +433,87 @@ export function Editor({
         </div>
       </header>
 
-      <div className="flex min-h-0 flex-1">
-        {/* left: structure */}
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card/60 lg:flex">
-          <div className="border-b border-border p-3">
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-background/60 px-2.5">
-              <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-              <input
-                value={treeQuery}
-                onChange={(e) => setTreeQuery(e.target.value)}
-                placeholder="Find something on this page"
-                className="h-8 w-full bg-transparent text-xs outline-none"
-              />
-            </div>
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-2">
-            <SectionTitle hint={page.name}>Page contents</SectionTitle>
-            {treeQuery ? (
-              <div className="space-y-1">
-                {page.fields
-                  .filter((f) =>
-                    `${f.label} ${f.value}`.toLowerCase().includes(treeQuery.toLowerCase()),
-                  )
-                  .slice(0, 60)
-                  .map((f) => (
-                    <button
-                      key={f.id}
-                      onClick={() => focusInPreview(f.id)}
-                      className="block w-full truncate rounded-md px-2 py-1.5 text-left text-[11px] text-muted-foreground hover:bg-elevated hover:text-foreground"
-                    >
-                      {f.label} · {f.value.slice(0, 28) || f.tag}
-                    </button>
-                  ))}
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        {/* left: structure / tree sidebar */}
+        {showLeftSidebar && (
+          <aside className="w-64 shrink-0 flex flex-col border-r border-[#e2e8f0] bg-white transition-all shadow-xs animate-in slide-in-from-left duration-200">
+            <div className="flex items-center justify-between border-b border-[#e2e8f0] p-3 bg-[#f8fafc]">
+              <div className="flex flex-1 items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-2.5 shadow-2xs">
+                <Search className="h-3.5 w-3.5 shrink-0 text-[#64748b]" />
+                <input
+                  value={treeQuery}
+                  onChange={(e) => setTreeQuery(e.target.value)}
+                  placeholder="Find on page..."
+                  className="h-8 w-full bg-transparent text-xs outline-none text-[#0f172a]"
+                />
               </div>
-            ) : (
-              <TreeView nodes={page.tree} onSelect={focusInPreview} selected={selected} />
-            )}
-          </div>
-        </aside>
+              <button
+                type="button"
+                onClick={() => setShowLeftSidebar(false)}
+                title="Collapse Structure Panel"
+                className="ml-2 flex h-8 w-8 items-center justify-center rounded-lg text-[#64748b] hover:bg-white hover:text-[#0f172a] transition cursor-pointer"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-3">
+              <SectionTitle hint={page.name}>Page contents</SectionTitle>
+              {treeQuery ? (
+                <div className="space-y-1">
+                  {page.fields
+                    .filter((f) =>
+                      `${f.label} ${f.value}`.toLowerCase().includes(treeQuery.toLowerCase()),
+                    )
+                    .slice(0, 60)
+                    .map((f) => (
+                      <button
+                        key={f.id}
+                        onClick={() => focusInPreview(f.id)}
+                        className="block w-full truncate rounded-lg px-2.5 py-1.5 text-left text-[11px] font-semibold text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a]"
+                      >
+                        {f.label} · {f.value.slice(0, 28) || f.tag}
+                      </button>
+                    ))}
+                </div>
+              ) : (
+                <TreeView
+                  nodes={page.tree}
+                  onSelect={focusInPreview}
+                  selected={selected}
+                  edits={state.edits[page.id] ?? {}}
+                  onToggleHide={(id) => {
+                    const current = !!state.edits[page.id]?.[id]?.hidden;
+                    patch(id, { hidden: !current });
+                    flash(current ? "Element restored" : "Element hidden");
+                  }}
+                />
+              )}
+            </div>
+          </aside>
+        )}
+
         {/* center: preview */}
         <main className="flex min-w-0 flex-1 flex-col bg-[#f8fafc]">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#e2e8f0] bg-white px-4 py-2 shadow-2xs">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
+              {/* Left Sidebar Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setShowLeftSidebar((s) => !s)}
+                title={showLeftSidebar ? "Hide Structure Panel" : "Show Page Structure Panel"}
+                className={cn(
+                  "flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-xs font-bold transition cursor-pointer",
+                  showLeftSidebar
+                    ? "border-[#059669] bg-[#ecfdf5] text-[#059669]"
+                    : "border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]",
+                )}
+              >
+                {showLeftSidebar ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+                <span className="hidden sm:inline">Page Structure</span>
+              </button>
+
+              <div className="h-4 w-px bg-[#e2e8f0]" />
+
               <div className="flex items-center gap-0.5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-1">
                 {DEVICES.map((d) => (
                   <button
@@ -484,6 +560,24 @@ export function Editor({
                   {Math.round(zoom * 100)}%
                 </span>
               </div>
+
+              <div className="h-4 w-px bg-[#e2e8f0]" />
+
+              {/* Right Sidebar Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setShowRightSidebar((s) => !s)}
+                title={showRightSidebar ? "Collapse Inspector" : "Open Settings / Inspector"}
+                className={cn(
+                  "flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-xs font-bold transition cursor-pointer",
+                  showRightSidebar
+                    ? "border-[#059669] bg-[#ecfdf5] text-[#059669]"
+                    : "border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]",
+                )}
+              >
+                <span className="hidden sm:inline">Settings Panel</span>
+                {showRightSidebar ? <PanelRightClose className="h-4 w-4" /> : <PanelRight className="h-4 w-4" />}
+              </button>
             </div>
           </div>
           <div className="surface-grid min-h-0 flex-1 overflow-auto p-6">
@@ -511,48 +605,72 @@ export function Editor({
                 />
               </div>
             </div>
-            <p className="mt-4 text-center text-[11px] text-muted-foreground">
-              Select something on the page to change it. Double-click text to type directly on the
-              page.
-            </p>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-4 py-1.5 text-xs font-bold text-[#065f46] shadow-2xs">
+                <span>💡</span> <span>Click any text or image for Quick Actions · Double-click to type directly on canvas</span>
+              </span>
+            </div>
           </div>
         </main>
 
         {/* right: property panel */}
-        <aside className="hidden w-[22rem] shrink-0 flex-col border-l border-[#e2e8f0] bg-white xl:flex shadow-xs">
-          <div className="flex flex-wrap items-center justify-between gap-1 border-b border-[#e2e8f0] bg-[#f8fafc] p-2">
-            {(
-              [
-                ["element", Type, "Edit Element"],
-                ["repeaters", Rows3, "Sections & Cards"],
-                ["theme", Palette, "Theme & Colors"],
-                ["assets", ImageIcon, "Media Assets"],
-                ["seo", Sparkles, "SEO Settings"],
-                ["nav", Link2, "Navigation Menu"],
-                ["validation", CircleAlert, "Check Issues"],
-                ["history", History, "Revisions"],
-              ] as [RightTab, typeof Type, string][]
-            ).map(([id, Icon, label]) => (
+        {showRightSidebar && (
+          <aside className="w-[23rem] shrink-0 flex flex-col border-l border-[#e2e8f0] bg-white shadow-xs animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between gap-1 border-b border-[#e2e8f0] bg-[#f8fafc] px-2 py-2">
+              <div className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {(
+                  [
+                    ["element", Type, "Edit Element"],
+                    ["repeaters", Rows3, "Sections & Cards"],
+                    ["theme", Palette, "Theme & Colors"],
+                    ["assets", ImageIcon, "Media Assets"],
+                    ["hidden", EyeOff, "Hidden Items & Sections"],
+                    ["seo", Sparkles, "SEO Settings"],
+                    ["nav", Link2, "Navigation Menu"],
+                    ["validation", CircleAlert, "Check Issues"],
+                    ["history", History, "Revisions"],
+                  ] as [RightTab, typeof Type, string][]
+                ).map(([id, Icon, label]) => {
+                  const hiddenCount = Object.values(state.edits[page.id] ?? {}).filter(
+                    (e) => e.hidden,
+                  ).length;
+                  return (
+                    <button
+                      key={id}
+                      onClick={() => setTab(id)}
+                      title={id === "hidden" && hiddenCount ? `${label} (${hiddenCount} hidden)` : label}
+                      className={cn(
+                        "relative grid h-7.5 w-7.5 shrink-0 place-items-center rounded-lg transition cursor-pointer",
+                        tab === id
+                          ? "bg-[#059669] text-white shadow-xs"
+                          : "text-[#64748b] hover:text-[#0f172a] hover:bg-white hover:border hover:border-[#e2e8f0]",
+                      )}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {id === "hidden" && hiddenCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[#ea580c] px-1 text-[8px] font-black text-white shadow-xs">
+                          {hiddenCount}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="h-4 w-px bg-[#e2e8f0] mx-0.5 shrink-0" />
               <button
-                key={id}
-                onClick={() => setTab(id)}
-                title={label}
-                className={cn(
-                  "grid h-8 w-8 place-items-center rounded-xl transition cursor-pointer",
-                  tab === id
-                    ? "bg-[#059669] text-white shadow-xs"
-                    : "text-[#64748b] hover:text-[#0f172a] hover:bg-white hover:border hover:border-[#e2e8f0]",
-                )}
+                type="button"
+                onClick={() => setShowRightSidebar(false)}
+                title="Collapse Inspector"
+                className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-lg text-[#64748b] hover:bg-white hover:text-[#0f172a] hover:border hover:border-[#e2e8f0] transition cursor-pointer"
               >
-                <Icon className="h-4 w-4" />
+                <PanelRightClose className="h-3.5 w-3.5" />
               </button>
-            ))}
-          </div>
-          <div className="min-h-0 flex-1 overflow-y-auto p-4">
-            {tab === "element" ? (
-              <ElementPanel
-                selected={selected}
-                field={field}
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto p-4">
+              {tab === "element" ? (
+                <ElementPanel
+                  selected={selected}
+                  field={field}
                 edit={selected ? editOf(selected) : {}}
                 patch={patch}
                 onUploadImage={onUploadImage}
@@ -579,6 +697,14 @@ export function Editor({
             ) : null}
             {tab === "assets" ? (
               <AssetPanel analysis={analysis} state={state} onReplace={replaceAsset} />
+            ) : null}
+            {tab === "hidden" ? (
+              <HiddenPanel
+                page={page}
+                state={state}
+                patch={patch}
+                focus={focusInPreview}
+              />
             ) : null}
             {tab === "seo" ? (
               <SeoPanel
@@ -610,6 +736,7 @@ export function Editor({
             ) : null}
           </div>
         </aside>
+        )}
       </div>
 
       {toast ? (
@@ -628,46 +755,79 @@ function TreeView({
   onSelect,
   selected,
   depth = 0,
+  edits = {},
+  onToggleHide,
 }: {
   nodes: { id: string; label: string; kind: string; children: unknown[] }[];
   onSelect: (id: string) => void;
   selected: string | null;
   depth?: number;
+  edits?: Record<string, ElementEdit>;
+  onToggleHide?: (id: string) => void;
 }) {
   return (
-    <ul className={cn(depth > 0 && "ml-2.5 border-l border-border/70 pl-2")}>
-      {nodes.map((n) => (
-        <li key={n.id + n.label}>
-          <button
-            onClick={() => onSelect(n.id)}
-            className={cn(
-              "flex w-full items-center gap-1.5 rounded-md px-1.5 py-1.5 text-left text-[11px] transition",
-              selected === n.id
-                ? "bg-primary/12 text-primary"
-                : "text-muted-foreground hover:bg-elevated hover:text-foreground",
-            )}
-          >
-            {n.kind === "repeater" ? (
-              <Rows3 className="h-3 w-3 shrink-0" />
-            ) : n.kind === "item" ? (
-              <Boxes className="h-3 w-3 shrink-0" />
-            ) : (
-              <ChevronRight className="h-3 w-3 shrink-0" />
-            )}
-            <span className="truncate">{n.label}</span>
-          </button>
-          {n.children.length ? (
-            <TreeView
-              nodes={
-                n.children as { id: string; label: string; kind: string; children: unknown[] }[]
-              }
-              onSelect={onSelect}
-              selected={selected}
-              depth={depth + 1}
-            />
-          ) : null}
-        </li>
-      ))}
+    <ul className={cn(depth > 0 && "ml-2 border-l border-border/60 pl-2")}>
+      {nodes.map((n) => {
+        const isHidden = !!edits[n.id]?.hidden;
+        return (
+          <li key={n.id + n.label} className="group/item relative">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => onSelect(n.id)}
+                className={cn(
+                  "flex min-w-0 flex-1 items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-[11px] font-semibold transition cursor-pointer",
+                  isHidden
+                    ? "opacity-45 line-through text-muted-foreground bg-muted/30"
+                    : selected === n.id
+                      ? "bg-[#059669]/10 text-[#059669]"
+                      : "text-[#475569] hover:bg-[#f1f5f9] hover:text-[#0f172a]",
+                )}
+              >
+                {n.kind === "repeater" ? (
+                  <Rows3 className="h-3 w-3 shrink-0" />
+                ) : n.kind === "item" ? (
+                  <Boxes className="h-3 w-3 shrink-0" />
+                ) : (
+                  <ChevronRight className="h-3 w-3 shrink-0" />
+                )}
+                <span className="truncate">{n.label}</span>
+              </button>
+
+              {onToggleHide && (
+                <button
+                  type="button"
+                  title={isHidden ? "Unhide this element" : "Hide this element"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleHide(n.id);
+                  }}
+                  className={cn(
+                    "flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition cursor-pointer",
+                    isHidden
+                      ? "text-[#ea580c] hover:bg-[#ffedd5]"
+                      : "text-[#94a3b8] opacity-0 group-hover/item:opacity-100 hover:text-[#0f172a] hover:bg-[#f1f5f9]",
+                  )}
+                >
+                  {isHidden ? <EyeOff className="h-3 w-3" /> : <Eye className="h-3 w-3" />}
+                </button>
+              )}
+            </div>
+
+            {n.children.length ? (
+              <TreeView
+                nodes={
+                  n.children as { id: string; label: string; kind: string; children: unknown[] }[]
+                }
+                onSelect={onSelect}
+                selected={selected}
+                depth={depth + 1}
+                edits={edits}
+                onToggleHide={onToggleHide}
+              />
+            ) : null}
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -1428,7 +1588,16 @@ function ThemePanel({
   ];
   return (
     <div className="fade-up space-y-4">
-      <SectionTitle hint="Changes every page">Site style</SectionTitle>
+      <div className="flex items-center justify-between">
+        <SectionTitle hint="Global Site Colors">Site style</SectionTitle>
+        <button
+          type="button"
+          onClick={() => setTheme(analysis.theme)}
+          className="rounded-lg border border-border bg-card px-2.5 py-1 text-[11px] font-bold text-muted-foreground hover:text-foreground hover:border-primary transition cursor-pointer"
+        >
+          Reset to Original
+        </button>
+      </div>
       <div className="space-y-2">
         {colorKeys.map((k) => (
           <ColorInput
@@ -1861,6 +2030,112 @@ function HistoryPanel({
           icon={<History className="h-5 w-5" />}
           title="No revisions yet"
           body="Hit Save in the toolbar to snapshot the current draft."
+        />
+      )}
+    </div>
+  );
+}
+
+function HiddenPanel({
+  page,
+  state,
+  patch,
+  focus,
+}: {
+  page: TemplateAnalysis["pages"][number];
+  state: EditorState;
+  patch: (id: string, p: ElementEdit) => void;
+  focus: (id: string) => void;
+}) {
+  const edits = state.edits[page.id] ?? {};
+  const hiddenEntries = Object.entries(edits).filter(([, e]) => e.hidden);
+
+  return (
+    <div className="fade-up space-y-4">
+      <div className="flex items-center justify-between">
+        <SectionTitle hint={`${hiddenEntries.length} items hidden`}>
+          Hidden from page
+        </SectionTitle>
+        {hiddenEntries.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              hiddenEntries.forEach(([id]) => patch(id, { hidden: false }));
+            }}
+            className="rounded-lg border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-1 text-[11px] font-bold text-[#065f46] hover:bg-[#d1fae5] transition cursor-pointer"
+          >
+            Unhide All
+          </button>
+        )}
+      </div>
+
+      {hiddenEntries.length ? (
+        <div className="space-y-2">
+          {hiddenEntries.map(([id, edit]) => {
+            const field = page.fields.find((f) => f.id === id);
+            
+            // Search tree nodes to get meaningful label if available
+            const findTreeNodeLabel = (nodes: typeof page.tree): string | null => {
+              for (const n of nodes) {
+                if (n.id === id) return n.label;
+                if (n.children?.length) {
+                  const sub = findTreeNodeLabel(n.children as typeof page.tree);
+                  if (sub) return sub;
+                }
+              }
+              return null;
+            };
+
+            const treeLabel = findTreeNodeLabel(page.tree);
+            const title =
+              edit.text ||
+              treeLabel ||
+              field?.label ||
+              (field?.value && field.value.length < 60 ? field.value : "") ||
+              (field?.kind ? `${field.kind.toUpperCase()} Element` : "Page Section");
+
+            const badgeKind = field?.kind || (treeLabel ? "section" : "element");
+
+            return (
+              <div
+                key={id}
+                className="flex items-center justify-between gap-2.5 rounded-xl border border-[#fed7aa] bg-[#fff7ed] p-3 shadow-2xs"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="rounded-md bg-[#ffedd5] px-1.5 py-0.5 text-[9px] font-bold uppercase text-[#c2410c]">
+                      {badgeKind}
+                    </span>
+                    <span className="truncate text-xs font-bold text-[#7c2d12]">
+                      {title}
+                    </span>
+                  </div>
+                  {field?.value && field.value !== title && (
+                    <p className="mt-1 text-[11px] text-[#9a3412] line-clamp-1 italic">
+                      "{field.value.slice(0, 60)}"
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    patch(id, { hidden: false });
+                    setTimeout(() => focus(id), 100);
+                  }}
+                  className="flex shrink-0 items-center gap-1 rounded-lg bg-[#059669] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-[#047857] transition cursor-pointer"
+                >
+                  <Eye className="h-3.5 w-3.5" /> <span>Show</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <EmptyState
+          icon={<Eye className="h-5 w-5" />}
+          title="No Hidden Elements"
+          body="All sections, text blocks, and images on this page are currently visible."
         />
       )}
     </div>

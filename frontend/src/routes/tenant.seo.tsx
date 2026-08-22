@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -136,65 +136,77 @@ function SeoPage() {
   if (!websites.length) return <NoWebsite />;
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">SEO manager</h1>
-            {dirty ? (
-              <span className="rounded-full bg-amber-400/10 px-2 py-1 text-[10px] font-semibold text-amber-300">
-                Unsaved changes
+    <div className="max-w-[1600px] space-y-6 pb-12">
+      {/* Header */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white px-5 py-6 shadow-xs sm:px-7">
+        <div className="absolute inset-x-0 top-0 flex h-1" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
+        </div>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#fff7ed] blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-28 h-48 w-48 rounded-full bg-[#ecfdf5] blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#c2410c]">
+                <Sparkles className="h-3.5 w-3.5" /> Search Optimization
               </span>
-            ) : null}
+              {dirty ? (
+                <span className="rounded-full bg-[#fff7ed] border border-[#fed7aa] px-2.5 py-0.5 text-[10px] font-extrabold text-[#ea580c]">
+                  Unsaved Changes
+                </span>
+              ) : null}
+            </div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#0f172a] sm:text-3xl">
+              SEO Manager
+            </h1>
+            <p className="mt-1 text-sm text-[#64748b]">
+              Manage indexing, metadata, search preview, structured data, and analytics tokens.
+            </p>
           </div>
-          <p className="mt-2 text-sm text-slate-400">
-            Manage indexing, search appearance, integrations, and public URL behavior.
-          </p>
-          {entitlements ? (
-            <p className="mt-1 text-xs text-cyan-300">{entitlements.planName} plan SEO access</p>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2.5">
+            <select
+              aria-label="Select website"
+              value={activeWebsiteId}
+              onChange={(event) => setSelectedWebsiteId(event.target.value)}
+              className="h-10 min-w-44 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 text-xs font-bold text-[#0f172a] outline-none transition focus:border-[#059669] cursor-pointer"
+            >
+              {websites.map((website) => (
+                <option key={website.id} value={website.id}>
+                  {website.name}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={!dirty || saveMutation.isPending}
+              onClick={() => saveMutation.mutate()}
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-4 text-xs font-bold text-[#0f172a] transition hover:bg-[#f8fafc] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer shadow-2xs"
+            >
+              {saveMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin text-[#059669]" />
+              ) : (
+                <Save className="h-4 w-4 text-[#059669]" />
+              )}
+              <span>Save Draft</span>
+            </button>
+            <button
+              type="button"
+              disabled={publishMutation.isPending}
+              onClick={() => publishMutation.mutate()}
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857] disabled:opacity-60 cursor-pointer"
+            >
+              {publishMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Globe2 className="h-4 w-4" />
+              )}
+              <span>Publish SEO</span>
+            </button>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <select
-            aria-label="Select website"
-            value={activeWebsiteId}
-            onChange={(event) => setSelectedWebsiteId(event.target.value)}
-            className="h-10 min-w-44 rounded-lg border border-slate-700 bg-[#0b1826] px-3 text-xs text-slate-200 outline-none focus:border-cyan-400"
-          >
-            {websites.map((website) => (
-              <option key={website.id} value={website.id}>
-                {website.name}
-              </option>
-            ))}
-          </select>
-          <button
-            type="button"
-            disabled={!dirty || saveMutation.isPending}
-            onClick={() => saveMutation.mutate()}
-            className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-700 px-4 text-xs font-semibold text-slate-200 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-45"
-          >
-            {saveMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-            Save draft
-          </button>
-          <button
-            type="button"
-            disabled={publishMutation.isPending}
-            onClick={() => publishMutation.mutate()}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-emerald-400 px-4 text-xs font-bold text-slate-950 transition hover:bg-emerald-300 disabled:opacity-60"
-          >
-            {publishMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Globe2 className="h-4 w-4" />
-            )}
-            Publish
-          </button>
-        </div>
-      </header>
+      </section>
 
       {websiteQuery.isLoading ? (
         <LoadingState />
@@ -205,10 +217,12 @@ function SeoPage() {
         />
       ) : (
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-          <main className="space-y-5">
-            <section className="rounded-lg border border-slate-800 bg-[#0b1826] p-4">
-              <label className="block text-xs font-semibold text-slate-300">Editing scope</label>
-              <div className="mt-2 grid gap-2 sm:grid-cols-[180px_minmax(0,1fr)]">
+          <main className="space-y-6">
+            <section className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
+              <label className="block text-xs font-extrabold uppercase tracking-wide text-[#64748b]">
+                Editing Scope
+              </label>
+              <div className="mt-2.5 grid gap-3 sm:grid-cols-[180px_minmax(0,1fr)]">
                 <select
                   value={scope.kind}
                   onChange={(event) =>
@@ -218,7 +232,7 @@ function SeoPage() {
                         : { kind: "page", pageId: pages[0]?.id ?? "page-0" },
                     )
                   }
-                  className="h-10 rounded-lg border border-slate-700 bg-slate-950/30 px-3 text-xs text-slate-200"
+                  className="h-10 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer"
                   disabled={!canUseGlobal || !canUsePerPage}
                 >
                   {canUsePerPage ? <option value="page">Page settings</option> : null}
@@ -228,7 +242,7 @@ function SeoPage() {
                   <select
                     value={scope.pageId}
                     onChange={(event) => setScope({ kind: "page", pageId: event.target.value })}
-                    className="h-10 rounded-lg border border-slate-700 bg-slate-950/30 px-3 text-xs text-slate-200"
+                    className="h-10 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer"
                     disabled={!canUsePerPage}
                   >
                     {pages.map((page) => (
@@ -238,7 +252,7 @@ function SeoPage() {
                     ))}
                   </select>
                 ) : (
-                  <div className="flex h-10 items-center rounded-lg border border-slate-800 px-3 text-xs text-slate-400">
+                  <div className="flex h-10 items-center rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 text-xs font-semibold text-[#64748b]">
                     Defaults inherited by every page unless overridden
                   </div>
                 )}
@@ -283,13 +297,13 @@ function SeoPage() {
             ) : null}
           </main>
 
-          <aside className="space-y-5 xl:sticky xl:top-6">
+          <aside className="space-y-6 xl:sticky xl:top-6">
             {has("seoHealthScore") ? (
-              <section className="rounded-lg border border-slate-800 bg-[#0b1826] p-5">
+              <section className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-semibold text-slate-300">SEO readiness</p>
-                    <p className="mt-1 text-[11px] text-slate-500">
+                    <p className="text-xs font-extrabold uppercase tracking-wide text-[#64748b]">SEO Readiness</p>
+                    <p className="mt-0.5 text-xs font-bold text-[#0f172a]">
                       {passedCount} of {audit.length} checks passed
                     </p>
                   </div>
@@ -302,10 +316,10 @@ function SeoPage() {
                 </div>
               </section>
             ) : null}
-            <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#0b1826]">
-              <div className="flex items-center justify-between border-b border-slate-800 p-4">
-                <h2 className="font-display text-sm font-bold">Live preview</h2>
-                <div className="flex rounded-lg border border-slate-700 p-0.5">
+            <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+              <div className="flex items-center justify-between border-b border-[#f1f5f9] p-4 bg-[#f8fafc]">
+                <h2 className="font-display text-xs font-extrabold uppercase tracking-wide text-[#0f172a]">Live Preview</h2>
+                <div className="flex rounded-xl border border-[#e2e8f0] bg-white p-1 shadow-2xs">
                   <PreviewButton
                     label="Search"
                     active={preview === "search"}
@@ -330,18 +344,18 @@ function SeoPage() {
             </section>
             <Link
               to="/tenant/domains"
-              className="flex items-center gap-3 rounded-lg border border-slate-800 bg-[#0b1826] p-4 transition hover:border-slate-600"
+              className="flex items-center gap-3.5 rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-xs transition hover:border-[#059669] hover:shadow-md"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-400/10 text-emerald-300">
-                <Globe2 className="h-4 w-4" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ecfdf5] border border-[#a7f3d0] text-[#059669]">
+                <Globe2 className="h-5 w-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-xs font-semibold text-slate-200">Domain settings</span>
-                <span className="mt-1 block text-[10px] text-slate-500">
-                  Connect a domain for canonical URLs.
+                <span className="block text-xs font-bold text-[#0f172a]">Custom Domain Settings</span>
+                <span className="mt-0.5 block text-[10px] font-medium text-[#64748b]">
+                  Connect your custom domain for clean canonical URLs.
                 </span>
               </span>
-              <ExternalLink className="h-4 w-4 text-slate-600" />
+              <ExternalLink className="h-4 w-4 text-[#94a3b8]" />
             </Link>
           </aside>
         </div>
@@ -370,14 +384,14 @@ function SeoEditorSections({
   const has = (key: string) => featureEnabled(features[key]);
   return (
     <>
-      <section className="rounded-lg border border-slate-800 bg-[#0b1826]">
+      <section className="rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
         <SectionHeading
           icon={<FileSearch className="h-5 w-5" />}
-          title="Search appearance"
-          detail={`Metadata for ${pageLabel}.`}
+          title="Search Appearance"
+          detail={`Metadata and snippet representation for ${pageLabel}.`}
           tone="cyan"
         />
-        <div className="space-y-5 p-5">
+        <div className="space-y-5 p-6">
           {has("pageTitle") ? (
             <SeoField
               label="Page title"
@@ -421,14 +435,14 @@ function SeoEditorSections({
       has("socialDescription") ||
       has("socialImage") ||
       has("twitterCard") ? (
-        <section className="rounded-lg border border-slate-800 bg-[#0b1826]">
+        <section className="rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
           <SectionHeading
             icon={<Share2 className="h-5 w-5" />}
-            title="Social sharing"
-            detail="Link previews for social platforms."
+            title="Social Sharing Cards"
+            detail="Rich link previews for WhatsApp, Facebook, Twitter/X, and LinkedIn."
             tone="violet"
           />
-          <div className="space-y-5 p-5">
+          <div className="space-y-5 p-6">
             {has("socialTitle") ? (
               <SeoField
                 label="Social title"
@@ -459,12 +473,12 @@ function SeoEditorSections({
             ) : null}
             {has("twitterCard") ? (
               <SelectField
-                label="Twitter card"
+                label="Twitter card type"
                 value={form.twitterCard}
                 onChange={(value) => update("twitterCard", value)}
                 options={[
-                  { value: "summary_large_image", label: "Large image" },
-                  { value: "summary", label: "Compact summary" },
+                  { value: "summary_large_image", label: "Large preview banner" },
+                  { value: "summary", label: "Compact summary card" },
                 ]}
               />
             ) : null}
@@ -472,31 +486,31 @@ function SeoEditorSections({
         </section>
       ) : null}
       {has("robotsDirective") || features["schemaJsonLd"] !== "disabled" ? (
-        <section className="rounded-lg border border-slate-800 bg-[#0b1826]">
+        <section className="rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="flex w-full items-center justify-between p-5 text-left"
+            className="flex w-full items-center justify-between p-5 text-left cursor-pointer hover:bg-[#f8fafc] rounded-2xl transition"
           >
-            <span className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-400/10 text-amber-300">
+            <span className="flex items-center gap-3.5">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#fff7ed] border border-[#fed7aa] text-[#ea580c]">
                 <Code2 className="h-5 w-5" />
               </span>
               <span>
-                <span className="block font-display text-base font-bold">Advanced SEO</span>
-                <span className="mt-0.5 block text-xs text-slate-500">
-                  Indexing directives and structured data.
+                <span className="block font-display text-sm font-extrabold text-[#0f172a]">Advanced SEO Directives</span>
+                <span className="mt-0.5 block text-xs text-[#64748b]">
+                  Crawler indexing instructions and JSON-LD structured data.
                 </span>
               </span>
             </span>
             <ChevronRight
-              className={`h-4 w-4 text-slate-500 transition ${showAdvanced ? "rotate-90" : ""}`}
+              className={`h-4 w-4 text-[#94a3b8] transition ${showAdvanced ? "rotate-90" : ""}`}
             />
           </button>
           {showAdvanced ? (
-            <div className="space-y-5 border-t border-slate-800 p-5">
+            <div className="space-y-5 border-t border-[#f1f5f9] p-6">
               {features["robotsDirective"] === "basic" ? (
-                <p className="text-xs text-slate-400">
+                <p className="text-xs font-semibold text-[#64748b]">
                   This plan uses the standard index and follow directive.
                 </p>
               ) : has("robotsDirective") ? (
@@ -505,12 +519,12 @@ function SeoEditorSections({
                   value={form.robots}
                   onChange={(value) => update("robots", value)}
                   options={[
-                    { value: "index, follow", label: "Index page and follow links" },
-                    { value: "noindex, follow", label: "Hide page, follow links" },
+                    { value: "index, follow", label: "Index page and follow links (Recommended)" },
+                    { value: "noindex, follow", label: "Hide page from search, follow links" },
                     ...(features["robotsDirective"] === "advanced"
                       ? [
-                          { value: "index, nofollow", label: "Index page, ignore links" },
-                          { value: "noindex, nofollow", label: "Hide page and ignore links" },
+                          { value: "index, nofollow", label: "Index page, ignore outbound links" },
+                          { value: "noindex, nofollow", label: "Hide page and ignore all links" },
                         ]
                       : []),
                   ]}
@@ -531,7 +545,7 @@ function SeoEditorSections({
                     code
                   />
                   {form.schema && !isValidJson(form.schema) ? (
-                    <p className="flex items-center gap-2 text-xs text-red-300">
+                    <p className="flex items-center gap-2 text-xs font-bold text-[#e11d48]">
                       <AlertCircle className="h-4 w-4" />
                       Structured data is not valid JSON.
                     </p>
@@ -558,19 +572,19 @@ function SitemapSection({
   const sitemap = { ...EMPTY_SITEMAP, ...draft.sitemap };
   const update = (next: typeof sitemap) => setDraft((current) => ({ ...current, sitemap: next }));
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826]">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
       <SectionHeading
         icon={<Globe2 className="h-5 w-5" />}
-        title="Sitemap"
-        detail="Control which pages search engines discover."
+        title="XML Sitemap Configuration"
+        detail="Control which pages search engine bots index and their crawl frequency."
         tone="emerald"
       />
-      <div className="divide-y divide-slate-800">
+      <div className="divide-y divide-[#f1f5f9]">
         {pages.map((page) => {
           const included = !sitemap.excludedPageIds.includes(page.id);
           return (
-            <div key={page.id} className="grid gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_100px_130px]">
-              <label className="flex items-center gap-3 text-xs text-slate-200">
+            <div key={page.id} className="grid items-center gap-3 p-4 sm:grid-cols-[minmax(0,1fr)_110px_140px] hover:bg-[#f8fafc] transition">
+              <label className="flex items-center gap-3 text-xs font-bold text-[#0f172a] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={included}
@@ -582,11 +596,11 @@ function SitemapSection({
                         : [...sitemap.excludedPageIds, page.id],
                     })
                   }
-                  className="h-4 w-4 accent-cyan-400"
+                  className="h-4 w-4 rounded accent-[#059669]"
                 />
                 <span>
-                  <span className="block font-semibold">{page.label}</span>
-                  <span className="mt-0.5 block text-[10px] text-slate-500">{page.route}</span>
+                  <span className="block font-bold text-[#0f172a]">{page.label}</span>
+                  <span className="mt-0.5 block font-mono text-[10px] font-semibold text-[#64748b]">{page.route}</span>
                 </span>
               </label>
               <input
@@ -602,7 +616,7 @@ function SitemapSection({
                     priorities: { ...sitemap.priorities, [page.id]: Number(event.target.value) },
                   })
                 }
-                className="h-9 rounded-lg border border-slate-700 bg-slate-950/30 px-3 text-xs"
+                className="h-9 rounded-xl border border-[#e2e8f0] bg-white px-3 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669]"
               />
               <select
                 aria-label={`${page.label} change frequency`}
@@ -613,7 +627,7 @@ function SitemapSection({
                     changefreq: { ...sitemap.changefreq, [page.id]: event.target.value },
                   })
                 }
-                className="h-9 rounded-lg border border-slate-700 bg-slate-950/30 px-2 text-xs"
+                className="h-9 rounded-xl border border-[#e2e8f0] bg-white px-3 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer capitalize"
               >
                 {CHANGE_FREQUENCIES.map((value) => (
                   <option key={value}>{value}</option>
@@ -639,21 +653,21 @@ function IntegrationSection({
   const patch = (key: "googleVerification" | "searchConsole" | "googleAnalytics", value: string) =>
     setDraft((current) => ({ ...current, [key]: value }));
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826]">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
       <SectionHeading
         icon={<Search className="h-5 w-5" />}
-        title="Search and analytics"
-        detail="Publish verification metadata and analytics tags."
+        title="Search Console & Analytics"
+        detail="Publish verification tokens and Google Analytics tracking codes."
         tone="cyan"
       />
-      <div className="space-y-5 p-5">
+      <div className="space-y-5 p-6">
         {featureEnabled(features["googleVerification"]) ? (
           <SeoField
             label="Google site verification token"
             value={draft.googleVerification ?? ""}
             onChange={(value) => patch("googleVerification", value)}
-            placeholder="Verification token only"
-            hint="Paste the content value supplied by Google, not the full meta tag."
+            placeholder="e.g. abcd1234efgh5678"
+            hint="Paste the content value supplied by Google Search Console."
           />
         ) : null}
         {featureEnabled(features["searchConsoleIntegration"]) ? (
@@ -661,13 +675,13 @@ function IntegrationSection({
             label="Search Console verification token"
             value={draft.searchConsole ?? ""}
             onChange={(value) => patch("searchConsole", value)}
-            placeholder="Search Console verification token"
-            hint="This publishes the verification metadata required to claim the site property."
+            placeholder="Verification token string"
+            hint="Publishes the meta verification tag required to claim ownership."
           />
         ) : null}
         {featureEnabled(features["googleAnalytics"]) ? (
           <SeoField
-            label="Google Analytics measurement ID"
+            label="Google Analytics Measurement ID"
             value={draft.googleAnalytics ?? ""}
             onChange={(value) => patch("googleAnalytics", value.toUpperCase())}
             placeholder="G-XXXXXXXXXX or GTM-XXXXXXX"
@@ -690,53 +704,53 @@ function RedirectSection({
       redirects.map((rule, ruleIndex) => (ruleIndex === index ? { ...rule, [key]: value } : rule)),
     );
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826]">
-      <div className="flex items-center justify-between border-b border-slate-800 p-5">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+      <div className="flex items-center justify-between border-b border-[#f1f5f9] p-5 sm:px-6 bg-[#f8fafc]">
         <div>
-          <h2 className="font-display text-base font-bold">301 redirects</h2>
-          <p className="mt-0.5 text-xs text-slate-500">
-            Send retired public paths to active pages.
+          <h2 className="font-display text-sm font-extrabold text-[#0f172a]">301 URL Redirects</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">
+            Forward old or retired URLs to your new active pages.
           </p>
         </div>
         <button
           type="button"
           title="Add redirect"
           onClick={() => onChange([...redirects, { from: "", to: "" }])}
-          className="grid h-9 w-9 place-items-center rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800"
+          className="grid h-9 w-9 place-items-center rounded-xl bg-[#059669] text-white shadow-xs hover:bg-[#047857] cursor-pointer transition"
         >
           <Plus className="h-4 w-4" />
         </button>
       </div>
-      <div className="space-y-3 p-5">
+      <div className="space-y-3 p-6">
         {redirects.length ? (
           redirects.map((rule, index) => (
-            <div key={index} className="grid gap-2 sm:grid-cols-[1fr_1fr_40px]">
+            <div key={index} className="grid gap-2.5 sm:grid-cols-[1fr_1fr_40px]">
               <input
                 aria-label={`Redirect ${index + 1} source`}
                 value={rule.from}
                 onChange={(event) => patch(index, "from", event.target.value)}
                 placeholder="/old-path"
-                className="h-10 rounded-lg border border-slate-700 bg-slate-950/30 px-3 text-xs"
+                className="h-10 rounded-xl border border-[#e2e8f0] bg-white px-3.5 text-xs font-semibold text-[#0f172a] outline-none focus:border-[#059669]"
               />
               <input
                 aria-label={`Redirect ${index + 1} target`}
                 value={rule.to}
                 onChange={(event) => patch(index, "to", event.target.value)}
                 placeholder="/new-path or https://..."
-                className="h-10 rounded-lg border border-slate-700 bg-slate-950/30 px-3 text-xs"
+                className="h-10 rounded-xl border border-[#e2e8f0] bg-white px-3.5 text-xs font-semibold text-[#0f172a] outline-none focus:border-[#059669]"
               />
               <button
                 type="button"
                 title="Delete redirect"
                 onClick={() => onChange(redirects.filter((_, ruleIndex) => ruleIndex !== index))}
-                className="grid h-10 w-10 place-items-center rounded-lg text-slate-500 hover:bg-red-400/10 hover:text-red-300"
+                className="grid h-10 w-10 place-items-center rounded-xl text-[#64748b] hover:bg-[#fff1f2] hover:text-[#e11d48] cursor-pointer transition"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
             </div>
           ))
         ) : (
-          <p className="text-xs text-slate-500">No redirect rules configured.</p>
+          <p className="text-xs font-semibold text-[#64748b]">No redirect rules configured.</p>
         )}
       </div>
     </section>
@@ -753,13 +767,13 @@ function Custom404Section({
   onChange: (pageId: string) => void;
 }) {
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826] p-5">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
       <SelectField
-        label="Custom not-found page"
+        label="Custom 404 Page"
         value={pageId}
         onChange={onChange}
         options={[
-          { value: "", label: "Default not-found response" },
+          { value: "", label: "Default platform 404 response" },
           ...pages.map((page) => ({ value: page.id, label: `${page.label} (${page.route})` })),
         ]}
       />
@@ -780,19 +794,19 @@ function SectionHeading({
 }) {
   const color =
     tone === "violet"
-      ? "bg-violet-400/10 text-violet-300"
+      ? "bg-[#faf5ff] border-[#e9d5ff] text-[#9333ea]"
       : tone === "emerald"
-        ? "bg-emerald-400/10 text-emerald-300"
-        : "bg-cyan-400/10 text-cyan-300";
+        ? "bg-[#ecfdf5] border-[#a7f3d0] text-[#059669]"
+        : "bg-[#f0fdfa] border-[#99f6e4] text-[#0d9488]";
   return (
-    <div className="border-b border-slate-800 p-5">
-      <div className="flex items-center gap-3">
-        <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${color}`}>
+    <div className="border-b border-[#f1f5f9] p-5 sm:px-6 bg-[#f8fafc]">
+      <div className="flex items-center gap-3.5">
+        <span className={`flex h-10 w-10 items-center justify-center rounded-xl border ${color} shadow-2xs`}>
           {icon}
         </span>
         <div>
-          <h2 className="font-display text-base font-bold">{title}</h2>
-          <p className="mt-0.5 text-xs text-slate-500">{detail}</p>
+          <h2 className="font-display text-sm font-extrabold text-[#0f172a]">{title}</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">{detail}</p>
         </div>
       </div>
     </div>
@@ -820,14 +834,14 @@ function SeoField({
   inputMode?: "url";
   code?: boolean;
 }) {
-  const lengthTone = maxLength && value.length > maxLength ? "text-red-300" : "text-slate-500";
-  const classes = `mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/30 px-3 py-2.5 text-xs text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-cyan-400 ${code ? "font-mono leading-5" : ""}`;
+  const lengthTone = maxLength && value.length > maxLength ? "text-rose-600 font-bold" : "text-[#64748b]";
+  const classes = `mt-1.5 w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2.5 text-xs font-semibold text-[#0f172a] outline-none transition placeholder:text-[#94a3b8] focus:border-[#059669] ${code ? "font-mono leading-5" : ""}`;
   return (
     <label className="block">
       <span className="flex items-center justify-between gap-3">
-        <span className="text-xs font-semibold text-slate-300">{label}</span>
+        <span className="text-xs font-bold text-[#0f172a]">{label}</span>
         {maxLength ? (
-          <span className={`text-[10px] ${lengthTone}`}>
+          <span className={`text-[10px] font-bold ${lengthTone}`}>
             {value.length} / {maxLength}
           </span>
         ) : null}
@@ -850,8 +864,8 @@ function SeoField({
         />
       )}
       {hint ? (
-        <span className="mt-1.5 flex items-start gap-1.5 text-[10px] leading-4 text-slate-500">
-          <Info className="mt-0.5 h-3 w-3 shrink-0" />
+        <span className="mt-1.5 flex items-start gap-1.5 text-[10px] leading-4 font-medium text-[#64748b]">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#059669]" />
           {hint}
         </span>
       ) : null}
@@ -872,11 +886,11 @@ function SelectField({
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold text-slate-300">{label}</span>
+      <span className="text-xs font-bold text-[#0f172a]">{label}</span>
       <select
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 h-10 w-full rounded-lg border border-slate-700 bg-slate-950/30 px-3 text-xs text-slate-200 outline-none focus:border-cyan-400"
+        className="mt-1.5 h-10 w-full rounded-xl border border-[#e2e8f0] bg-white px-3.5 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer"
       >
         {options.map((option) => (
           <option key={option.value || "empty"} value={option.value}>
@@ -891,10 +905,10 @@ function SelectField({
 function SearchPreview({ form, websiteName }: { form: SeoForm; websiteName: string }) {
   const url = form.canonical || "https://www.example.com/";
   return (
-    <div className="rounded-lg bg-white p-4 text-slate-900">
-      <p className="truncate text-xs text-emerald-700">{url}</p>
-      <p className="mt-1 line-clamp-1 text-lg text-[#1a0dab]">{form.title || websiteName}</p>
-      <p className="mt-1 line-clamp-3 text-xs leading-5 text-slate-600">
+    <div className="rounded-xl border border-[#e2e8f0] bg-white p-4 shadow-xs text-slate-900">
+      <p className="truncate text-xs font-semibold text-[#059669]">{url}</p>
+      <p className="mt-1 line-clamp-1 text-base font-extrabold text-[#1a0dab] hover:underline cursor-pointer">{form.title || websiteName}</p>
+      <p className="mt-1 line-clamp-3 text-xs leading-5 text-[#475569]">
         {form.description || "Add a meta description to show searchers what this page offers."}
       </p>
     </div>
@@ -902,7 +916,7 @@ function SearchPreview({ form, websiteName }: { form: SeoForm; websiteName: stri
 }
 function SocialPreview({ form, websiteName }: { form: SeoForm; websiteName: string }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-700 bg-slate-900">
+    <div className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-xs">
       {form.ogImage ? (
         <img
           src={form.ogImage}
@@ -910,43 +924,43 @@ function SocialPreview({ form, websiteName }: { form: SeoForm; websiteName: stri
           className="aspect-[1.91/1] w-full object-cover"
         />
       ) : (
-        <div className="grid aspect-[1.91/1] place-items-center bg-slate-800 text-slate-600">
-          <ImageIcon className="h-8 w-8" />
+        <div className="grid aspect-[1.91/1] place-items-center bg-[#f8fafc] text-[#94a3b8]">
+          <ImageIcon className="h-10 w-10" />
         </div>
       )}
-      <div className="p-3">
-        <p className="text-[10px] uppercase text-slate-500">{hostnameOf(form.canonical)}</p>
-        <p className="mt-1 line-clamp-1 text-xs font-semibold text-slate-200">
+      <div className="p-3.5 border-t border-[#f1f5f9]">
+        <p className="text-[10px] font-extrabold uppercase tracking-wide text-[#64748b]">{hostnameOf(form.canonical)}</p>
+        <p className="mt-1 line-clamp-1 text-xs font-extrabold text-[#0f172a]">
           {form.ogTitle || form.title || websiteName}
         </p>
-        <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-500">
-          {form.ogDescription || form.description || "Add a description for social sharing."}
+        <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-[#64748b]">
+          {form.ogDescription || form.description || "Add a description for social sharing cards."}
         </p>
       </div>
     </div>
   );
 }
 function ScoreRing({ score }: { score: number }) {
-  const color = score >= 75 ? "text-emerald-300" : score >= 45 ? "text-amber-300" : "text-red-300";
+  const color = score >= 75 ? "text-[#059669] border-[#a7f3d0] bg-[#ecfdf5]" : score >= 45 ? "text-[#ea580c] border-[#fed7aa] bg-[#fff7ed]" : "text-[#e11d48] border-[#fecdd3] bg-[#fff1f2]";
   return (
     <div
-      className={`grid h-12 w-12 place-items-center rounded-full border-4 border-slate-700 font-display text-xs font-bold ${color}`}
+      className={`grid h-12 w-12 place-items-center rounded-full border-3 font-display text-xs font-black shadow-2xs ${color}`}
     >
-      {score}
+      {score}%
     </div>
   );
 }
 function AuditRow({ label, detail, status }: AuditItem) {
   return (
-    <div className="flex items-start gap-2.5 rounded-lg bg-slate-950/25 p-2.5">
+    <div className="flex items-start gap-2.5 rounded-xl border border-[#f1f5f9] bg-[#f8fafc] p-2.5">
       <span
-        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${status === "pass" ? "bg-emerald-400 text-slate-950" : "bg-amber-400/15 text-amber-300"}`}
+        className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${status === "pass" ? "bg-[#059669] text-white" : "bg-[#ea580c] text-white"}`}
       >
-        {status === "pass" ? <Check className="h-3 w-3" /> : <AlertCircle className="h-3 w-3" />}
+        {status === "pass" ? <Check className="h-2.5 w-2.5" /> : <AlertCircle className="h-2.5 w-2.5" />}
       </span>
       <span>
-        <span className="block text-[11px] font-medium text-slate-300">{label}</span>
-        <span className="mt-0.5 block text-[10px] leading-4 text-slate-500">{detail}</span>
+        <span className="block text-[11px] font-bold text-[#0f172a]">{label}</span>
+        <span className="mt-0.5 block text-[10px] leading-4 text-[#64748b]">{detail}</span>
       </span>
     </div>
   );
@@ -968,7 +982,11 @@ function PreviewButton({
       title={`${label} preview`}
       aria-label={`${label} preview`}
       onClick={onClick}
-      className={`rounded-md p-2 transition ${active ? "bg-slate-700 text-white" : "text-slate-500 hover:text-slate-200"}`}
+      className={`rounded-lg p-1.5 transition cursor-pointer ${
+        active
+          ? "bg-[#059669] text-white shadow-2xs"
+          : "text-[#64748b] hover:text-[#0f172a] hover:bg-[#f8fafc]"
+      }`}
     >
       {icon}
     </button>
@@ -1146,23 +1164,23 @@ function LoadingState() {
   return (
     <div className="grid min-h-96 place-items-center">
       <div className="text-center">
-        <Loader2 className="mx-auto h-7 w-7 animate-spin text-cyan-300" />
-        <p className="mt-3 text-xs text-slate-500">Loading SEO settings</p>
+        <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#059669]" />
+        <p className="mt-3 text-xs font-semibold text-[#64748b]">Loading SEO settings...</p>
       </div>
     </div>
   );
 }
 function ErrorState({ message, retry }: { message: string; retry: () => void }) {
   return (
-    <div className="grid min-h-96 place-items-center rounded-lg border border-slate-800 bg-[#0b1826] text-center">
+    <div className="grid min-h-96 place-items-center rounded-2xl border border-[#fecdd3] bg-[#fff1f2] p-8 text-center">
       <div>
-        <AlertCircle className="mx-auto h-8 w-8 text-red-300" />
-        <h2 className="mt-3 font-display text-base font-bold">Unable to load SEO settings</h2>
-        <p className="mt-2 text-xs text-slate-500">{message}</p>
+        <AlertCircle className="mx-auto h-8 w-8 text-[#e11d48]" />
+        <h2 className="mt-3 font-display text-base font-extrabold text-[#0f172a]">Unable to load SEO settings</h2>
+        <p className="mt-1 text-xs text-[#64748b]">{message}</p>
         <button
           type="button"
           onClick={retry}
-          className="mt-4 rounded-lg border border-slate-700 px-4 py-2 text-xs font-semibold hover:bg-slate-800"
+          className="mt-4 rounded-xl bg-[#059669] px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#047857] cursor-pointer"
         >
           Try again
         </button>
@@ -1172,12 +1190,12 @@ function ErrorState({ message, retry }: { message: string; retry: () => void }) 
 }
 function NoWebsite() {
   return (
-    <div className="grid min-h-[60vh] place-items-center rounded-lg border border-dashed border-slate-700 bg-[#0b1826]/60 text-center">
+    <div className="grid min-h-[60vh] place-items-center rounded-2xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center shadow-xs">
       <div>
-        <Sparkles className="mx-auto h-10 w-10 text-slate-600" />
-        <h1 className="mt-4 font-display text-xl font-bold">Create a website first</h1>
-        <p className="mt-2 text-sm text-slate-500">
-          SEO settings are managed separately for each website.
+        <Sparkles className="mx-auto h-12 w-12 text-[#cbd5e1]" />
+        <h1 className="mt-4 font-display text-lg font-extrabold text-[#0f172a]">Create a website first</h1>
+        <p className="mt-1 text-xs text-[#64748b]">
+          SEO settings and indexing rules are configured per website.
         </p>
       </div>
     </div>

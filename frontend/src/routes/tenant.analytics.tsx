@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
@@ -73,24 +73,37 @@ function AnalyticsPage() {
   );
 
   return (
-    <div className="space-y-6 pb-10">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-xs font-semibold uppercase text-cyan-300">Workspace insights</p>
-          <h1 className="mt-2 font-display text-3xl font-bold text-white">Analytics</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-            Monitor publishing coverage, domain readiness, and the sites prepared to collect
-            traffic.
-          </p>
+    <div className="max-w-[1600px] space-y-6 pb-12">
+      {/* Header */}
+      <section className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white px-5 py-6 shadow-xs sm:px-7">
+        <div className="absolute inset-x-0 top-0 flex h-1" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
         </div>
-        <Link
-          to="/tenant/websites"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-400 px-4 text-xs font-bold text-slate-950 transition hover:bg-emerald-300"
-        >
-          <Rocket className="h-4 w-4" />
-          Manage websites
-        </Link>
-      </header>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#fff7ed] blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-28 h-48 w-48 rounded-full bg-[#ecfdf5] blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#c2410c]">
+              <BarChart3 className="h-3.5 w-3.5" /> Workspace Insights
+            </div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#0f172a] sm:text-3xl">
+              Analytics & Traffic
+            </h1>
+            <p className="mt-1 text-sm text-[#64748b]">
+              Monitor visitor trends, page views, lead conversions, and domain setup health.
+            </p>
+          </div>
+          <Link
+            to="/tenant/websites"
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857]"
+          >
+            <Rocket className="h-4 w-4" />
+            Manage Websites
+          </Link>
+        </div>
+      </section>
 
       <section aria-label="Analytics summary" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
@@ -98,7 +111,7 @@ function AnalyticsPage() {
           label="Unique visitors"
           value={analyticsQuery.isLoading ? "..." : (analytics?.summary.uniqueVisitors ?? 0)}
           detail="Last 30 days"
-          tone="violet"
+          tone="emerald"
         />
         <MetricCard
           icon={FileText}
@@ -111,8 +124,8 @@ function AnalyticsPage() {
           icon={MousePointerClick}
           label="Conversions"
           value={analyticsQuery.isLoading ? "..." : (analytics?.summary.conversions ?? 0)}
-          detail="Form submissions attempted"
-          tone="emerald"
+          detail="Form submissions recorded"
+          tone="amber"
         />
         <MetricCard
           icon={ShieldCheck}
@@ -121,11 +134,11 @@ function AnalyticsPage() {
           detail={
             domainsQuery.isLoading ? "Loading domain state" : `${securedDomains.length} SSL secured`
           }
-          tone="amber"
+          tone="violet"
         />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.75fr)]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.75fr)]">
         <TrafficPanel
           analytics={analytics}
           isLoading={analyticsQuery.isLoading}
@@ -142,7 +155,7 @@ function AnalyticsPage() {
         />
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
         <WebsitePerformance
           websites={liveWebsites}
           domains={domains}
@@ -175,24 +188,24 @@ function MetricCard({
   tone: MetricTone;
 }) {
   const colors: Record<MetricTone, string> = {
-    cyan: "bg-cyan-400/10 text-cyan-300",
-    emerald: "bg-emerald-400/10 text-emerald-300",
-    amber: "bg-amber-400/10 text-amber-300",
-    violet: "bg-violet-400/10 text-violet-300",
+    cyan: "bg-[#f0fdfa] border-[#99f6e4] text-[#0d9488]",
+    emerald: "bg-[#ecfdf5] border-[#a7f3d0] text-[#059669]",
+    amber: "bg-[#fff7ed] border-[#fed7aa] text-[#ea580c]",
+    violet: "bg-[#faf5ff] border-[#e9d5ff] text-[#9333ea]",
   };
 
   return (
-    <article className="rounded-lg border border-slate-800 bg-[#0b1826] p-5">
+    <article className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-xs">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs text-slate-500">{label}</p>
-          <p className="mt-2 font-display text-3xl font-bold text-white">{value}</p>
+          <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#64748b]">{label}</p>
+          <p className="mt-1 font-display text-3xl font-black text-[#0f172a]">{value}</p>
         </div>
-        <span className={`flex h-9 w-9 items-center justify-center rounded-lg ${colors[tone]}`}>
-          <Icon className="h-4 w-4" />
+        <span className={`flex h-10 w-10 items-center justify-center rounded-xl border ${colors[tone]} shadow-2xs`}>
+          <Icon className="h-5 w-5" />
         </span>
       </div>
-      <p className="mt-3 text-[11px] text-slate-400">{detail}</p>
+      <p className="mt-3 text-[10px] font-semibold text-[#94a3b8]">{detail}</p>
     </article>
   );
 }
@@ -210,31 +223,31 @@ function TrafficPanel({
 }) {
   const hasData = Boolean(analytics?.daily.some((day) => day.pageViews > 0));
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826] p-5 sm:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between border-b border-[#f1f5f9] pb-4">
         <div>
-          <h2 className="font-display text-lg font-bold">Website traffic</h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <h2 className="font-display text-base font-extrabold text-[#0f172a]">Website Traffic Trend</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">
             Visitors and page views over the last 30 days
           </p>
         </div>
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-bold text-emerald-300">
-          <Activity className="h-3 w-3" /> Tracking active
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-3 py-1 text-[10px] font-extrabold text-[#065f46]">
+          <Activity className="h-3 w-3 text-[#059669]" /> Tracking Active
         </span>
       </div>
 
       {isLoading ? (
         <div className="grid min-h-72 place-items-center">
-          <Loader2 className="h-6 w-6 animate-spin text-cyan-300" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
         </div>
       ) : isError ? (
         <div className="grid min-h-72 place-items-center text-center">
           <div>
-            <p className="text-sm font-semibold">Traffic analytics could not be loaded</p>
+            <p className="text-xs font-bold text-[#e11d48]">Traffic analytics could not be loaded</p>
             <button
               type="button"
               onClick={onRetry}
-              className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-cyan-300"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#059669] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#047857] cursor-pointer"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Retry
@@ -250,21 +263,21 @@ function TrafficPanel({
             >
               <defs>
                 <linearGradient id="trafficViews" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.35} />
-                  <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#059669" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#059669" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
               <XAxis
                 dataKey="date"
-                stroke="#64748b"
+                stroke="#94a3b8"
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => value.slice(5)}
               />
               <YAxis
-                stroke="#64748b"
+                stroke="#94a3b8"
                 fontSize={10}
                 tickLine={false}
                 axisLine={false}
@@ -272,24 +285,28 @@ function TrafficPanel({
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#0f172a",
-                  borderColor: "#1e293b",
-                  borderRadius: 8,
+                  backgroundColor: "#ffffff",
+                  borderColor: "#e2e8f0",
+                  borderRadius: 12,
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                  color: "#0f172a",
+                  fontWeight: 600,
+                  fontSize: 12,
                 }}
               />
               <Area
                 type="monotone"
                 dataKey="pageViews"
                 name="Page views"
-                stroke="#22d3ee"
-                strokeWidth={2}
+                stroke="#059669"
+                strokeWidth={2.5}
                 fill="url(#trafficViews)"
               />
               <Area
                 type="monotone"
                 dataKey="visitors"
                 name="Visitors"
-                stroke="#a78bfa"
+                stroke="#0284c7"
                 strokeWidth={2}
                 fillOpacity={0}
               />
@@ -297,12 +314,12 @@ function TrafficPanel({
           </ResponsiveContainer>
         </div>
       ) : (
-        <div className="mt-6 grid min-h-72 place-items-center border-y border-slate-800 text-center">
+        <div className="mt-6 grid min-h-72 place-items-center rounded-2xl border border-dashed border-[#cbd5e1] bg-[#f8fafc] p-6 text-center">
           <div>
-            <BarChart3 className="mx-auto h-8 w-8 text-slate-700" />
-            <h3 className="mt-3 text-sm font-semibold">No traffic recorded yet</h3>
-            <p className="mt-1 text-xs text-slate-500">
-              Visits to newly published pages will appear here automatically.
+            <BarChart3 className="mx-auto h-10 w-10 text-[#cbd5e1]" />
+            <h3 className="mt-3 text-sm font-extrabold text-[#0f172a]">No traffic recorded yet</h3>
+            <p className="mt-1 max-w-sm text-xs leading-relaxed text-[#64748b]">
+              Visits to published sites and pages will appear here in real-time.
             </p>
           </div>
         </div>
@@ -327,23 +344,23 @@ function ReadinessPanel({
   domainsLoading: boolean;
 }) {
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826] p-5 sm:p-6">
-      <div className="flex items-start justify-between gap-3">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
+      <div className="flex items-start justify-between gap-3 border-b border-[#f1f5f9] pb-4">
         <div>
-          <h2 className="font-display text-lg font-bold">Analytics readiness</h2>
-          <p className="mt-1 text-xs text-slate-500">Workspace setup progress</p>
+          <h2 className="font-display text-base font-extrabold text-[#0f172a]">Launch Readiness</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">Workspace setup progress</p>
         </div>
-        <span className="font-display text-2xl font-bold text-emerald-300">
+        <span className="font-display text-2xl font-black text-[#059669]">
           {domainsLoading ? "..." : `${readiness}%`}
         </span>
       </div>
-      <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-800">
+      <div className="mt-5 h-2 overflow-hidden rounded-full bg-[#e2e8f0]">
         <div
-          className="h-full rounded-full bg-emerald-400 transition-all"
+          className="h-full rounded-full bg-[#059669] transition-all"
           style={{ width: `${domainsLoading ? 0 : readiness}%` }}
         />
       </div>
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-3.5">
         <ReadinessItem label="Create a website" complete={hasWebsite} />
         <ReadinessItem label="Publish a website" complete={hasPublishedSite} />
         <ReadinessItem label="Add a custom domain" complete={hasDomain} loading={domainsLoading} />
@@ -355,9 +372,9 @@ function ReadinessPanel({
       </div>
       <Link
         to="/tenant/domains"
-        className="mt-6 flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-slate-700 text-xs font-semibold text-slate-300 transition hover:border-slate-500 hover:text-white"
+        className="mt-6 flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-[#e2e8f0] bg-white text-xs font-bold text-[#0f172a] transition hover:bg-[#f8fafc] shadow-2xs"
       >
-        Review domains <ArrowRight className="h-3.5 w-3.5" />
+        Review Domains <ArrowRight className="h-3.5 w-3.5 text-[#059669]" />
       </Link>
     </section>
   );
@@ -373,15 +390,15 @@ function ReadinessItem({
   loading?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-3 text-xs">
+    <div className="flex items-center gap-3 text-xs font-semibold">
       {loading ? (
-        <Loader2 className="h-5 w-5 animate-spin text-slate-500" />
+        <Loader2 className="h-4 w-4 animate-spin text-[#94a3b8]" />
       ) : complete ? (
-        <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+        <CheckCircle2 className="h-4 w-4 text-[#059669]" />
       ) : (
-        <CircleDashed className="h-5 w-5 text-slate-600" />
+        <CircleDashed className="h-4 w-4 text-[#cbd5e1]" />
       )}
-      <span className={complete ? "text-slate-200" : "text-slate-500"}>{label}</span>
+      <span className={complete ? "text-[#0f172a] font-bold" : "text-[#94a3b8]"}>{label}</span>
     </div>
   );
 }
@@ -400,42 +417,42 @@ function WebsitePerformance({
   );
 
   return (
-    <section className="overflow-hidden rounded-lg border border-slate-800 bg-[#0b1826]">
-      <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+    <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+      <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-4 bg-[#f8fafc]">
         <div>
-          <h2 className="font-display text-base font-bold">Website status</h2>
-          <p className="mt-1 text-xs text-slate-500">Publishing and domain coverage by site</p>
+          <h2 className="font-display text-base font-extrabold text-[#0f172a]">Website Status</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">Publishing state and domain routing coverage</p>
         </div>
-        <Activity className="h-5 w-5 text-cyan-300" />
+        <Activity className="h-5 w-5 text-[#059669]" />
       </div>
       {sortedWebsites.length ? (
-        <div className="divide-y divide-slate-800">
+        <div className="divide-y divide-[#f1f5f9]">
           {sortedWebsites.map((website) => {
             const domain = domains.find((item) => item.websiteId === website.id);
             return (
               <article
                 key={website.id}
-                className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between hover:bg-[#f8fafc] transition"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate text-sm font-semibold text-slate-200">
+                    <h3 className="truncate text-xs font-bold text-[#0f172a]">
                       {website.name}
                     </h3>
                     <StatusBadge status={website.status} />
                   </div>
-                  <p className="mt-1 text-[11px] text-slate-500">
+                  <p className="mt-1 text-[11px] font-medium text-[#64748b]">
                     Updated {formatDate(website.updatedAt)} ·{" "}
                     {website.templateName || "WebMintra template"}
                   </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-2 text-[11px] text-slate-400">
-                  <Globe2 className="h-3.5 w-3.5" />
+                <div className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#059669]">
+                  <Globe2 className="h-3.5 w-3.5 text-[#059669]" />
                   {domainsLoading
-                    ? "Checking domain"
+                    ? "Checking domain..."
                     : domain
                       ? domain.domain
-                      : "No domain connected"}
+                      : "Default subdomain only"}
                 </div>
               </article>
             );
@@ -443,9 +460,9 @@ function WebsitePerformance({
         </div>
       ) : (
         <div className="px-6 py-12 text-center">
-          <Globe2 className="mx-auto h-8 w-8 text-slate-700" />
-          <h3 className="mt-3 text-sm font-semibold">No websites to analyze</h3>
-          <p className="mt-1 text-xs text-slate-500">
+          <Globe2 className="mx-auto h-10 w-10 text-[#cbd5e1]" />
+          <h3 className="mt-3 text-sm font-extrabold text-[#0f172a]">No websites to analyze</h3>
+          <p className="mt-1 text-xs text-[#64748b]">
             Create a website to begin tracking launch readiness.
           </p>
         </div>
@@ -469,26 +486,26 @@ function DomainHealth({
   const pending = domains.length - active;
 
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#0b1826] p-5">
-      <div className="flex items-center justify-between">
+    <section className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-xs">
+      <div className="flex items-center justify-between border-b border-[#f1f5f9] pb-4">
         <div>
-          <h2 className="font-display text-base font-bold">Domain health</h2>
-          <p className="mt-1 text-xs text-slate-500">Connection status across your workspace</p>
+          <h2 className="font-display text-base font-extrabold text-[#0f172a]">Domain Health</h2>
+          <p className="mt-0.5 text-xs text-[#64748b]">Connection status across your workspace</p>
         </div>
-        <ShieldCheck className="h-5 w-5 text-emerald-300" />
+        <ShieldCheck className="h-5 w-5 text-[#059669]" />
       </div>
       {isLoading ? (
         <div className="grid min-h-48 place-items-center">
-          <Loader2 className="h-6 w-6 animate-spin text-cyan-300" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#059669]" />
         </div>
       ) : isError ? (
         <div className="grid min-h-48 place-items-center text-center">
           <div>
-            <p className="text-sm font-semibold">Domain status could not be loaded</p>
+            <p className="text-xs font-bold text-[#e11d48]">Domain status could not be loaded</p>
             <button
               type="button"
               onClick={onRetry}
-              className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-cyan-300"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#059669] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#047857] cursor-pointer"
             >
               <RefreshCw className="h-3.5 w-3.5" />
               Retry
@@ -498,16 +515,16 @@ function DomainHealth({
       ) : (
         <>
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <DomainMetric label="Active" value={active} color="text-emerald-300" />
-            <DomainMetric label="Pending" value={pending} color="text-amber-300" />
+            <DomainMetric label="Active" value={active} color="text-[#059669]" />
+            <DomainMetric label="Pending" value={pending} color="text-[#ea580c]" />
           </div>
-          <div className="mt-5 rounded-lg border border-slate-800 bg-slate-950/25 p-4">
+          <div className="mt-5 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
             <div className="flex items-start gap-3">
-              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-              <p className="text-xs leading-5 text-slate-400">
+              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-[#059669]" />
+              <p className="text-xs leading-relaxed text-[#64748b]">
                 {domains.length
-                  ? `${active} of ${domains.length} domains are ready to serve published sites.`
-                  : "Connect a custom domain to establish a public analytics surface."}
+                  ? `${active} of ${domains.length} domains are ready to serve published websites.`
+                  : "Connect a custom domain to establish your distinct brand URL."}
               </p>
             </div>
           </div>
@@ -519,9 +536,9 @@ function DomainHealth({
 
 function DomainMetric({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="rounded-lg border border-slate-800 p-4">
-      <p className="text-[11px] text-slate-500">{label}</p>
-      <p className={`mt-1 font-display text-2xl font-bold ${color}`}>{value}</p>
+    <div className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
+      <p className="text-[10px] font-extrabold uppercase tracking-wide text-[#64748b]">{label}</p>
+      <p className={`mt-1 font-display text-2xl font-black ${color}`}>{value}</p>
     </div>
   );
 }
@@ -530,7 +547,7 @@ function StatusBadge({ status }: { status: Website["status"] }) {
   const published = status === "published";
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[9px] font-bold capitalize ${published ? "bg-emerald-400/10 text-emerald-300" : "bg-amber-400/10 text-amber-300"}`}
+      className={`rounded-full px-2.5 py-0.5 text-[9px] font-extrabold capitalize ${published ? "bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]" : "bg-[#fff7ed] text-[#c2410c] border border-[#fed7aa]"}`}
     >
       {status}
     </span>

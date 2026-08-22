@@ -133,29 +133,40 @@ function SupportPage() {
   }, [ticket, selectedId]);
 
   return (
-    <div className="mx-auto flex flex-col gap-6">
+    <div className="max-w-[1600px] space-y-6 pb-12">
       {/* Header */}
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase text-emerald-400">
-            <LifeBuoy className="h-4 w-4" /> Customer support
-          </div>
-          <h1 className="font-display text-3xl font-bold text-white">Support tickets</h1>
-          <p className="mt-2 text-sm text-slate-400">
-            Contact the WebMintra team and track every response.
-          </p>
+      <section className="relative overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white px-5 py-6 shadow-xs sm:px-7">
+        <div className="absolute inset-x-0 top-0 flex h-1" aria-hidden="true">
+          <span className="flex-1 bg-[#ea580c]" />
+          <span className="flex-1 bg-white" />
+          <span className="flex-1 bg-[#059669]" />
         </div>
-        <button
-          type="button"
-          onClick={() => setShowCreate(true)}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400"
-        >
-          <Plus className="h-4 w-4" /> New ticket
-        </button>
-      </header>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#fff7ed] blur-2xl" />
+        <div className="pointer-events-none absolute -bottom-24 right-28 h-48 w-48 rounded-full bg-[#ecfdf5] blur-2xl" />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#c2410c]">
+              <LifeBuoy className="h-3.5 w-3.5" /> Customer Support
+            </div>
+            <h1 className="font-display text-2xl font-extrabold tracking-tight text-[#0f172a] sm:text-3xl">
+              Support Tickets
+            </h1>
+            <p className="mt-1 text-sm text-[#64748b]">
+              Contact the WebMintra technical team, track resolutions, and submit requests.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857] cursor-pointer"
+          >
+            <Plus className="h-4 w-4" /> New Ticket
+          </button>
+        </div>
+      </section>
 
       {/* Summary strip */}
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-slate-800 bg-slate-800 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-[#e2e8f0] bg-[#e2e8f0] sm:grid-cols-4 shadow-xs">
         <SummaryCard label="Total" value={pagination.total} icon={Inbox} />
         <SummaryCard label="Open" value={summary.open ?? 0} icon={AlertCircle} />
         <SummaryCard
@@ -171,23 +182,23 @@ function SupportPage() {
       </div>
 
       {/* Main split panel */}
-      <section className="grid min-h-[640px] overflow-hidden border-y border-slate-800 bg-[#0b1826] lg:grid-cols-[minmax(300px,400px)_1fr] lg:rounded-xl lg:border">
+      <section className="grid min-h-[640px] overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs lg:grid-cols-[minmax(320px,400px)_1fr]">
         {/* Ticket list (left) */}
         <div
-          className={`${selectedId ? "hidden lg:flex" : "flex"} min-h-0 flex-col border-slate-800 lg:border-r`}
+          className={`${selectedId ? "hidden lg:flex" : "flex"} min-h-0 flex-col border-[#e2e8f0] lg:border-r`}
         >
           {/* Filters */}
-          <div className="space-y-3 border-b border-slate-800 p-4">
+          <div className="space-y-3 border-b border-[#f1f5f9] p-4 bg-[#f8fafc]">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by number or subject"
-                className="h-10 w-full rounded-lg border border-slate-700 bg-slate-950/60 pl-10 pr-3 text-sm outline-none focus:border-emerald-500"
+                placeholder="Search ticket # or subject..."
+                className="h-10 w-full rounded-xl border border-[#e2e8f0] bg-white pl-10 pr-3 text-xs font-semibold text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#059669] transition"
               />
             </div>
-            <div className="flex gap-2 overflow-x-auto">
+            <div className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
               {[
                 { value: "", label: "All" },
                 { value: "open", label: "Open" },
@@ -198,7 +209,11 @@ function SupportPage() {
                   key={tab.value}
                   type="button"
                   onClick={() => setStatus(tab.value)}
-                  className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${status === tab.value ? "bg-slate-700 text-white" : "text-slate-500 hover:text-slate-300"}`}
+                  className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-bold transition cursor-pointer ${
+                    status === tab.value
+                      ? "bg-[#059669] text-white shadow-xs"
+                      : "text-[#64748b] hover:bg-white hover:text-[#0f172a]"
+                  }`}
                 >
                   {tab.label}
                 </button>
@@ -207,25 +222,25 @@ function SupportPage() {
           </div>
 
           {/* List body */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#f1f5f9]">
             {listQuery.isLoading ? (
               <Centered
-                icon={<Loader2 className="h-7 w-7 animate-spin text-emerald-400" />}
-                title="Loading tickets"
+                icon={<Loader2 className="h-8 w-8 animate-spin text-[#059669]" />}
+                title="Loading tickets..."
               />
             ) : listQuery.isError ? (
               <Centered
-                icon={<AlertCircle className="h-7 w-7 text-rose-400" />}
+                icon={<AlertCircle className="h-8 w-8 text-rose-500" />}
                 title="Could not load tickets"
                 action={
-                  <button onClick={() => listQuery.refetch()} className="text-sm text-emerald-400">
+                  <button onClick={() => listQuery.refetch()} className="text-xs font-bold text-[#059669]">
                     Try again
                   </button>
                 }
               />
             ) : tickets.length === 0 ? (
               <Centered
-                icon={<Inbox className="h-8 w-8 text-slate-600" />}
+                icon={<Inbox className="h-10 w-10 text-[#cbd5e1]" />}
                 title="No tickets"
                 description={
                   search || status
@@ -239,30 +254,35 @@ function SupportPage() {
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedId(item.id)}
-                  className={`w-full border-b border-slate-800/70 p-4 text-left transition ${selectedId === item.id ? "bg-emerald-500/5 border-l-2 border-l-emerald-500" : "hover:bg-slate-900/50"}`}
+                  className={`w-full p-4 text-left transition cursor-pointer ${
+                    selectedId === item.id
+                      ? "bg-[#ecfdf5] border-l-3 border-l-[#059669]"
+                      : "hover:bg-[#f8fafc]"
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-200">
+                      <p className="truncate text-xs font-bold text-[#0f172a]">
                         {item.subject}
                       </p>
-                      <p className="mt-0.5 text-[11px] font-medium text-slate-500">
-                        {item.ticketNumber}
+                      <p className="mt-0.5 font-mono text-[10px] font-bold text-[#64748b]">
+                        {item.ticketNumber} · {item.category}
                       </p>
                     </div>
                     <StatusBadge status={item.status} />
                   </div>
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-500">
-                    {item.description}
-                  </p>
-                  <div className="mt-2.5 flex items-center justify-between gap-2">
+                  <div className="mt-2 flex items-center justify-between text-[10px] text-[#94a3b8]">
                     <span
-                      className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase ${PRIORITY_COLORS[item.priority] ?? ""}`}
+                      className={`rounded px-1.5 py-0.5 font-bold uppercase ${
+                        PRIORITY_COLORS[item.priority] ?? "bg-slate-100 text-slate-600"
+                      }`}
                     >
                       {item.priority}
                     </span>
-                    <span className="text-[10px] text-slate-600">
-                      {formatDistanceToNow(new Date(item.updatedAt), { addSuffix: true })}
+                    <span>
+                      {item.updatedAt
+                        ? formatDistanceToNow(new Date(item.updatedAt), { addSuffix: true })
+                        : formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
                     </span>
                   </div>
                 </button>
@@ -271,63 +291,57 @@ function SupportPage() {
           </div>
         </div>
 
-        {/* Conversation panel (right) */}
-        <div className={`${selectedId ? "flex" : "hidden lg:flex"} min-h-0 flex-col`}>
+        {/* Ticket thread (right) */}
+        <div className={`${selectedId ? "flex" : "hidden lg:flex"} min-h-0 flex-col bg-[#f8fafc]`}>
           {!selectedId ? (
             <Centered
-              icon={<MessageSquare className="h-10 w-10 text-slate-700" />}
+              icon={<MessageSquare className="h-12 w-12 text-[#cbd5e1]" />}
               title="Select a ticket"
-              description="Choose a conversation to read messages and reply."
+              description="Choose a ticket conversation from the list to view replies and send messages."
             />
           ) : detailQuery.isLoading ? (
             <Centered
-              icon={<Loader2 className="h-7 w-7 animate-spin text-emerald-400" />}
-              title="Loading conversation"
+              icon={<Loader2 className="h-8 w-8 animate-spin text-[#059669]" />}
+              title="Loading conversation..."
             />
           ) : !ticket ? (
             <Centered
-              icon={<AlertCircle className="h-7 w-7 text-rose-400" />}
-              title="Could not load ticket"
-              action={
-                <button onClick={() => detailQuery.refetch()} className="text-sm text-emerald-400">
-                  Try again
-                </button>
-              }
+              icon={<AlertCircle className="h-8 w-8 text-rose-500" />}
+              title="Ticket not found"
             />
           ) : (
             <>
-              {/* Conversation header */}
-              <div className="shrink-0 border-b border-slate-800 p-4 sm:p-5">
-                <div className="flex items-start gap-3">
+              {/* Detail header */}
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e2e8f0] bg-white p-4 sm:px-6">
+                <div className="flex min-w-0 items-center gap-3">
                   <button
                     type="button"
                     onClick={() => setSelectedId(null)}
-                    className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-white lg:hidden"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#e2e8f0] text-[#64748b] hover:text-[#0f172a] lg:hidden"
                   >
                     <ArrowLeft className="h-4 w-4" />
                   </button>
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-base font-semibold text-white">{ticket.subject}</h2>
-                      <StatusBadge status={ticket.status} />
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-500">
-                      <span>{ticket.ticketNumber}</span>
-                      {ticket.category && <span className="capitalize">{ticket.category}</span>}
-                      <span
-                        className={`rounded border px-1.5 py-0.5 font-semibold uppercase ${PRIORITY_COLORS[ticket.priority] ?? ""}`}
-                      >
-                        {ticket.priority}
+                      <span className="font-mono text-xs font-extrabold text-[#059669]">
+                        {ticket.ticketNumber}
                       </span>
-                      <span>Opened {format(new Date(ticket.createdAt), "PPp")}</span>
+                      <h2 className="truncate text-sm font-extrabold text-[#0f172a]">
+                        {ticket.subject}
+                      </h2>
                     </div>
+                    <p className="mt-0.5 text-[11px] text-[#64748b]">
+                      Created {format(new Date(ticket.createdAt), "PPP")} · Category: {ticket.category}
+                    </p>
                   </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={ticket.status} />
                 </div>
               </div>
 
-              {/* Messages */}
-              <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
-                {/* Original description */}
+              {/* Message scroll area */}
+              <div className="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6">
                 <Message
                   author="You"
                   content={ticket.description}
@@ -335,68 +349,58 @@ function SupportPage() {
                   isTenant
                   attachments={ticket.attachments}
                 />
-
-                {/* Replies */}
                 {(ticket.replies ?? []).map((r: any) => (
                   <Message
                     key={r.id}
-                    author={
-                      r.author?.role === "admin" ? r.author.name || "WebMintra Support" : "You"
-                    }
+                    author={r.author?.role === "admin" ? r.author.name || "WebMintra Support" : "You"}
                     content={r.content}
                     date={r.createdAt}
                     isTenant={r.author?.role !== "admin"}
                     attachments={r.attachments}
                   />
                 ))}
-
-                {ticket.replies?.length === 0 && (
-                  <div className="rounded-lg border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">
-                    No replies yet. Our team will respond shortly.
-                  </div>
-                )}
-
                 <div ref={bottomRef} />
               </div>
 
-              {/* Reply form */}
-              <div className="shrink-0 border-t border-slate-800 bg-slate-950/30 p-4">
+              {/* Reply box */}
+              <div className="border-t border-[#e2e8f0] bg-white p-4">
                 {ticket.status === "closed" ? (
-                  <p className="rounded-lg border border-slate-700 bg-slate-900 p-3 text-center text-sm text-slate-400">
-                    This ticket is closed and cannot receive new replies.
+                  <p className="py-2 text-center text-xs font-semibold text-[#64748b]">
+                    This ticket has been marked as resolved and closed.
                   </p>
                 ) : (
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      if (reply.trim()) replyMutation.mutate();
+                      if (!reply.trim() && attachments.length === 0) return;
+                      replyMutation.mutate();
                     }}
                   >
                     <textarea
                       value={reply}
                       onChange={(e) => setReply(e.target.value)}
-                      maxLength={5000}
-                      placeholder="Write a reply to the support team..."
-                      className="h-24 w-full resize-none rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm outline-none transition focus:border-emerald-500"
+                      placeholder="Type your message here..."
+                      rows={3}
+                      className="w-full resize-none rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 text-xs font-semibold text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#059669] focus:bg-white transition"
                     />
                     {attachments.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {attachments.map((file, i) => (
                           <div
                             key={i}
-                            className="group relative rounded border border-slate-700 bg-slate-900 p-1"
+                            className="group relative rounded-lg border border-[#e2e8f0] bg-white p-1"
                           >
                             <img
                               src={file.url}
                               alt={file.filename}
-                              className="h-10 w-10 object-cover opacity-80"
+                              className="h-10 w-10 object-cover rounded"
                             />
                             <button
                               type="button"
                               onClick={() =>
                                 setAttachments((prev) => prev.filter((_, idx) => idx !== i))
                               }
-                              className="absolute -right-1.5 -top-1.5 rounded-full bg-slate-800 p-0.5 text-slate-400 opacity-0 hover:text-rose-400 group-hover:opacity-100 transition"
+                              className="absolute -right-1.5 -top-1.5 rounded-full bg-rose-600 p-0.5 text-white shadow-xs transition"
                             >
                               <X className="h-3 w-3" />
                             </button>
@@ -417,16 +421,16 @@ function SupportPage() {
                           type="button"
                           onClick={() => fileInputRef.current?.click()}
                           disabled={uploading || attachments.length >= 3}
-                          className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-emerald-400 disabled:opacity-50"
+                          className="flex items-center gap-1.5 text-xs font-bold text-[#64748b] hover:text-[#059669] disabled:opacity-50 cursor-pointer"
                         >
                           {uploading ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-[#059669]" />
                           ) : (
                             <Paperclip className="h-3.5 w-3.5" />
                           )}
-                          {uploading ? "Uploading..." : "Attach"}
+                          {uploading ? "Uploading..." : "Attach File"}
                         </button>
-                        <span className="text-[11px] text-slate-600">{reply.length}/5000</span>
+                        <span className="text-[10px] text-[#94a3b8]">{reply.length}/5000</span>
                       </div>
                       <button
                         type="submit"
@@ -435,14 +439,14 @@ function SupportPage() {
                           replyMutation.isPending ||
                           uploading
                         }
-                        className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 transition hover:bg-emerald-400 disabled:opacity-40"
+                        className="inline-flex h-9 items-center gap-2 rounded-xl bg-[#059669] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857] disabled:opacity-40 cursor-pointer"
                       >
                         {replyMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
                         ) : (
-                          <Send className="h-4 w-4" />
+                          <Send className="h-3.5 w-3.5" />
                         )}
-                        {replyMutation.isPending ? "Sending..." : "Send reply"}
+                        <span>{replyMutation.isPending ? "Sending..." : "Send Reply"}</span>
                       </button>
                     </div>
                   </form>
@@ -478,11 +482,13 @@ function SummaryCard({
   icon: typeof Inbox;
 }) {
   return (
-    <div className="flex items-center gap-3 bg-[#0b1826] p-4">
-      <Icon className="h-5 w-5 text-slate-500 shrink-0" />
+    <div className="flex items-center gap-3.5 bg-white p-5">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#059669] shadow-2xs">
+        <Icon className="h-5 w-5" />
+      </div>
       <div>
-        <p className="text-xl font-bold text-white">{value}</p>
-        <p className="text-[11px] text-slate-500">{label}</p>
+        <p className="text-2xl font-black text-[#0f172a]">{value}</p>
+        <p className="text-[11px] font-bold text-[#64748b]">{label}</p>
       </div>
     </div>
   );
@@ -492,12 +498,12 @@ function SummaryCard({
 function StatusBadge({ status }: { status: SupportTicket["status"] }) {
   const styles =
     status === "open"
-      ? "bg-emerald-500/10 text-emerald-400"
+      ? "bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0]"
       : status === "in_progress" || status === "waiting_reply"
-        ? "bg-cyan-500/10 text-cyan-400"
-        : "bg-slate-700/60 text-slate-400";
+        ? "bg-[#f0f9ff] text-[#0284c7] border border-[#bae6fd]"
+        : "bg-[#f8fafc] text-[#64748b] border border-[#e2e8f0]";
   return (
-    <span className={`shrink-0 rounded px-2 py-1 text-[10px] font-semibold uppercase ${styles}`}>
+    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase ${styles}`}>
       {status.replace(/_/g, " ")}
     </span>
   );
@@ -518,22 +524,22 @@ function Message({
 }) {
   return (
     <div className={`flex flex-col ${isTenant ? "items-end" : "items-start"}`}>
-      <div className="mb-1.5 flex items-center gap-2 px-1 text-[11px] text-slate-500">
-        <span className="font-semibold text-slate-300">{author}</span>
+      <div className="mb-1 flex items-center gap-2 px-1 text-[11px] font-semibold text-[#64748b]">
+        <span className="text-[#0f172a] font-extrabold">{author}</span>
         <span>{format(new Date(date), "MMM d, h:mm a")}</span>
       </div>
       <div
-        className={`max-w-[88%] whitespace-pre-wrap rounded-xl px-4 py-3 text-sm leading-6 ${
+        className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-xs leading-relaxed font-medium shadow-2xs ${
           isTenant
-            ? "bg-emerald-500/12 text-emerald-50 border border-emerald-500/20"
-            : "border border-slate-700/50 bg-slate-800 text-slate-200"
+            ? "bg-[#059669] text-white rounded-br-xs"
+            : "border border-[#e2e8f0] bg-white text-[#0f172a] rounded-bl-xs"
         }`}
       >
         {content}
       </div>
       {attachments && attachments.length > 0 && (
         <div
-          className={`mt-2 flex flex-wrap gap-2 max-w-[88%] ${isTenant ? "justify-end" : "justify-start"}`}
+          className={`mt-2 flex flex-wrap gap-2 max-w-[85%] ${isTenant ? "justify-end" : "justify-start"}`}
         >
           {attachments.map((file, i) => (
             <a
@@ -541,12 +547,12 @@ function Message({
               href={file.url}
               target="_blank"
               rel="noreferrer"
-              className="group relative block overflow-hidden rounded-lg border border-slate-700 bg-slate-900"
+              className="group relative block overflow-hidden rounded-xl border border-[#e2e8f0] bg-white p-1 shadow-2xs"
             >
               <img
                 src={file.url}
                 alt={file.filename}
-                className="h-20 w-auto object-cover opacity-90 transition group-hover:opacity-100"
+                className="h-20 w-auto object-cover rounded-lg"
               />
             </a>
           ))}
@@ -571,9 +577,9 @@ function Centered({
   return (
     <div className="flex min-h-64 flex-1 flex-col items-center justify-center p-8 text-center">
       {icon}
-      <h3 className="mt-3 text-sm font-semibold text-slate-300">{title}</h3>
+      <h3 className="mt-3 text-sm font-extrabold text-[#0f172a]">{title}</h3>
       {description && (
-        <p className="mt-1 max-w-xs text-xs leading-5 text-slate-500">{description}</p>
+        <p className="mt-1 max-w-xs text-xs leading-relaxed text-[#64748b]">{description}</p>
       )}
       {action && <div className="mt-3">{action}</div>}
     </div>
@@ -596,7 +602,7 @@ function CreateTicketModal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/60 p-4 backdrop-blur-xs"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form
@@ -604,26 +610,26 @@ function CreateTicketModal({
           e.preventDefault();
           onSubmit();
         }}
-        className="w-full max-w-xl rounded-xl border border-slate-700 bg-[#0b1826] shadow-2xl"
+        className="w-full max-w-xl rounded-2xl border border-[#e2e8f0] bg-white shadow-2xl overflow-hidden"
       >
-        <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-[#f1f5f9] px-6 py-4 bg-[#f8fafc]">
           <div>
-            <h2 className="font-semibold text-white">Create support ticket</h2>
-            <p className="mt-1 text-xs text-slate-500">
-              Include enough detail for the team to investigate quickly.
+            <h2 className="font-extrabold text-base text-[#0f172a]">Create Support Ticket</h2>
+            <p className="mt-0.5 text-xs text-[#64748b]">
+              Include enough detail for our technical engineers to assist quickly.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded text-slate-500 hover:bg-slate-800 hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748b] hover:bg-white hover:text-[#0f172a] cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid gap-4 p-5 sm:grid-cols-2">
-          <label className="sm:col-span-2 text-xs font-medium text-slate-300">
+        <div className="grid gap-4 p-6 sm:grid-cols-2">
+          <label className="sm:col-span-2 text-xs font-bold text-[#0f172a]">
             Subject *
             <input
               required
@@ -631,17 +637,17 @@ function CreateTicketModal({
               maxLength={200}
               value={form.subject}
               onChange={(e) => setForm({ ...form, subject: e.target.value })}
-              placeholder="e.g. Cannot publish my website"
-              className="mt-1.5 h-10 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100 outline-none transition focus:border-emerald-500"
+              placeholder="e.g. Need assistance with custom domain verification"
+              className="mt-1.5 h-10 w-full rounded-xl border border-[#e2e8f0] bg-white px-3 text-xs font-semibold text-[#0f172a] outline-none focus:border-[#059669]"
             />
           </label>
 
-          <label className="text-xs font-medium text-slate-300">
+          <label className="text-xs font-bold text-[#0f172a]">
             Category
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="mt-1.5 h-10 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100"
+              className="mt-1.5 h-10 w-full rounded-xl border border-[#e2e8f0] bg-white px-3 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer"
             >
               <option>Technical</option>
               <option>Billing</option>
@@ -652,14 +658,14 @@ function CreateTicketModal({
             </select>
           </label>
 
-          <label className="text-xs font-medium text-slate-300">
+          <label className="text-xs font-bold text-[#0f172a]">
             Priority
             <select
               value={form.priority}
               onChange={(e) =>
                 setForm({ ...form, priority: e.target.value as SupportTicket["priority"] })
               }
-              className="mt-1.5 h-10 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 text-sm text-slate-100"
+              className="mt-1.5 h-10 w-full rounded-xl border border-[#e2e8f0] bg-white px-3 text-xs font-bold text-[#0f172a] outline-none focus:border-[#059669] cursor-pointer"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -668,7 +674,7 @@ function CreateTicketModal({
             </select>
           </label>
 
-          <label className="sm:col-span-2 text-xs font-medium text-slate-300">
+          <label className="sm:col-span-2 text-xs font-bold text-[#0f172a]">
             Description *
             <textarea
               required
@@ -676,20 +682,20 @@ function CreateTicketModal({
               maxLength={5000}
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Describe the issue: what happened, what you expected, and any error messages."
-              className="mt-1.5 h-40 w-full resize-none rounded-lg border border-slate-700 bg-slate-950 p-3 text-sm text-slate-100 outline-none transition focus:border-emerald-500"
+              placeholder="Describe what happened, error codes or logs, and what you expected."
+              className="mt-1.5 h-36 w-full resize-none rounded-xl border border-[#e2e8f0] bg-white p-3 text-xs font-semibold text-[#0f172a] outline-none focus:border-[#059669]"
             />
-            <span className="mt-1 block text-right text-[10px] text-slate-600">
+            <span className="mt-1 block text-right text-[10px] text-[#94a3b8]">
               {form.description.length}/5000
             </span>
           </label>
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-800 px-5 py-4">
+        <div className="flex justify-end gap-2.5 border-t border-[#f1f5f9] bg-[#f8fafc] px-6 py-4">
           <button
             type="button"
             onClick={onClose}
-            className="h-9 rounded-lg px-4 text-sm text-slate-400 hover:text-white"
+            className="rounded-xl border border-[#e2e8f0] px-4 py-2 text-xs font-bold text-[#64748b] hover:bg-white hover:text-[#0f172a] cursor-pointer"
           >
             Cancel
           </button>
