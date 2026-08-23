@@ -16,7 +16,9 @@ const router = Router();
  */
 router.post("/", async (req, res) => {
   try {
-    const payload = req.body || {};
+    const raw = req.body || {};
+    // Resend wraps the payload in req.body.data for email.received events
+    const payload = raw.data || raw;
 
     let fromEmail = "";
     let fromName = "";
@@ -27,7 +29,7 @@ router.post("/", async (req, res) => {
     let messageId = "";
     let attachments = [];
 
-    // 1. Resend Inbound Payload Format (or Cloudflare / Postmark / Sendgrid normalized)
+    // 1. Resend / Cloudflare / Postmark / SendGrid Payload Format
     if (payload.from) {
       if (typeof payload.from === "string") {
         const match = payload.from.match(/(.*)<(.+)>/);
@@ -37,6 +39,14 @@ router.post("/", async (req, res) => {
         } else {
           fromEmail = payload.from.trim().toLowerCase();
         }
+      } else if (Array.isArray(payload.from) && payload.from.length > 0) {
+        const firstFrom = payload.from[0];
+        if (typeof firstFrom === "string") {
+          fromEmail = firstFrom.toLowerCase();
+        } else if (firstFrom?.email) {
+          fromEmail = firstFrom.email.toLowerCase();
+          fromName = firstFrom.name || "";
+        }
       } else if (payload.from.email) {
         fromEmail = payload.from.email.toLowerCase();
         fromName = payload.from.name || "";
@@ -45,16 +55,22 @@ router.post("/", async (req, res) => {
 
     if (payload.to) {
       if (Array.isArray(payload.to)) {
-        toEmail = payload.to[0]?.email || payload.to[0] || "support@webmintra.in";
+        const firstTo = payload.to[0];
+        toEmail = typeof firstTo === "string" ? firstTo : firstTo?.email || "support@webmintra.in";
       } else if (typeof payload.to === "string") {
         toEmail = payload.to;
       }
     }
 
-    subject = payload.subject || payload.Subject || "No Subject";
-    htmlBody = payload.html || payload.HtmlBody || payload["body-html"] || payload.htmlBody || "";
-    textBody = payload.text || payload.TextBody || payload["body-plain"] || payload.textBody || "";
-    messageId = payload.messageId || payload.MessageID || payload.id || `inb_${Date.now()}`;
+    subject = payload.subject || payload.Subject || raw.subject || "No Subject";
+    let rawHtml = payload.html || payload.HtmlBody || payload["body-html"] || payload.htmlBody || "";
+    let rawText = payload.text || payload.TextBody || payload["body-plain"] || payload.textBody || "";
+    messageId = payload.email_id || payload.messageId || payload.MessageID || payload.id || raw.id || `inb_${Date.now()}`;
+
+    // Clean and unwrap raw MIME RFC 822 stream if passed from Cloudflare Worker
+    const parsedMime = parseMimeContent(rawText || rawHtml);
+    textBody = parsedMime.text || rawText || "";
+    htmlBody = parsedMime.html || rawHtml || (textBody ? `<p>${textBody.replace(/\n/g, "<br/>")}</p>` : "");
 
     // Handle Attachments
     if (Array.isArray(payload.attachments)) {
@@ -67,6 +83,7 @@ router.post("/", async (req, res) => {
     }
 
     if (!fromEmail) {
+      console.warn("[Inbound Webhook Warning] Received payload without identifiable fromEmail:", JSON.stringify(raw));
       return res.status(400).json({ message: "Sender email is missing from payload." });
     }
 
@@ -154,5 +171,58 @@ router.post("/", async (req, res) => {
     return res.status(500).json({ message: "Failed to process inbound email: " + error.message });
   }
 });
+
+function decodeQuotedPrintable(str) {
+  return str
+    .replace(/=\r?\n/g, "")
+    .replace(/=([0-9A-Fa-f]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
+function parseMimeContent(content) {
+  if (!content || typeof content !== "string") return { text: "", html: "" };
+  if (!content.startsWith("Received:") && !content.includes("ARC-Seal:") && !content.includes("MIME-Version:")) {
+    return { text: content, html: "" };
+  }
+
+  const parts = content.split(/\r?\n\r?\n/);
+  const headers = parts[0] || "";
+  const body = parts.slice(1).join("\n\n");
+
+  const boundaryMatch = headers.match(/boundary=["']?([^"';\r\n]+)["']?/i);
+  if (boundaryMatch) {
+    const boundary = boundaryMatch[1].trim();
+    const sections = body.split(new RegExp(`--${boundary.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")}`));
+    let plainText = "";
+    let htmlText = "";
+
+    for (const sec of sections) {
+      if (sec.trim().endsWith("--")) continue;
+      const subParts = sec.split(/\r?\n\r?\n/);
+      if (subParts.length < 2) continue;
+      const subHeaders = subParts[0];
+      let subContent = subParts.slice(1).join("\n\n").trim();
+
+      if (/Content-Transfer-Encoding:\s*base64/i.test(subHeaders)) {
+        try {
+          subContent = Buffer.from(subContent.replace(/\s+/g, ""), "base64").toString("utf-8");
+        } catch {}
+      } else if (/Content-Transfer-Encoding:\s*quoted-printable/i.test(subHeaders)) {
+        subContent = decodeQuotedPrintable(subContent);
+      }
+
+      if (/Content-Type:\s*text\/html/i.test(subHeaders)) {
+        htmlText = subContent;
+      } else if (/Content-Type:\s*text\/plain/i.test(subHeaders)) {
+        plainText = subContent;
+      }
+    }
+
+    if (plainText || htmlText) {
+      return { text: plainText || htmlText.replace(/<[^>]*>?/gm, "").trim(), html: htmlText };
+    }
+  }
+
+  return { text: body.trim(), html: `<p>${body.trim().replace(/\n/g, "<br/>")}</p>` };
+}
 
 export default router;
