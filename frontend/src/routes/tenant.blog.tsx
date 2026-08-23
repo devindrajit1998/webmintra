@@ -5,6 +5,7 @@ import { getTenantBlogPosts, createTenantBlogPost, deleteTenantBlogPost } from "
 import { useTenantContext } from "@/components/TenantDashboard";
 import { Loader2, FileText, Globe, Search, Plus, Edit, Trash2, Calendar } from "lucide-react";
 import { format } from "date-fns";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export const Route = createFileRoute("/tenant/blog")({
   component: BlogPage,
@@ -22,6 +23,7 @@ function BlogPage() {
     slug: "",
     content: "",
     excerpt: "",
+    coverImage: "",
     status: "draft",
   });
 
@@ -42,7 +44,7 @@ function BlogPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tenantBlog", selectedWebsiteId] });
       setIsCreateOpen(false);
-      setForm({ title: "", slug: "", content: "", excerpt: "", status: "draft" });
+      setForm({ title: "", slug: "", content: "", excerpt: "", coverImage: "", status: "draft" });
     },
   });
 
@@ -147,6 +149,19 @@ function BlogPage() {
                     placeholder="Brief summary for search engines and social previews..."
                   />
                 </label>
+                <div className="col-span-full">
+                  <label className="block text-xs font-bold text-[#0f172a] mb-1.5">
+                    Cover Image
+                  </label>
+                  <ImageUpload
+                    value={form.coverImage}
+                    onChange={(url) => setForm({ ...form, coverImage: url })}
+                    placeholder="Select cover image from library or upload"
+                    title="Select Article Cover"
+                    aspectRatioHint="16:9 widescreen recommended"
+                    websiteId={selectedWebsiteId}
+                  />
+                </div>
                 <label className="col-span-full text-xs font-bold text-[#0f172a]">
                   Content (Markdown) *
                   <textarea

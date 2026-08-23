@@ -27,6 +27,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as VerifyPasswordResetRouteImport } from './routes/verify-password-reset'
 import { Route as AdminActivityLogsRouteImport } from './routes/admin.activity-logs'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin.announcements'
+import { Route as AdminBackupRouteImport } from './routes/admin.backup'
 import { Route as AdminBlogRouteImport } from './routes/admin.blog'
 import { Route as AdminCouponsRouteImport } from './routes/admin.coupons'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
@@ -34,6 +35,8 @@ import { Route as AdminDomainsRouteImport } from './routes/admin.domains'
 import { Route as AdminEmailTemplatesRouteImport } from './routes/admin.email-templates'
 import { Route as AdminFaqsRouteImport } from './routes/admin.faqs'
 import { Route as AdminKbRouteImport } from './routes/admin.kb'
+import { Route as AdminLeadsRouteImport } from './routes/admin.leads'
+import { Route as AdminMailboxRouteImport } from './routes/admin.mailbox'
 import { Route as AdminNotificationsRouteImport } from './routes/admin.notifications'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPlansRouteImport } from './routes/admin.plans'
@@ -67,6 +70,7 @@ import { Route as TenantSettingsRouteImport } from './routes/tenant.settings'
 import { Route as TenantSubscriptionRouteImport } from './routes/tenant.subscription'
 import { Route as TenantSupportRouteImport } from './routes/tenant.support'
 import { Route as TenantWebsitesRouteImport } from './routes/tenant.websites'
+import { Route as TenantWhatsappRouteImport } from './routes/tenant.whatsapp'
 import { Route as AdminTenantsIndexRouteImport } from './routes/admin.tenants.index'
 import { Route as AdminTenantsIdRouteImport } from './routes/admin.tenants.$id'
 import { Route as TenantBuilderIdRouteImport } from './routes/tenant_.builder.$id'
@@ -163,6 +167,11 @@ const AdminAnnouncementsRoute = AdminAnnouncementsRouteImport.update({
   path: '/announcements',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBackupRoute = AdminBackupRouteImport.update({
+  id: '/backup',
+  path: '/backup',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminBlogRoute = AdminBlogRouteImport.update({
   id: '/blog',
   path: '/blog',
@@ -196,6 +205,16 @@ const AdminFaqsRoute = AdminFaqsRouteImport.update({
 const AdminKbRoute = AdminKbRouteImport.update({
   id: '/kb',
   path: '/kb',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLeadsRoute = AdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMailboxRoute = AdminMailboxRouteImport.update({
+  id: '/mailbox',
+  path: '/mailbox',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
@@ -363,6 +382,11 @@ const TenantWebsitesRoute = TenantWebsitesRouteImport.update({
   path: '/websites',
   getParentRoute: () => TenantRoute,
 } as any)
+const TenantWhatsappRoute = TenantWhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
+  getParentRoute: () => TenantRoute,
+} as any)
 const AdminTenantsIndexRoute = AdminTenantsIndexRouteImport.update({
   id: '/tenants/',
   path: '/tenants/',
@@ -403,6 +427,7 @@ export interface FileRoutesByFullPath {
   '/verify-password-reset': typeof VerifyPasswordResetRoute
   '/admin/activity-logs': typeof AdminActivityLogsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/backup': typeof AdminBackupRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -410,6 +435,8 @@ export interface FileRoutesByFullPath {
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/kb': typeof AdminKbRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/mailbox': typeof AdminMailboxRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/plans': typeof AdminPlansRoute
@@ -441,6 +468,7 @@ export interface FileRoutesByFullPath {
   '/tenant/subscription': typeof TenantSubscriptionRoute
   '/tenant/support': typeof TenantSupportRoute
   '/tenant/websites': typeof TenantWebsitesRoute
+  '/tenant/whatsapp': typeof TenantWhatsappRoute
   '/blog/': typeof BlogIndexRoute
   '/tenant/': typeof TenantIndexRoute
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
@@ -466,6 +494,7 @@ export interface FileRoutesByTo {
   '/verify-password-reset': typeof VerifyPasswordResetRoute
   '/admin/activity-logs': typeof AdminActivityLogsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/backup': typeof AdminBackupRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -473,6 +502,8 @@ export interface FileRoutesByTo {
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/kb': typeof AdminKbRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/mailbox': typeof AdminMailboxRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/plans': typeof AdminPlansRoute
@@ -504,6 +535,7 @@ export interface FileRoutesByTo {
   '/tenant/subscription': typeof TenantSubscriptionRoute
   '/tenant/support': typeof TenantSupportRoute
   '/tenant/websites': typeof TenantWebsitesRoute
+  '/tenant/whatsapp': typeof TenantWhatsappRoute
   '/blog': typeof BlogIndexRoute
   '/tenant': typeof TenantIndexRoute
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
@@ -531,6 +563,7 @@ export interface FileRoutesById {
   '/verify-password-reset': typeof VerifyPasswordResetRoute
   '/admin/activity-logs': typeof AdminActivityLogsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
+  '/admin/backup': typeof AdminBackupRoute
   '/admin/blog': typeof AdminBlogRoute
   '/admin/coupons': typeof AdminCouponsRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -538,6 +571,8 @@ export interface FileRoutesById {
   '/admin/email-templates': typeof AdminEmailTemplatesRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/kb': typeof AdminKbRoute
+  '/admin/leads': typeof AdminLeadsRoute
+  '/admin/mailbox': typeof AdminMailboxRoute
   '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/plans': typeof AdminPlansRoute
@@ -569,6 +604,7 @@ export interface FileRoutesById {
   '/tenant/subscription': typeof TenantSubscriptionRoute
   '/tenant/support': typeof TenantSupportRoute
   '/tenant/websites': typeof TenantWebsitesRoute
+  '/tenant/whatsapp': typeof TenantWhatsappRoute
   '/blog/': typeof BlogIndexRoute
   '/tenant/': typeof TenantIndexRoute
   '/admin/tenants/$id': typeof AdminTenantsIdRoute
@@ -597,6 +633,7 @@ export interface FileRouteTypes {
     | '/verify-password-reset'
     | '/admin/activity-logs'
     | '/admin/announcements'
+    | '/admin/backup'
     | '/admin/blog'
     | '/admin/coupons'
     | '/admin/dashboard'
@@ -604,6 +641,8 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/faqs'
     | '/admin/kb'
+    | '/admin/leads'
+    | '/admin/mailbox'
     | '/admin/notifications'
     | '/admin/payments'
     | '/admin/plans'
@@ -635,6 +674,7 @@ export interface FileRouteTypes {
     | '/tenant/subscription'
     | '/tenant/support'
     | '/tenant/websites'
+    | '/tenant/whatsapp'
     | '/blog/'
     | '/tenant/'
     | '/admin/tenants/$id'
@@ -660,6 +700,7 @@ export interface FileRouteTypes {
     | '/verify-password-reset'
     | '/admin/activity-logs'
     | '/admin/announcements'
+    | '/admin/backup'
     | '/admin/blog'
     | '/admin/coupons'
     | '/admin/dashboard'
@@ -667,6 +708,8 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/faqs'
     | '/admin/kb'
+    | '/admin/leads'
+    | '/admin/mailbox'
     | '/admin/notifications'
     | '/admin/payments'
     | '/admin/plans'
@@ -698,6 +741,7 @@ export interface FileRouteTypes {
     | '/tenant/subscription'
     | '/tenant/support'
     | '/tenant/websites'
+    | '/tenant/whatsapp'
     | '/blog'
     | '/tenant'
     | '/admin/tenants/$id'
@@ -724,6 +768,7 @@ export interface FileRouteTypes {
     | '/verify-password-reset'
     | '/admin/activity-logs'
     | '/admin/announcements'
+    | '/admin/backup'
     | '/admin/blog'
     | '/admin/coupons'
     | '/admin/dashboard'
@@ -731,6 +776,8 @@ export interface FileRouteTypes {
     | '/admin/email-templates'
     | '/admin/faqs'
     | '/admin/kb'
+    | '/admin/leads'
+    | '/admin/mailbox'
     | '/admin/notifications'
     | '/admin/payments'
     | '/admin/plans'
@@ -762,6 +809,7 @@ export interface FileRouteTypes {
     | '/tenant/subscription'
     | '/tenant/support'
     | '/tenant/websites'
+    | '/tenant/whatsapp'
     | '/blog/'
     | '/tenant/'
     | '/admin/tenants/$id'
@@ -920,6 +968,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnnouncementsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/backup': {
+      id: '/admin/backup'
+      path: '/backup'
+      fullPath: '/admin/backup'
+      preLoaderRoute: typeof AdminBackupRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/blog': {
       id: '/admin/blog'
       path: '/blog'
@@ -967,6 +1022,20 @@ declare module '@tanstack/react-router' {
       path: '/kb'
       fullPath: '/admin/kb'
       preLoaderRoute: typeof AdminKbRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/leads': {
+      id: '/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AdminLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/mailbox': {
+      id: '/admin/mailbox'
+      path: '/mailbox'
+      fullPath: '/admin/mailbox'
+      preLoaderRoute: typeof AdminMailboxRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/notifications': {
@@ -1200,6 +1269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TenantWebsitesRouteImport
       parentRoute: typeof TenantRoute
     }
+    '/tenant/whatsapp': {
+      id: '/tenant/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/tenant/whatsapp'
+      preLoaderRoute: typeof TenantWhatsappRouteImport
+      parentRoute: typeof TenantRoute
+    }
     '/admin/tenants/': {
       id: '/admin/tenants/'
       path: '/tenants'
@@ -1234,6 +1310,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminActivityLogsRoute: typeof AdminActivityLogsRoute
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
+  AdminBackupRoute: typeof AdminBackupRoute
   AdminBlogRoute: typeof AdminBlogRoute
   AdminCouponsRoute: typeof AdminCouponsRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -1241,6 +1318,8 @@ interface AdminRouteChildren {
   AdminEmailTemplatesRoute: typeof AdminEmailTemplatesRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminKbRoute: typeof AdminKbRoute
+  AdminLeadsRoute: typeof AdminLeadsRoute
+  AdminMailboxRoute: typeof AdminMailboxRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPlansRoute: typeof AdminPlansRoute
@@ -1263,6 +1342,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminActivityLogsRoute: AdminActivityLogsRoute,
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
+  AdminBackupRoute: AdminBackupRoute,
   AdminBlogRoute: AdminBlogRoute,
   AdminCouponsRoute: AdminCouponsRoute,
   AdminDashboardRoute: AdminDashboardRoute,
@@ -1270,6 +1350,8 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEmailTemplatesRoute: AdminEmailTemplatesRoute,
   AdminFaqsRoute: AdminFaqsRoute,
   AdminKbRoute: AdminKbRoute,
+  AdminLeadsRoute: AdminLeadsRoute,
+  AdminMailboxRoute: AdminMailboxRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPlansRoute: AdminPlansRoute,
@@ -1308,6 +1390,7 @@ interface TenantRouteChildren {
   TenantSubscriptionRoute: typeof TenantSubscriptionRoute
   TenantSupportRoute: typeof TenantSupportRoute
   TenantWebsitesRoute: typeof TenantWebsitesRoute
+  TenantWhatsappRoute: typeof TenantWhatsappRoute
   TenantIndexRoute: typeof TenantIndexRoute
 }
 
@@ -1328,6 +1411,7 @@ const TenantRouteChildren: TenantRouteChildren = {
   TenantSubscriptionRoute: TenantSubscriptionRoute,
   TenantSupportRoute: TenantSupportRoute,
   TenantWebsitesRoute: TenantWebsitesRoute,
+  TenantWhatsappRoute: TenantWhatsappRoute,
   TenantIndexRoute: TenantIndexRoute,
 }
 

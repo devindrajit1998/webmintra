@@ -94,6 +94,7 @@ export async function submitPublicContactForm(data: {
   phone?: string;
   subject?: string;
   message: string;
+  recaptchaToken?: string;
 }): Promise<{ message: string }> {
   const response = await fetch(`${API_URL}/public/contact`, {
     method: "POST",

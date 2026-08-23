@@ -148,6 +148,12 @@ router.post("/", async (req, res, next) => {
         monthly: b.pricing?.monthly ?? null,
         yearly: b.pricing?.yearly ?? null,
       },
+      originalPricing: {
+        monthly: b.originalPricing?.monthly ?? null,
+        yearly: b.originalPricing?.yearly ?? null,
+      },
+      discountBadge: b.discountBadge?.trim() || "",
+      isOfferActive: Boolean(b.isOfferActive),
       currency: b.currency?.toUpperCase() || "INR",
       trialDays: b.trialDays ?? 0,
       limits: {
@@ -208,6 +214,8 @@ router.patch("/:planId", async (req, res, next) => {
     const update = stripUndefined({
       name: b.name?.trim(),
       description: b.description?.trim(),
+      discountBadge: b.discountBadge !== undefined ? b.discountBadge.trim() : undefined,
+      isOfferActive: b.isOfferActive !== undefined ? Boolean(b.isOfferActive) : undefined,
       currency: b.currency?.toUpperCase(),
       trialDays: b.trialDays,
       sortOrder: b.sortOrder,
@@ -220,6 +228,10 @@ router.patch("/:planId", async (req, res, next) => {
     if (b.pricing) {
       if (b.pricing.monthly !== undefined) update[`pricing.monthly`] = b.pricing.monthly;
       if (b.pricing.yearly !== undefined) update[`pricing.yearly`] = b.pricing.yearly;
+    }
+    if (b.originalPricing) {
+      if (b.originalPricing.monthly !== undefined) update[`originalPricing.monthly`] = b.originalPricing.monthly;
+      if (b.originalPricing.yearly !== undefined) update[`originalPricing.yearly`] = b.originalPricing.yearly;
     }
 
     if (limits) {

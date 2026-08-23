@@ -28,6 +28,9 @@ import onboardingRouter from "./routes/onboarding.js";
 import billingRouter from "./routes/billing.js";
 import workspaceRouter from "./routes/workspace.js";
 import pluginsRouter from "./routes/plugins.js";
+import tenantWhatsAppRouter from "./routes/tenantWhatsApp.js";
+import { tenantWhatsAppManager } from "./services/TenantWhatsAppManager.js";
+import { whatsAppQueueService } from "./services/WhatsAppQueueService.js";
 
 // ── Admin Platform Routes ──
 import adminDashboardRouter from "./routes/admin/dashboard.js";
@@ -56,6 +59,12 @@ import adminTestimonialsRouter from "./routes/admin/testimonials.js";
 import adminFaqsRouter from "./routes/admin/faqs.js";
 import adminUploadRouter from "./routes/admin/upload.js";
 import adminWhatsAppRouter from "./routes/admin/whatsapp.js";
+import adminLeadsRouter from "./routes/admin/leads.js";
+import adminMailboxRouter from "./routes/admin/mailbox.js";
+import adminBackupRouter from "./routes/admin/backup.js";
+import mediaRouter from "./routes/media.js";
+import inboundEmailWebhookRouter from "./routes/webhooks/inboundEmail.js";
+import razorpayWebhookRouter from "./routes/webhooks/razorpay.js";
 import { initCronJobs } from "./services/cron.js";
 import { initWhatsAppClient } from "./services/whatsapp.js";
 
@@ -151,6 +160,8 @@ app.use("/api/domains", domainsRouter);
 app.use("/api/onboarding", onboardingLimiter, onboardingRouter);
 app.use("/api/billing", billingRouter);
 app.use("/api/workspace", workspaceRouter);
+app.use("/api/media", mediaRouter);
+app.use("/api/workspace/whatsapp", tenantWhatsAppRouter);
 app.use("/api/plugins", pluginsRouter);
 
 // ── Public Settings Endpoint (no auth) ─────────────────────────
@@ -184,6 +195,13 @@ app.use("/api/admin/testimonials", adminTestimonialsRouter);
 app.use("/api/admin/faqs", adminFaqsRouter);
 app.use("/api/admin/upload", adminUploadRouter);
 app.use("/api/admin/whatsapp", adminWhatsAppRouter);
+app.use("/api/admin/leads", adminLeadsRouter);
+app.use("/api/admin/mailbox", adminMailboxRouter);
+app.use("/api/admin/backup", adminBackupRouter);
+
+// ── Inbound Webhooks (Resend / Cloudflare / Postmark / Brevo & Razorpay) ──
+app.use("/api/webhooks/inbound-email", inboundEmailWebhookRouter);
+app.use("/api/webhooks/razorpay", razorpayWebhookRouter);
 
 // ── Public APIs ──────────────────────────────────────────────────
 app.use("/api/public", publicSubmissionsLimiter, publicRouter);
@@ -359,9 +377,13 @@ mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
     app.listen(port, () => {
-      // Initialize Free Self-Hosted WhatsApp Engine (Baileys)
-      initWhatsAppClient().catch((err) => console.error("[WhatsApp] Startup error:", err.message));
       console.log(`Backend server listening on port ${port}`);
+      // 1. Recover active multi-tenant WhatsApp sessions
+      tenantWhatsAppManager.restoreAllSessions().catch((err) =>
+        console.error("[Tenant WhatsApp] Session recovery error:", err.message)
+      );
+      // 2. Start background message queue worker
+      whatsAppQueueService.startWorker();
     });
     initCronJobs();
   })

@@ -2,7 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTenantContext } from "@/components/TenantDashboard";
-import { deleteWebsiteForm, getWebsiteForms, type FormSubmission } from "@/lib/auth-api";
+import {
+  deleteWebsiteForm,
+  getWebsiteForms,
+  sendTenantWhatsAppMessage,
+  type FormSubmission,
+} from "@/lib/auth-api";
 import { format } from "date-fns";
 import {
   Copy,
@@ -15,6 +20,8 @@ import {
   MoreHorizontal,
   Trash2,
   X,
+  MessageSquare,
+  Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -26,6 +33,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
@@ -45,6 +53,8 @@ function FormsPage() {
   const [selectedWebsiteId, setSelectedWebsiteId] = useState("");
   const [viewSubmission, setViewSubmission] = useState<FormSubmission | null>(null);
   const [deleteSubmission, setDeleteSubmission] = useState<FormSubmission | null>(null);
+  const [whatsappLead, setWhatsappLead] = useState<FormSubmission | null>(null);
+  const [followupMessage, setFollowupMessage] = useState("");
 
   const activeWebsiteId = selectedWebsiteId || websites[0]?.id || "";
   const queryKey = ["website-forms", activeWebsiteId];
@@ -55,10 +65,43 @@ function FormsPage() {
   });
 
   const forms = useMemo(() => data?.forms ?? [], [data?.forms]);
-  const columns = useMemo(
-    () => Array.from(new Set(forms.flatMap((submission) => Object.keys(submission.data ?? {})))),
-    [forms],
-  );
+  const columns = useMemo(() => {
+    const keys = new Set<string>();
+    forms.forEach((submission) => {
+      // 1. Keys from the submission.data object
+      if (submission.data && typeof submission.data === "object") {
+        Object.keys(submission.data).forEach((k) => keys.add(k));
+      }
+      // 2. Fallbacks if data object is empty but top-level fields exist
+      if (submission.contactName) keys.add("name");
+      if (submission.contactPhone) keys.add("phone");
+      if (submission.contactEmail) keys.add("email");
+    });
+    const arr = Array.from(keys);
+    // If no keys could be found, provide standard fallback columns
+    if (arr.length === 0 && forms.length > 0) {
+      return ["name", "phone", "email"];
+    }
+    return arr;
+  }, [forms]);
+
+  function getFieldValue(submission: FormSubmission, col: string) {
+    if (
+      submission.data &&
+      typeof submission.data === "object" &&
+      submission.data[col] !== undefined
+    ) {
+      return submission.data[col];
+    }
+    const lk = col.toLowerCase();
+    if (lk === "name" || lk === "fullname" || lk === "contactname")
+      return submission.contactName || "-";
+    if (lk === "phone" || lk === "mobile" || lk === "whatsapp" || lk === "contactphone") {
+      return submission.contactPhone ? `+${submission.contactPhone}` : "-";
+    }
+    if (lk === "email" || lk === "contactemail") return submission.contactEmail || "-";
+    return null;
+  }
 
   const deleteMutation = useMutation({
     mutationFn: (submissionId: string) => deleteWebsiteForm(activeWebsiteId, submissionId),
@@ -197,9 +240,10 @@ function FormsPage() {
                         key={column}
                         className="max-w-xs truncate px-6 py-4 text-xs font-bold text-[#0f172a]"
                       >
-                        {formatValue(submission.data[column])}
+                        {formatValue(getFieldValue(submission, column))}
                       </td>
                     ))}
+
                     <td className="whitespace-nowrap px-6 py-4 text-right text-xs">
                       <span className="font-mono font-bold text-[#64748b]">
                         #{submission._id.slice(-8)}
@@ -220,6 +264,18 @@ function FormsPage() {
                           align="end"
                           className="border-[#e2e8f0] bg-white text-[#0f172a] shadow-xl"
                         >
+                          <DropdownMenuItem
+                            onSelect={() => {
+                              setWhatsappLead(submission);
+                              const name = submission.contactName || "there";
+                              setFollowupMessage(
+                                `Hi ${name}, this is regarding your recent enquiry on our website. How can we assist you today?`,
+                              );
+                            }}
+                            className="text-[#059669] focus:bg-[#ecfdf5] focus:text-[#047857] cursor-pointer font-bold"
+                          >
+                            <MessageSquare className="mr-2 h-4 w-4" /> Follow up on WhatsApp
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onSelect={() => setViewSubmission(submission)}
                             className="cursor-pointer"
@@ -255,6 +311,104 @@ function FormsPage() {
         </div>
       )}
 
+      {/* WhatsApp Follow-up Modal */}
+      {whatsappLead && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-[#0f172a]/60 p-4 backdrop-blur-xs">
+          <section className="w-full max-w-lg rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-2xl animate-in zoom-in-95">
+            <div className="flex items-start justify-between gap-4 border-b border-[#f1f5f9] pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
+                  <MessageSquare className="h-4 w-4" />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-[#0f172a]">
+                    WhatsApp Lead Follow-up
+                  </h2>
+                  <p className="text-xs text-[#64748b]">
+                    Send a direct message to this customer from your linked WhatsApp.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setWhatsappLead(null)}
+                className="rounded-lg p-1.5 text-[#94a3b8] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const phone =
+                  whatsappLead.contactPhone ||
+                  (Object.values(whatsappLead.data || {}).find(
+                    (v) => typeof v === "string" && /\d{10}/.test(v),
+                  ) as string);
+
+                if (!phone) {
+                  toast.error("No valid phone number found in this lead submission.");
+                  return;
+                }
+
+                try {
+                  await sendTenantWhatsAppMessage({
+                    leadId: whatsappLead._id,
+                    recipient: phone,
+                    message: followupMessage.trim(),
+                  });
+                  toast.success(`Message queued for delivery to +${phone}!`);
+                  setWhatsappLead(null);
+                } catch (err: any) {
+                  toast.error(err.message || "Failed to send follow-up message.");
+                }
+              }}
+              className="mt-4 space-y-4"
+            >
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] mb-1">
+                  Recipient Contact
+                </label>
+                <div className="rounded-xl border border-[#cbd5e1] bg-[#f8fafc] px-3 py-2 text-xs font-mono font-bold text-[#0f172a]">
+                  {whatsappLead.contactPhone ||
+                    whatsappLead.contactName ||
+                    `Lead #${whatsappLead._id.slice(-8)}`}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#0f172a] mb-1">Message Text</label>
+                <textarea
+                  rows={4}
+                  required
+                  value={followupMessage}
+                  onChange={(e) => setFollowupMessage(e.target.value)}
+                  className="w-full rounded-xl border border-[#cbd5e1] p-3 text-xs text-[#0f172a] outline-none focus:border-[#059669] focus:ring-1 focus:ring-[#059669]"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setWhatsappLead(null)}
+                  className="rounded-xl border border-[#cbd5e1] px-4 py-2 text-xs font-bold text-[#64748b] hover:bg-[#f8fafc]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!followupMessage.trim()}
+                  className="inline-flex items-center gap-2 rounded-xl bg-[#059669] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#047857] disabled:opacity-50"
+                >
+                  <Send className="h-3.5 w-3.5" /> Send Message
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
+
       {viewSubmission && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-[#0f172a]/60 p-4 backdrop-blur-xs">
           <section className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-2xl animate-in zoom-in-95">
@@ -267,25 +421,80 @@ function FormsPage() {
               </div>
               <button
                 type="button"
+                aria-label="Close details"
                 onClick={() => setViewSubmission(null)}
-                aria-label="Close submission details"
-                className="rounded-lg p-1.5 text-[#64748b] hover:bg-[#f8fafc] hover:text-[#0f172a] cursor-pointer"
+                className="rounded-lg p-2 text-[#64748b] transition-colors hover:bg-[#f8fafc] hover:text-[#0f172a] cursor-pointer"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
-            <dl className="mt-5 grid gap-3">
-              {Object.entries(viewSubmission.data).map(([key, value]) => (
-                <div key={key} className="rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
-                  <dt className="text-[10px] font-extrabold uppercase tracking-wide text-[#64748b]">
-                    {key.replaceAll("_", " ")}
-                  </dt>
-                  <dd className="mt-1 whitespace-pre-wrap break-words text-xs font-bold text-[#0f172a]">
-                    {displayValue(value)}
-                  </dd>
+            <div className="mt-6 space-y-4">
+              <div className="grid gap-3 rounded-xl border border-[#f1f5f9] bg-[#f8fafc] p-4 text-xs sm:grid-cols-2">
+                <div>
+                  <span className="font-bold text-[#64748b]">Submitted:</span>{" "}
+                  <span className="font-semibold text-[#0f172a]">
+                    {format(new Date(viewSubmission.createdAt), "PPP p")}
+                  </span>
                 </div>
-              ))}
-            </dl>
+                <div>
+                  <span className="font-bold text-[#64748b]">Source:</span>{" "}
+                  <span className="rounded-full bg-white px-2 py-0.5 font-mono font-bold text-[#059669] border border-[#e2e8f0]">
+                    {viewSubmission.source || "public_site"}
+                  </span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#64748b]">
+                  Form Fields
+                </h3>
+                <div className="overflow-hidden rounded-xl border border-[#e2e8f0]">
+                  <table className="min-w-full divide-y divide-[#f1f5f9] text-left text-xs">
+                    <tbody className="divide-y divide-[#f1f5f9] bg-white">
+                      {viewSubmission.contactName && (
+                        <tr>
+                          <td className="w-1/3 bg-[#f8fafc] px-4 py-2.5 font-bold text-[#475569]">
+                            Contact Name
+                          </td>
+                          <td className="px-4 py-2.5 font-semibold text-[#0f172a]">
+                            {viewSubmission.contactName}
+                          </td>
+                        </tr>
+                      )}
+                      {viewSubmission.contactPhone && (
+                        <tr>
+                          <td className="w-1/3 bg-[#f8fafc] px-4 py-2.5 font-bold text-[#475569]">
+                            WhatsApp Phone
+                          </td>
+                          <td className="px-4 py-2.5 font-mono font-bold text-[#059669]">
+                            +{viewSubmission.contactPhone}
+                          </td>
+                        </tr>
+                      )}
+                      {viewSubmission.contactEmail && (
+                        <tr>
+                          <td className="w-1/3 bg-[#f8fafc] px-4 py-2.5 font-bold text-[#475569]">
+                            Contact Email
+                          </td>
+                          <td className="px-4 py-2.5 font-semibold text-[#0f172a]">
+                            {viewSubmission.contactEmail}
+                          </td>
+                        </tr>
+                      )}
+                      {Object.entries(viewSubmission.data ?? {}).map(([key, val]) => (
+                        <tr key={key}>
+                          <td className="w-1/3 bg-[#f8fafc] px-4 py-2.5 font-bold text-[#475569]">
+                            {key.replaceAll("_", " ")}
+                          </td>
+                          <td className="px-4 py-2.5 font-semibold text-[#0f172a]">
+                            {displayValue(val)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </section>
         </div>
       )}

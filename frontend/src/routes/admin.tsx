@@ -26,6 +26,9 @@ import {
   HardDrive,
   Quote,
   HelpCircle,
+  UserCheck,
+  Inbox,
+  CloudUpload,
 } from "lucide-react";
 import { clearSessionUser, getAuthenticatedUser, type SessionUser } from "@/lib/auth-api";
 import { apiFetch, clearCsrfToken } from "@/lib/api-fetch";
@@ -38,6 +41,8 @@ export const Route = createFileRoute("/admin")({
 
 const navigation = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/admin/dashboard" },
+  { label: "Mailbox (Inbox)", icon: Inbox, to: "/admin/mailbox" },
+  { label: "Leads (CRM)", icon: UserCheck, to: "/admin/leads" },
   { label: "Tenants", icon: Users, to: "/admin/tenants" },
   { label: "Websites", icon: Monitor, to: "/admin/websites" },
   { label: "Templates", icon: Boxes, to: "/admin/templates" },
@@ -62,7 +67,8 @@ const content = [
 
 const system = [
   { label: "Reports", icon: BarChart, to: "/admin/reports" },
-  { label: "Storage", icon: HardDrive, to: "/admin/storage" },
+  { label: "Storage & Database", icon: HardDrive, to: "/admin/storage" },
+  { label: "Database Backups", icon: CloudUpload, to: "/admin/backup" },
   { label: "Email Templates", icon: Mail, to: "/admin/email-templates" },
   { label: "SEO & Settings", icon: SearchCheck, to: "/admin/settings" },
   { label: "Activity Logs", icon: Database, to: "/admin/activity-logs" },

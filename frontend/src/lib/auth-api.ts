@@ -104,7 +104,6 @@ export async function googleSignIn(credential: string): Promise<ApiResponse> {
   return authRequest("/google", { credential });
 }
 
-
 const SESSION_USER_KEY = "webmintra:session-user";
 
 export function saveSessionUser(user: SessionUser) {
@@ -661,6 +660,9 @@ export type OnboardingPlan = {
   slug: string;
   description: string;
   pricing: { monthly: number; yearly: number };
+  originalPricing?: { monthly?: number | null; yearly?: number | null };
+  discountBadge?: string;
+  isOfferActive?: boolean;
   currency: string;
   trialDays: number;
   maxPages: number;
@@ -1081,7 +1083,7 @@ export function toggleWebsitePlugin(websiteId: string, pluginSlug: string, isEna
   return pluginRequest<{ message: string; plugin: InstalledPlugin }>(`/${websiteId}/toggle`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pluginSlug, isEnabled }),
+    body: JSON.stringify({ pluginSlug, slug: pluginSlug, isEnabled, enabled: isEnabled }),
   });
 }
 
@@ -1096,7 +1098,7 @@ export function saveWebsitePluginConfig(
     {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ config, isEnabled }),
+      body: JSON.stringify({ pluginSlug, slug: pluginSlug, config, isEnabled, enabled: isEnabled }),
     },
   );
 }
@@ -1115,4 +1117,78 @@ async function pluginRequest<T>(path: string, options: RequestInit = {}): Promis
     .catch(() => ({ message: "Unable to process plugin request." }));
   if (!response.ok) throw new Error(payload.message ?? "Unable to process plugin request.");
   return payload as T;
+}
+
+// ── Tenant Workspace WhatsApp APIs ────────────────────────────
+export function getTenantWhatsAppStatus() {
+  return workspaceRequest<any>("/whatsapp/status");
+}
+
+export function connectTenantWhatsApp() {
+  return workspaceRequest<any>("/whatsapp/connect", { method: "POST" });
+}
+
+export function reconnectTenantWhatsApp() {
+  return workspaceRequest<any>("/whatsapp/reconnect", { method: "POST" });
+}
+
+export function logoutTenantWhatsApp() {
+  return workspaceRequest<any>("/whatsapp/logout", { method: "POST" });
+}
+
+export function getTenantWhatsAppSettings() {
+  return workspaceRequest<any>("/whatsapp/settings");
+}
+
+export function updateTenantWhatsAppSettings(data: any) {
+  return workspaceRequest<any>("/whatsapp/settings", {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function testTenantWhatsAppMessage(phone: string) {
+  return workspaceRequest<any>("/whatsapp/test-message", {
+    method: "POST",
+    body: JSON.stringify({ phone }),
+  });
+}
+
+export function sendTenantWhatsAppMessage(data: {
+  leadId?: string;
+  recipient: string;
+  message: string;
+}) {
+  return workspaceRequest<any>("/whatsapp/send-message", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function getTenantWhatsAppMessages(params?: { page?: number; limit?: number }) {
+  const q = new URLSearchParams(params as any).toString();
+  return workspaceRequest<any>(`/whatsapp/messages${q ? `?${q}` : ""}`);
+}
+
+export function getTenantWhatsAppCampaigns() {
+  return workspaceRequest<any>("/whatsapp/campaigns");
+}
+
+export function createTenantWhatsAppCampaign(data: { name: string; message: string }) {
+  return workspaceRequest<any>("/whatsapp/campaigns", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function pauseTenantWhatsAppCampaign(id: string) {
+  return workspaceRequest<any>(`/whatsapp/campaigns/${id}/pause`, { method: "POST" });
+}
+
+export function resumeTenantWhatsAppCampaign(id: string) {
+  return workspaceRequest<any>(`/whatsapp/campaigns/${id}/resume`, { method: "POST" });
+}
+
+export function cancelTenantWhatsAppCampaign(id: string) {
+  return workspaceRequest<any>(`/whatsapp/campaigns/${id}/cancel`, { method: "POST" });
 }

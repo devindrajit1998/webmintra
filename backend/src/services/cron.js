@@ -5,6 +5,7 @@ import { Subscription } from "../models/Subscription.js";
 import { Payment } from "../models/Payment.js";
 import { sendRawEmail } from "./mail.js";
 import { Notification } from "../models/Notification.js";
+import { runDatabaseBackup, isR2Configured } from "./backup.js";
 
 /**
  * Initializes and starts all background cron jobs.
@@ -155,6 +156,45 @@ export function initCronJobs() {
             }
         } catch (error) {
             console.error("[CRON] Error processing dunning:", error);
+        }
+    });
+
+    // 5. Automated Daily Database Backup to Cloudflare R2
+    // Runs daily at 2:00 AM (IST-adjusted: UTC 20:30 = IST 02:00)
+    cron.schedule("30 20 * * *", async () => {
+        console.log("[CRON] Starting automated daily database backup to Cloudflare R2...");
+        try {
+            if (!isR2Configured()) {
+                console.warn("[CRON] R2 backup skipped: Cloudflare R2 credentials not configured.");
+                return;
+            }
+
+            const result = await runDatabaseBackup();
+            console.log(`[CRON] Daily backup completed! File: ${result.key} | Documents: ${result.totalDocuments} | Compressed: ${result.compressedSizeKb} KB | Duration: ${result.durationMs}ms`);
+
+            // Notify admin of successful backup
+            const adminEmail = process.env.ADMIN_INBOX_FORWARD_EMAIL;
+            if (adminEmail) {
+                sendRawEmail({
+                    to: adminEmail,
+                    subject: `✅ WebMintra Daily Backup Successful – ${new Date().toLocaleDateString("en-IN")}`,
+                    html: `<p>Your daily WebMintra database backup completed successfully.</p><ul><li><strong>File:</strong> ${result.key}</li><li><strong>Documents backed up:</strong> ${result.totalDocuments}</li><li><strong>Compressed size:</strong> ${result.compressedSizeKb} KB</li><li><strong>Duration:</strong> ${result.durationMs}ms</li></ul><p>View and download backups in your <a href="https://webmintra.in/admin/storage">Admin Storage Dashboard</a>.</p>`,
+                    text: `Daily backup complete. File: ${result.key} | Documents: ${result.totalDocuments} | Size: ${result.compressedSizeKb} KB`,
+                }).catch((e) => console.warn("[CRON] Backup notification email failed:", e.message));
+            }
+        } catch (error) {
+            console.error("[CRON] Daily R2 backup failed:", error.message);
+
+            // Alert admin of backup failure
+            const adminEmail = process.env.ADMIN_INBOX_FORWARD_EMAIL;
+            if (adminEmail) {
+                sendRawEmail({
+                    to: adminEmail,
+                    subject: `❌ WebMintra Daily Backup FAILED – ${new Date().toLocaleDateString("en-IN")}`,
+                    html: `<p>Your daily database backup failed.</p><p><strong>Error:</strong> ${error.message}</p><p>Please check your Cloudflare R2 configuration in the Admin Settings.</p>`,
+                    text: `Daily backup failed: ${error.message}`,
+                }).catch(() => {});
+            }
         }
     });
 

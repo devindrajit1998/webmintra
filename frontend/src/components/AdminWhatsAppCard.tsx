@@ -80,13 +80,16 @@ export function AdminWhatsAppCard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-extrabold text-[#0b192c]">WhatsApp Lead Notification Engine</h2>
+              <h2 className="text-base font-extrabold text-[#0b192c]">
+                WhatsApp Lead Notification Engine
+              </h2>
               <span className="rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 text-[10px] font-extrabold text-[#047857]">
                 Free / Zero Cost
               </span>
             </div>
             <p className="mt-0.5 text-xs text-[#64748b]">
-              Self-hosted Baileys client. Link once using QR code to send instant WhatsApp alerts when leads submit forms.
+              Self-hosted Baileys client. Link once using QR code to send instant WhatsApp alerts
+              when leads submit forms.
             </p>
           </div>
         </div>
@@ -120,13 +123,19 @@ export function AdminWhatsAppCard() {
                 <div>
                   <h4 className="text-sm font-extrabold">Device Connected & Active</h4>
                   <p className="text-xs text-[#065f46] mt-0.5">
-                    Your Node server is paired with WhatsApp. Lead form submissions will be automatically forwarded to tenants.
+                    Your Node server is paired with WhatsApp. Lead form submissions will be
+                    automatically forwarded to tenants.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-2">
-                <span className="text-xs text-[#64748b]">Session stored locally in <code className="text-[#0f172a] font-mono bg-white px-1.5 py-0.5 rounded border border-[#cbd5e1]">.whatsapp-auth</code></span>
+                <span className="text-xs text-[#64748b]">
+                  Session stored locally in{" "}
+                  <code className="text-[#0f172a] font-mono bg-white px-1.5 py-0.5 rounded border border-[#cbd5e1]">
+                    .whatsapp-auth
+                  </code>
+                </span>
                 <button
                   type="button"
                   onClick={() => logoutMutation.mutate()}
@@ -153,18 +162,28 @@ export function AdminWhatsAppCard() {
                 </div>
                 <h4 className="text-sm font-bold text-[#0f172a]">How to connect:</h4>
                 <ol className="list-decimal list-inside space-y-1 text-xs text-[#64748b] leading-relaxed">
-                  <li>Open <strong>WhatsApp</strong> on your phone</li>
-                  <li>Go to <strong>Settings</strong> ➔ <strong>Linked Devices</strong></li>
-                  <li>Tap <strong>Link a Device</strong> and point your camera at this QR code</li>
+                  <li>
+                    Open <strong>WhatsApp</strong> on your phone
+                  </li>
+                  <li>
+                    Go to <strong>Settings</strong> ➔ <strong>Linked Devices</strong>
+                  </li>
+                  <li>
+                    Tap <strong>Link a Device</strong> and point your camera at this QR code
+                  </li>
                 </ol>
-                <p className="text-[11px] text-[#94a3b8]">Auto-refreshes automatically until paired.</p>
+                <p className="text-[11px] text-[#94a3b8]">
+                  Auto-refreshes automatically until paired.
+                </p>
               </div>
             </div>
           ) : (
             <div className="text-center py-8 space-y-3">
               <AlertCircle className="mx-auto h-8 w-8 text-amber-500" />
               <div>
-                <h4 className="text-sm font-extrabold text-[#0f172a]">WhatsApp Client Disconnected</h4>
+                <h4 className="text-sm font-extrabold text-[#0f172a]">
+                  WhatsApp Client Disconnected
+                </h4>
                 <p className="text-xs text-[#64748b] max-w-sm mx-auto mt-0.5">
                   Click the button below to start the Baileys client and generate a new QR code.
                 </p>
@@ -185,7 +204,9 @@ export function AdminWhatsAppCard() {
         {/* Test Message Box */}
         <div className="lg:col-span-5 flex flex-col justify-between rounded-xl border border-[#e2e8f0] bg-white p-5">
           <div>
-            <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#64748b]">Send Test Alert</h3>
+            <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#64748b]">
+              Send Test Alert
+            </h3>
             <p className="mt-1 text-xs text-[#64748b]">
               Verify your connected number by sending a test alert to any WhatsApp mobile number.
             </p>
@@ -224,7 +245,9 @@ export function AdminWhatsAppCard() {
 
           <div className="mt-4 rounded-lg bg-[#f8fafc] p-2.5 text-[11px] text-[#64748b] flex items-center gap-2 border border-[#f1f5f9]">
             <ShieldCheck className="h-4 w-4 text-[#059669] shrink-0" />
-            <span>Encrypted directly from your server over official WhatsApp WebSocket protocol.</span>
+            <span>
+              Encrypted directly from your server over official WhatsApp WebSocket protocol.
+            </span>
           </div>
         </div>
       </div>

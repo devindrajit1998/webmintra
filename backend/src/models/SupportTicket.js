@@ -19,9 +19,12 @@ const supportTicketSchema = new mongoose.Schema(
     tenant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
       index: true,
     },
+    contactName: { type: String, trim: true, default: "" },
+    contactEmail: { type: String, trim: true, default: "" },
+    contactPhone: { type: String, trim: true, default: "" },
     subject: { type: String, required: true, trim: true, maxlength: 200 },
     description: { type: String, required: true, maxlength: 5000 },
     status: { type: String, enum: TICKET_STATUSES, default: "open", index: true },

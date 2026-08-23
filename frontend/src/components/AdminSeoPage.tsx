@@ -6,11 +6,13 @@ import {
   Loader2,
   Save,
   SearchCheck,
-  Share2,
   Upload,
+  Layers,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { MediaLibraryModal } from "@/components/ui/media-library-modal";
 import { getSettings, updateSeoSettings, uploadAdminFile } from "@/lib/admin-api";
 
 type SeoForm = {
@@ -467,22 +469,25 @@ function ImageField({
   error,
   busy,
   onChange,
-  onUpload,
   compact,
 }: {
   label: string;
   value: string;
   error?: string | undefined;
-  busy: boolean;
+  busy?: boolean;
   onChange: (value: string) => void;
-  onUpload: (file?: File) => void;
+  onUpload?: (file?: File) => void;
   compact?: boolean | undefined;
 }) {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <Field label={label} error={error}>
       <div className="flex items-start gap-3">
         <div
-          className={`${compact ? "h-16 w-16" : "h-20 w-32"} grid shrink-0 place-items-center overflow-hidden rounded-xl border border-[#cbd5e1] bg-[#f8fafc]`}
+          onClick={() => setModalOpen(true)}
+          className={`${compact ? "h-16 w-16" : "h-20 w-32"} grid shrink-0 place-items-center overflow-hidden rounded-xl border border-[#cbd5e1] bg-[#f8fafc] cursor-pointer hover:border-[#059669] hover:bg-[#ecfdf5]/30 transition shadow-2xs`}
+          title="Click to choose image from library"
         >
           {value ? (
             <img src={value} alt="" className="h-full w-full object-contain p-1" />
@@ -498,26 +503,42 @@ function ImageField({
             onChange={(e) => onChange(e.target.value)}
             className={input(error)}
           />
-          <label className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#475569] shadow-2xs transition hover:border-[#a7f3d0] hover:bg-[#ecfdf5] hover:text-[#047857]">
-            <input
-              type="file"
-              accept="image/*"
-              disabled={busy}
-              className="sr-only"
-              onChange={(e) => {
-                onUpload(e.target.files?.[0]);
-                e.currentTarget.value = "";
-              }}
-            />
-            {busy ? (
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-[#ea580c]" />
-            ) : (
-              <Upload className="h-3.5 w-3.5 text-[#ea580c]" />
-            )}{" "}
-            Upload Image
-          </label>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-bold text-[#0f172a] shadow-2xs transition hover:border-[#059669] hover:bg-[#ecfdf5] hover:text-[#047857]"
+            >
+              <Layers className="h-3.5 w-3.5 text-[#059669]" />
+              {value ? "Choose from Library / Replace" : "Select or Upload Image"}
+            </button>
+            {value && (
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-200 bg-[#fff1f2] text-rose-600 hover:bg-rose-100 transition cursor-pointer"
+                title="Remove image"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      <MediaLibraryModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSelect={(url) => {
+          onChange(url);
+          toast.success(`${label} updated from library.`);
+        }}
+        title={`Select ${label}`}
+        initialSelectedUrl={value}
+        aspectRatioHint={
+          compact ? "Square format (e.g. 512x512)" : "1200x630 Social Card recommended"
+        }
+      />
     </Field>
   );
 }

@@ -95,6 +95,22 @@ const DEFAULT_CATALOG: PluginCatalogItem[] = [
         helpText: "Text displayed next to the WhatsApp icon.",
       },
       {
+        name: "popupHeader",
+        label: "Chat Popup Header",
+        type: "text",
+        placeholder: "Chat with us on WhatsApp",
+        required: false,
+        helpText: "Title displayed at the top of the chat widget.",
+      },
+      {
+        name: "popupSubheader",
+        label: "Chat Popup Subheader / Reply Time",
+        type: "text",
+        placeholder: "Typically replies within a few minutes",
+        required: false,
+        helpText: "Status or sub-text below the title.",
+      },
+      {
         name: "buttonPosition",
         label: "Position on Screen",
         type: "select",
@@ -112,7 +128,8 @@ function TenantPluginsPage() {
   const { websites } = useTenantContext();
   const queryClient = useQueryClient();
 
-  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>(websites[0]?.id || "");
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>(() => websites[0]?.id || "");
+  const activeWebsiteId = selectedWebsiteId || websites[0]?.id || "";
 
   useEffect(() => {
     if (!selectedWebsiteId && websites.length > 0) {
@@ -125,24 +142,43 @@ function TenantPluginsPage() {
     installed?: InstalledPlugin;
   } | null>(null);
 
-  const currentWebsite = websites.find((w) => w.id === selectedWebsiteId);
+  const currentWebsite = websites.find((w) => w.id === activeWebsiteId);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["website-plugins", selectedWebsiteId],
-    queryFn: () => getWebsitePlugins(selectedWebsiteId),
-    enabled: Boolean(selectedWebsiteId),
+    queryKey: ["website-plugins", activeWebsiteId],
+    queryFn: () => getWebsitePlugins(activeWebsiteId),
+    enabled: Boolean(activeWebsiteId),
   });
 
   const catalog = data?.catalog?.length ? data.catalog : DEFAULT_CATALOG;
   const installedPlugins = data?.plugins || [];
 
+  // Resolve the installed plugin for the currently-open config modal.
+  // Uses fresh cache data if available, falls back to the snapshot stored in state.
+  const activeInstalledPlugin = activeConfigPlugin
+    ? (installedPlugins.find((p) => p.pluginSlug === activeConfigPlugin.catalog.slug) ??
+      activeConfigPlugin.installed)
+    : undefined;
+
   const toggleMutation = useMutation({
-    mutationFn: ({ slug, isEnabled }: { slug: string; isEnabled: boolean }) =>
-      toggleWebsitePlugin(selectedWebsiteId, slug, isEnabled),
+    mutationFn: ({
+      websiteId,
+      slug,
+      isEnabled,
+    }: {
+      websiteId: string;
+      slug: string;
+      isEnabled: boolean;
+    }) => {
+      if (!websiteId) {
+        throw new Error("No website selected.");
+      }
+      return toggleWebsitePlugin(websiteId, slug, isEnabled);
+    },
     onSuccess: (_, variables) => {
       toast.success(variables.isEnabled ? "App activated on your website!" : "App disabled.");
       queryClient.invalidateQueries({
-        queryKey: ["website-plugins", selectedWebsiteId],
+        queryKey: ["website-plugins", variables.websiteId],
       });
     },
     onError: (err: any) => {
@@ -181,7 +217,7 @@ function TenantPluginsPage() {
             <div className="flex items-center gap-2 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-1.5 px-3">
               <span className="text-xs font-bold text-[#64748b]">Website:</span>
               <select
-                value={selectedWebsiteId}
+                value={activeWebsiteId}
                 onChange={(e) => setSelectedWebsiteId(e.target.value)}
                 className="bg-transparent text-xs font-extrabold text-[#0f172a] outline-none cursor-pointer"
               >
@@ -267,6 +303,7 @@ function TenantPluginsPage() {
                         type="button"
                         onClick={() =>
                           toggleMutation.mutate({
+                            websiteId: activeWebsiteId,
                             slug: plugin.slug,
                             isEnabled: !isEnabled,
                           })
@@ -284,7 +321,7 @@ function TenantPluginsPage() {
                         />
                       </button>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#059669] bg-[#ecfdf5] border border-[#a7f3d0] px-2.5 py-1 rounded-full">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#059669] bg-[#ecfdf5] border border-[#a7f3d0] px-2.5 py-1 rounded-full">
                         <CheckCircle2 className="h-3 w-3" /> Included
                       </span>
                     )}
@@ -370,13 +407,33 @@ function TenantPluginsPage() {
       {/* Configuration Modal */}
       {activeConfigPlugin && (
         <ConfigPluginModal
-          websiteId={selectedWebsiteId}
+          key={activeConfigPlugin.catalog.slug}
+          websiteId={activeWebsiteId}
           plugin={activeConfigPlugin.catalog}
-          installed={activeConfigPlugin.installed}
+          installed={activeInstalledPlugin}
           onClose={() => setActiveConfigPlugin(null)}
-          onSaved={() => {
+          onSaved={(savedPlugin?: InstalledPlugin) => {
+            if (savedPlugin) {
+              // Update local cache immediately for instant UI reflection
+              queryClient.setQueryData(["website-plugins", activeWebsiteId], (oldData: any) => {
+                if (!oldData) return oldData;
+                const existingList = oldData.plugins || [];
+                const exists = existingList.some(
+                  (p: any) => p.pluginSlug === savedPlugin.pluginSlug,
+                );
+                const updatedPlugins = exists
+                  ? existingList.map((p: any) =>
+                      p.pluginSlug === savedPlugin.pluginSlug ? savedPlugin : p,
+                    )
+                  : [...existingList, savedPlugin];
+                return { ...oldData, plugins: updatedPlugins };
+              });
+              // Update the active plugin state so re-opening shows the saved data
+              setActiveConfigPlugin((prev) => (prev ? { ...prev, installed: savedPlugin } : null));
+            }
+            // Refresh from server in background
             queryClient.invalidateQueries({
-              queryKey: ["website-plugins", selectedWebsiteId],
+              queryKey: ["website-plugins", activeWebsiteId],
             });
             setActiveConfigPlugin(null);
           }}
@@ -397,22 +454,32 @@ function ConfigPluginModal({
   plugin: PluginCatalogItem;
   installed?: InstalledPlugin;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (savedPlugin?: InstalledPlugin) => void;
 }) {
-  const [config, setConfig] = useState<Record<string, any>>({
+  // Initialize config ONCE from installed data — never reset it mid-edit.
+  // The `key` prop on this component ensures a fresh mount when a different plugin is opened.
+  const [config, setConfig] = useState<Record<string, any>>(() => ({
     ...plugin.defaultConfig,
     ...(installed?.config || {}),
-  });
+  }));
   const [isEnabled, setIsEnabled] = useState<boolean>(installed?.isEnabled ?? true);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Only sync `isEnabled` if it changes externally (e.g. toggled on card while modal is open)
+  // Do NOT sync `config` here — that would wipe user's typed input!
+  useEffect(() => {
+    if (installed?.isEnabled !== undefined) {
+      setIsEnabled(installed.isEnabled);
+    }
+  }, [installed?.isEnabled]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await saveWebsitePluginConfig(websiteId, plugin.slug, config, isEnabled);
+      const res = await saveWebsitePluginConfig(websiteId, plugin.slug, config, isEnabled);
       toast.success(`${plugin.name} settings saved successfully!`);
-      onSaved();
+      onSaved(res.plugin);
     } catch (err: any) {
       toast.error(err.message || "Failed to save settings");
     } finally {

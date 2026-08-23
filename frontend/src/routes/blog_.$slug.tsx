@@ -183,12 +183,12 @@ function SingleBlogPostPage() {
   }
 
   return (
-    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+    <div className="landing-page min-h-screen flex flex-col justify-between tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
       {/* ── GLOBAL HEADER NAVIGATION ─────────────────────────────────── */}
       <PublicHeader />
 
       {/* ── MAIN ARTICLE CONTAINER (Aligned with Landing max-w-7xl) ──── */}
-      <main className="mx-auto max-w-7xl px-5 sm:px-6 py-10 lg:py-14">
+      <main className="flex-1 w-full mx-auto max-w-7xl px-5 sm:px-6 py-10 lg:py-14">
         {/* Back Link & Category */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <Link

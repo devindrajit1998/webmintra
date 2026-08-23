@@ -15,7 +15,7 @@ router.get("/plans", async (_request, response, next) => {
     try {
         const plans = await Plan.find({ status: "active", isPublic: true })
             .sort({ sortOrder: 1, createdAt: 1 })
-            .select("name slug description pricing currency trialDays limits features highlights sortOrder")
+            .select("name slug description pricing originalPricing discountBadge isOfferActive currency trialDays limits features highlights sortOrder")
             .lean();
         return response.json({
             plans: plans.map((plan) => ({

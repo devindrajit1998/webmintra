@@ -128,49 +128,49 @@ export function LandingPage() {
   const defaultTemplates = [
     {
       id: "tpl-healthcare",
-      title: "Dental & Healthcare",
-      subtitle: "Dr. Sharma Dental, Greater Kailash Delhi",
-      category: "Healthcare",
+      title: "Clinic & Healthcare",
+      subtitle: "Dr. Sharma Dental Clinic, Greater Kailash",
+      category: "Clinic",
       thumbnailUrl:
         "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800",
     },
     {
       id: "tpl-fitness",
-      title: "Gym & CrossFit",
-      subtitle: "Apex Fitness Studio, Indiranagar Bengaluru",
-      category: "Fitness",
+      title: "Gym & Fitness Studio",
+      subtitle: "Apex Fitness & Gym, Indiranagar",
+      category: "Gym",
       thumbnailUrl:
         "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800",
     },
     {
       id: "tpl-restaurant",
-      title: "Fine Dining & Cafe",
-      subtitle: "Saffron Dining & Cafe, Bandra Mumbai",
+      title: "Restaurant & Cafe",
+      subtitle: "Saffron Dining & Cafe, Bandra",
       category: "Restaurant",
       thumbnailUrl:
         "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800",
     },
     {
       id: "tpl-salon",
-      title: "Bridal Salon & Spa",
-      subtitle: "Elegance Bridal & Spa, Jubilee Hills Hyderabad",
+      title: "Salon & Spa",
+      subtitle: "Elegance Bridal & Beauty Spa, Jubilee Hills",
       category: "Salon",
       thumbnailUrl:
         "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=800",
     },
     {
-      id: "tpl-travel",
-      title: "Tours & Resorts",
-      subtitle: "Royal Rajasthan & Kerala Backwaters",
-      category: "Travel",
+      id: "tpl-realestate",
+      title: "Real Estate & Builders",
+      subtitle: "Skyline Properties & Housing, Whitefield",
+      category: "Real Estate",
       thumbnailUrl:
-        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&q=80&w=800",
+        "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=800",
     },
     {
       id: "tpl-consultant",
-      title: "CA & Tax Advisory",
+      title: "CA / Professional Services",
       subtitle: "R.K. Agarwal & Co., Chartered Accountants",
-      category: "Consultant",
+      category: "CA / Professional Services",
       thumbnailUrl:
         "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=800",
     },
@@ -240,49 +240,49 @@ export function LandingPage() {
                 {/* Eyebrow Pill */}
                 <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11.5px] font-bold text-[#c2410c] shadow-2xs">
                   <span className="text-sm">🇮🇳</span>
-                  <span>BHARAT&apos;S #1 WEBSITE BUILDER FOR BUSINESSES</span>
+                  <span>WEBSITE BUILDER FOR SMALL BUSINESSES</span>
                 </div>
 
                 {/* Headline */}
-                <h1 className="max-w-xl text-[40px] font-extrabold text-[#0f172a] leading-[1.08] sm:text-[52px] lg:text-[56px]">
-                  Your business <br />
-                  deserves a website <br />
-                  that <span className="text-[#ea580c]">works</span> as hard <br />
-                  as <span className="text-[#059669]">you do.</span>
+                <h1 className="max-w-xl text-[40px] font-extrabold text-[#0f172a] leading-[1.12] sm:text-[50px] lg:text-[54px] tracking-tight">
+                  Build a Professional <br />
+                  Business Website That <br />
+                  <span className="text-[#ea580c]">Works</span>{" "}
+                  <span className="text-[#059669]">for You</span>
                 </h1>
 
-                <p className="mt-5 text-[16px] sm:text-[17.5px] text-[#475569] leading-relaxed max-w-lg">
-                  Launch a high-converting website with <strong>direct WhatsApp leads</strong>,{" "}
-                  <strong>instant UPI payments</strong>, and <strong>free .in domain</strong>. No
-                  coding or developers needed.
+                <p className="mt-5 text-[16px] sm:text-[17px] text-[#475569] leading-relaxed max-w-lg">
+                  Create a professional website for your small business with Webmintra. Choose a
+                  ready-made template, customize your business content, connect your domain, and
+                  publish your website without needing a developer.
                 </p>
 
                 {/* CTAs */}
                 <div className="mt-7 flex flex-wrap items-center gap-3.5">
                   <Link
                     to={primaryRoute}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[#ea580c] px-6 text-[14.5px] font-bold text-white shadow-[0_4px_14px_rgba(234,88,12,0.35)] transition hover:bg-[#c2410c]"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#059669] px-6 text-[14.5px] font-extrabold text-white shadow-sm transition hover:bg-[#047857] active:scale-[0.98]"
                   >
                     Create Your Website <ArrowRight className="h-4 w-4" />
                   </Link>
                   <a
                     href="#templates"
-                    className="inline-flex h-12 items-center justify-center rounded-lg border border-[#cbd5e1] bg-white px-5 text-[14.5px] font-bold text-[#0f172a] shadow-sm transition hover:bg-[#f8fafc]"
+                    className="inline-flex h-12 items-center justify-center rounded-xl border border-[#cbd5e1] bg-white px-5 text-[14.5px] font-bold text-[#0f172a] shadow-2xs transition hover:bg-[#f8fafc]"
                   >
                     Explore Templates
                   </a>
                 </div>
 
-                {/* Indian Business Trust Indicators */}
+                {/* Small Trust Line */}
                 <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] font-bold text-[#475569]">
                   <span className="flex items-center gap-1.5 text-[#059669]">
-                    <span>💬</span> Direct WhatsApp Leads
+                    <Check className="h-3.5 w-3.5 text-[#059669]" /> No credit card required
                   </span>
                   <span className="flex items-center gap-1.5 text-[#ea580c]">
                     <span>🇮🇳</span> Free .in / .com Domain
                   </span>
                   <span className="flex items-center gap-1.5 text-[#1d4ed8]">
-                    <span>⚡</span> Instant UPI & QR Pay
+                    <span>⚡</span> Launch in 5 minutes
                   </span>
                 </div>
               </div>
@@ -482,43 +482,66 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ── 4. PROBLEM VS SOLUTION (WITH 'VS' BADGE) ─────────────── */}
-        <section className="px-6 py-16 lg:py-20 bg-white border-b border-[#e2e8f0]">
+        {/* ── 4. PROBLEM VS SOLUTION (WHY CHOOSE WEBMINTRA) ─────────── */}
+        <section
+          id="why-webmintra"
+          className="px-6 py-16 lg:py-20 bg-white border-b border-[#e2e8f0]"
+        >
           <div className="mx-auto max-w-6xl">
+            {/* Section Header */}
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#ea580c] block mb-2">
+                WHY CHOOSE WEBMINTRA
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0f172a] tracking-tight">
+                Everything You Need to Build Your Business Website
+              </h2>
+              <p className="mt-3 text-sm text-[#475569] leading-relaxed">
+                Skip the complexity of traditional website development. Webmintra gives small
+                businesses a simpler way to create, customize and manage a professional website.
+              </p>
+            </div>
+
             <div className="grid lg:grid-cols-[1fr_auto_1fr_1.15fr] gap-5 lg:gap-6 items-stretch">
-              {/* Left Box: The Old Way (Orange tone) */}
+              {/* Left Box: Traditional Website Development */}
               <div className="flex flex-col justify-between rounded-2xl border border-[#fed7aa] bg-[#fffaf5] p-7 shadow-xs">
                 <div>
                   <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#ea580c] block mb-2">
-                    THE OLD WAY IS SLOW & EXPENSIVE
+                    TRADITIONAL DEVELOPMENT
                   </span>
-                  <h3 className="text-[21px] font-extrabold text-[#0f172a] leading-snug">
-                    Building a website shouldn&apos;t become another headache.
+                  <h3 className="text-[20px] font-extrabold text-[#0f172a] leading-snug">
+                    Traditional Website Development
                   </h3>
                   <ul className="mt-5 space-y-3 text-[13px] text-[#475569] font-medium">
                     <li className="flex items-start gap-2.5">
                       <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
                         ✕
                       </span>
-                      <span>Depend on developers for every small change</span>
+                      <span>Expensive upfront development</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
                         ✕
                       </span>
-                      <span>Long timelines and back-and-forth revisions</span>
+                      <span>Long development timelines</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
                         ✕
                       </span>
-                      <span>High development and maintenance cost</span>
+                      <span>Difficult content updates</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
                         ✕
                       </span>
-                      <span>Not built for your business needs</span>
+                      <span>Dependence on developers</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <span className="text-red-500 font-bold text-sm leading-none shrink-0 mt-0.5">
+                        ✕
+                      </span>
+                      <span>Complicated website management</span>
                     </li>
                   </ul>
                 </div>
@@ -531,31 +554,35 @@ export function LandingPage() {
                 </div>
               </div>
 
-              {/* Middle Box: The Webmintra Way (Green tone) */}
+              {/* Middle Box: The Webmintra Way */}
               <div className="flex flex-col justify-between rounded-2xl border border-[#a7f3d0] bg-[#f7fdfa] p-7 shadow-xs">
                 <div>
                   <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#059669] block mb-2">
                     THE WEBMINTRA WAY
                   </span>
-                  <h3 className="text-[21px] font-extrabold text-[#0f172a] leading-snug">
-                    Your website, your way.
+                  <h3 className="text-[20px] font-extrabold text-[#0f172a] leading-snug">
+                    Your Website, Your Way
                   </h3>
                   <ul className="mt-5 space-y-3 text-[13px] text-[#0f172a] font-semibold">
                     <li className="flex items-start gap-2.5">
                       <Check className="h-4 w-4 text-[#059669] shrink-0 mt-0.5" />
-                      <span>Choose from beautiful templates</span>
+                      <span>Ready-made business templates</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <Check className="h-4 w-4 text-[#059669] shrink-0 mt-0.5" />
-                      <span>Customise everything yourself</span>
+                      <span>Customize your business content</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <Check className="h-4 w-4 text-[#059669] shrink-0 mt-0.5" />
-                      <span>Publish in minutes and go live</span>
+                      <span>Manage your website online</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <Check className="h-4 w-4 text-[#059669] shrink-0 mt-0.5" />
-                      <span>Update anytime, with no technical skills</span>
+                      <span>Connect your own domain</span>
+                    </li>
+                    <li className="flex items-start gap-2.5">
+                      <Check className="h-4 w-4 text-[#059669] shrink-0 mt-0.5" />
+                      <span>Capture customer enquiries</span>
                     </li>
                   </ul>
                 </div>
@@ -601,15 +628,18 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ── 5. SIMPLE PROCESS (3 CARDS FROM BLANK PAGE) ─────────── */}
-        <section className="tiranga-section-subtle px-6 py-16 lg:py-20 border-b border-[#e2e8f0]">
+        {/* ── 5. HOW IT WORKS (3 SIMPLE STEPS) ─────────────────────── */}
+        <section
+          id="how-it-works"
+          className="tiranga-section-subtle px-6 py-16 lg:py-20 border-b border-[#e2e8f0]"
+        >
           <div className="mx-auto max-w-6xl">
             <div className="text-center max-w-3xl mx-auto">
               <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-[#059669]">
-                SIMPLE PROCESS
+                HOW WEBMINTRA WORKS
               </span>
-              <h2 className="mt-2 text-[32px] sm:text-[40px] font-extrabold text-[#0f172a] leading-tight">
-                From blank page to business-ready website.
+              <h2 className="mt-2 text-[30px] sm:text-[38px] font-extrabold text-[#0f172a] leading-tight tracking-tight">
+                From Template to Business-Ready Website in 3 Simple Steps
               </h2>
               <p className="mt-3 text-sm sm:text-base text-[#64748b] max-w-lg mx-auto">
                 Launch your high-converting business website in three effortless steps.
@@ -626,9 +656,10 @@ export function LandingPage() {
                       <Layers className="h-4 w-4" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-[#0f172a]">Choose</h3>
-                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
-                    Pick a professionally designed template tailored for your industry.
+                  <h3 className="text-lg font-bold text-[#0f172a]">Choose a Website Template</h3>
+                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
+                    Choose a professionally designed template built for your type of business. Start
+                    with a structure that&apos;s already designed for your industry.
                   </p>
                 </div>
 
@@ -649,7 +680,7 @@ export function LandingPage() {
                           className="h-full w-full object-cover"
                         />
                         <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#c2410c]">
-                          Dental
+                          Clinic
                         </span>
                       </div>
                       <div className="h-1.5 w-3/4 bg-[#e2e8f0] rounded" />
@@ -671,7 +702,7 @@ export function LandingPage() {
                 </div>
               </div>
 
-              {/* Card 02: Customise */}
+              {/* Card 02: Customize */}
               <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-[#ea580c]/40 transition-all duration-200">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -680,9 +711,10 @@ export function LandingPage() {
                       <FileEdit className="h-4 w-4" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-[#0f172a]">Customise</h3>
-                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
-                    Update text, images, services and contact details in minutes.
+                  <h3 className="text-lg font-bold text-[#0f172a]">Add Your Business Content</h3>
+                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
+                    Update your business information, services, images, contact details and other
+                    supported content using Webmintra&apos;s website editor.
                   </p>
                 </div>
 
@@ -696,10 +728,10 @@ export function LandingPage() {
                   </div>
                   <div className="rounded-lg border border-dashed border-[#ea580c] bg-[#fffaf5] p-2 text-center my-auto shadow-2xs">
                     <span className="text-[10px] font-extrabold text-[#0f172a] block">
-                      Apex Fitness Indiranagar
+                      Apex Fitness & Gym
                     </span>
                     <span className="text-[8px] text-[#64748b] mt-0.5 block">
-                      Click to edit timings, fees & photos
+                      Click to edit timings, services & photos
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-[8px] font-semibold text-[#64748b]">
@@ -718,9 +750,10 @@ export function LandingPage() {
                       <Zap className="h-4 w-4" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold text-[#0f172a]">Publish</h3>
-                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
-                    Go live instantly with your custom domain & start attracting leads.
+                  <h3 className="text-lg font-bold text-[#0f172a]">Publish Your Website</h3>
+                  <p className="mt-2 text-xs text-[#64748b] leading-relaxed">
+                    Connect your domain, review your website and publish it when you&apos;re ready
+                    to take your business online.
                   </p>
                 </div>
 
@@ -749,21 +782,22 @@ export function LandingPage() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
               <div>
                 <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-[#059669]">
-                  BEAUTIFUL TEMPLATES
+                  READY-MADE BUSINESS WEBSITE TEMPLATES
                 </span>
-                <h2 className="mt-2 text-[32px] sm:text-[38px] font-extrabold text-[#0f172a] leading-tight">
-                  Designed for every type of business
+                <h2 className="mt-2 text-[30px] sm:text-[36px] font-extrabold text-[#0f172a] leading-tight tracking-tight">
+                  Professional Website Templates for Every Type of Business
                 </h2>
-                <p className="mt-2 text-sm text-[#64748b] max-w-xl">
-                  Pick a ready-to-launch website layout tailored with industry-specific sections,
-                  appointment forms & WhatsApp routing.
+                <p className="mt-2 text-sm text-[#64748b] max-w-2xl leading-relaxed">
+                  Start with a ready-made website designed for your industry. Webmintra offers
+                  business website templates for clinics, gyms, salons, restaurants, professionals
+                  and other local businesses.
                 </p>
               </div>
               <Link
                 to="/templates"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#059669] hover:text-[#047857] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#059669] hover:text-[#047857] hover:underline shrink-0"
               >
-                View all templates <ArrowRight className="h-4 w-4" />
+                View All Website Templates →
               </Link>
             </div>
 
@@ -842,18 +876,19 @@ export function LandingPage() {
           <div className="mx-auto max-w-7xl px-6 relative z-10">
             <div className="mb-12 text-center max-w-2xl mx-auto">
               <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-[#059669]">
-                POWERFUL FEATURES
+                POWERFUL WEBSITE FEATURES
               </span>
-              <h2 className="mt-2 text-[30px] sm:text-[38px] font-extrabold text-[#0f172a] leading-tight">
-                Everything you need to grow online
+              <h2 className="mt-2 text-[30px] sm:text-[38px] font-extrabold text-[#0f172a] leading-tight tracking-tight">
+                Everything You Need to Manage Your Business Website
               </h2>
-              <p className="mt-2 text-sm text-[#64748b]">
-                Enterprise-grade technology built specifically for Indian businesses.
+              <p className="mt-2 text-sm text-[#64748b] leading-relaxed">
+                Create a professional online presence with practical tools designed for small
+                businesses.
               </p>
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-5">
-              {/* Feature 1: Mobile */}
+              {/* Feature 1: Mobile Responsive */}
               <div className="landing-feature-card p-5 space-y-3 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -861,12 +896,12 @@ export function LandingPage() {
                       <PhoneIcon className="h-5 w-5" />
                     </div>
                     <span className="text-[9px] font-bold bg-[#fff7ed] text-[#c2410c] px-2 py-0.5 rounded-full border border-[#fed7aa]">
-                      100% Score
+                      100% Mobile
                     </span>
                   </div>
                   <h4 className="text-sm font-bold text-[#0f172a]">Mobile Responsive</h4>
-                  <p className="mt-1 text-xs text-[#64748b] leading-relaxed">
-                    Looks flawless on iPhones, Androids, tablets, and desktops automatically.
+                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
+                    Give customers a great experience on phones, tablets and desktops.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-[#f1f5f9] text-[10px] font-semibold text-[#ea580c]">
@@ -874,7 +909,7 @@ export function LandingPage() {
                 </div>
               </div>
 
-              {/* Feature 2: SEO */}
+              {/* Feature 2: SEO Ready */}
               <div className="landing-feature-card p-5 space-y-3 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -882,20 +917,21 @@ export function LandingPage() {
                       <Search className="h-5 w-5" />
                     </div>
                     <span className="text-[9px] font-bold bg-[#fff7ed] text-[#c2410c] px-2 py-0.5 rounded-full border border-[#fed7aa]">
-                      Google Ready
+                      SEO Ready
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-[#0f172a]">SEO Optimized</h4>
-                  <p className="mt-1 text-xs text-[#64748b] leading-relaxed">
-                    Auto-generated meta tags, sitemaps, and local Schema to rank higher.
+                  <h4 className="text-sm font-bold text-[#0f172a]">SEO Ready</h4>
+                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
+                    Manage important SEO information such as page titles and meta descriptions to
+                    help search engines understand your website.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-[#f1f5f9] text-[10px] font-semibold text-[#ea580c]">
-                  Rank on Maps →
+                  Search Optimized →
                 </div>
               </div>
 
-              {/* Feature 3: Speed */}
+              {/* Feature 3: Lightning Fast */}
               <div className="landing-feature-card p-5 space-y-3 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -903,20 +939,20 @@ export function LandingPage() {
                       <Zap className="h-5 w-5" />
                     </div>
                     <span className="text-[9px] font-bold bg-[#fff7ed] text-[#c2410c] px-2 py-0.5 rounded-full border border-[#fed7aa]">
-                      0.4s Fast
+                      Fast Loading
                     </span>
                   </div>
                   <h4 className="text-sm font-bold text-[#0f172a]">Lightning Fast</h4>
-                  <p className="mt-1 text-xs text-[#64748b] leading-relaxed">
-                    Hosted on Mumbai & Delhi Edge CDN servers for ultra-fast local speeds.
+                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
+                    Give your visitors a smooth and fast website experience.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-[#f1f5f9] text-[10px] font-semibold text-[#ea580c]">
-                  99 PageSpeed →
+                  Edge CDN Speed →
                 </div>
               </div>
 
-              {/* Feature 4: Security */}
+              {/* Feature 4: Secure & Reliable */}
               <div className="landing-feature-card p-5 space-y-3 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -924,54 +960,57 @@ export function LandingPage() {
                       <Lock className="h-5 w-5" />
                     </div>
                     <span className="text-[9px] font-bold bg-[#ecfdf5] text-[#047857] px-2 py-0.5 rounded-full border border-[#a7f3d0]">
-                      256-Bit SSL
+                      SSL & Backups
                     </span>
                   </div>
                   <h4 className="text-sm font-bold text-[#0f172a]">Secure & Reliable</h4>
-                  <p className="mt-1 text-xs text-[#64748b] leading-relaxed">
-                    Free automated SSL certificates and daily cloud data backups.
+                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
+                    Keep your business website protected with the platform&apos;s built-in security
+                    and infrastructure.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-[#f1f5f9] text-[10px] font-semibold text-[#059669]">
-                  99.9% Uptime →
+                  Enterprise Cloud →
                 </div>
               </div>
 
-              {/* Feature 5: Made in India */}
+              {/* Feature 5: WhatsApp Leads */}
               <div className="landing-feature-card p-5 space-y-3 flex flex-col justify-between border-[#a7f3d0] bg-[#f7fdfa]">
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0] shadow-2xs">
-                      <span className="text-base">🇮🇳</span>
+                      <span className="text-base">💬</span>
                     </div>
                     <span className="text-[9px] font-bold bg-[#ecfdf5] text-[#047857] px-2 py-0.5 rounded-full border border-[#a7f3d0]">
-                      Local Support
+                      Direct Enquiries
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-[#0f172a]">Made in India</h4>
-                  <p className="mt-1 text-xs text-[#64748b] leading-relaxed">
-                    WhatsApp lead capture, UPI readiness, and GST invoices built-in.
+                  <h4 className="text-sm font-bold text-[#0f172a]">WhatsApp Leads</h4>
+                  <p className="mt-1.5 text-xs text-[#64748b] leading-relaxed">
+                    Receive customer enquiries through supported WhatsApp lead functionality and
+                    follow up faster.
                   </p>
                 </div>
                 <div className="pt-2 border-t border-[#e2e8f0] text-[10px] font-semibold text-[#059669]">
-                  WhatsApp Ready →
+                  Instant Routing →
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── 8. PRICING SECTION (STARTER ₹199 / GROWTH ₹349) ──────── */}
+        {/* ── 8. PRICING SECTION (AFFORDABLE WEBSITE PLANS) ────────── */}
         <section id="pricing" className="px-6 py-16 lg:py-20 bg-white border-b border-[#e2e8f0]">
           <div className="mx-auto max-w-4xl text-center">
             <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-[#059669]">
-              SIMPLE, PREDICTABLE PRICING
+              SIMPLE WEBSITE PRICING
             </span>
-            <h2 className="mt-2 text-[30px] sm:text-[38px] font-extrabold text-[#0f172a]">
-              Plans that grow with your business
+            <h2 className="mt-2 text-[30px] sm:text-[38px] font-extrabold text-[#0f172a] tracking-tight">
+              Affordable Website Plans for Small Businesses
             </h2>
-            <p className="mt-2 text-sm text-[#64748b]">
-              Transparent pricing with no hidden charges. All prices in Indian Rupees (₹).
+            <p className="mt-2 text-sm text-[#64748b] max-w-2xl mx-auto leading-relaxed">
+              Start your business website without the high upfront cost of traditional custom
+              development. Choose a Webmintra plan that fits your business and upgrade as you grow.
             </p>
 
             {/* Toggle */}
@@ -1005,12 +1044,25 @@ export function LandingPage() {
               {/* Starter Plan */}
               <div className="rounded-2xl border border-[#e2e8f0] bg-[#fafcfb] p-7 shadow-sm flex flex-col justify-between hover:border-[#cbd5e1] hover:shadow-md transition">
                 <div>
-                  <h3 className="text-lg font-bold text-[#0f172a]">Starter</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-[#0f172a]">Starter</h3>
+                    <span className="rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 text-[9px] font-extrabold text-[#065f46]">
+                      50% OFF
+                    </span>
+                  </div>
                   <p className="text-xs text-[#64748b] mt-0.5">
                     Ideal for single-location shops & clinics.
                   </p>
 
                   <div className="my-5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold text-[#94a3b8] line-through">
+                        ₹{billingCycle === "yearly" ? "399" : "499"}
+                      </span>
+                      <span className="text-[9px] font-extrabold text-[#ea580c] bg-[#fff7ed] px-1.5 py-0.2 rounded border border-[#fed7aa]">
+                        SPECIAL OFFER
+                      </span>
+                    </div>
                     <span className="text-4xl font-extrabold text-[#0f172a]">
                       ₹{billingCycle === "yearly" ? "159" : "199"}
                     </span>
@@ -1044,8 +1096,13 @@ export function LandingPage() {
 
               {/* Growth Plan (Most Popular) */}
               <div className="relative rounded-2xl border-2 border-[#ea580c] bg-white p-7 shadow-xl flex flex-col justify-between">
-                <div className="absolute -top-3 right-6 rounded-md bg-[#ea580c] px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-sm">
-                  MOST POPULAR
+                <div className="absolute -top-3 right-6 flex items-center gap-1">
+                  <div className="rounded-md bg-[#ea580c] px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-sm">
+                    MOST POPULAR
+                  </div>
+                  <div className="rounded-md bg-[#059669] px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider text-white shadow-sm">
+                    60% OFF
+                  </div>
                 </div>
 
                 <div>
@@ -1055,6 +1112,14 @@ export function LandingPage() {
                   </p>
 
                   <div className="my-5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold text-[#94a3b8] line-through">
+                        ₹{billingCycle === "yearly" ? "699" : "899"}
+                      </span>
+                      <span className="text-[9px] font-extrabold text-[#ea580c] bg-[#fff7ed] px-1.5 py-0.2 rounded border border-[#fed7aa]">
+                        SPECIAL OFFER
+                      </span>
+                    </div>
                     <span className="text-4xl font-extrabold text-[#0f172a]">
                       ₹{billingCycle === "yearly" ? "279" : "349"}
                     </span>
@@ -1093,8 +1158,16 @@ export function LandingPage() {
               </div>
             </div>
 
+            {/* SEO Trust Strip */}
+            <div className="mt-8 mx-auto max-w-xl text-center">
+              <p className="text-xs text-[#64748b] leading-relaxed font-medium">
+                No complicated website development process. Choose a template, customize your
+                content and get your business online.
+              </p>
+            </div>
+
             {/* Indian Payments & Invoicing Strip */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium text-[#64748b]">
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-6 text-[12px] font-medium text-[#64748b]">
               <span className="flex items-center gap-1.5">
                 <span className="font-bold text-[#0f172a]">⚡ Supported Payments:</span> UPI (GPay,
                 PhonePe, Paytm), RuPay, NetBanking & Cards
@@ -1106,15 +1179,15 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ── 9. TESTIMONIALS SECTION ──────────────────────────────── */}
+        {/* ── 9. TESTIMONIALS SECTION (CUSTOMER STORIES) ───────────── */}
         <section className="tiranga-section-subtle px-6 py-16 lg:py-20 border-b border-[#e2e8f0]">
           <div className="mx-auto max-w-6xl">
             <div className="mb-10 text-center sm:text-left">
-              <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#059669]">
-                LOVED BY BUSINESS OWNERS
+              <span className="text-[11.5px] font-extrabold uppercase tracking-wider text-[#059669]">
+                CUSTOMER STORIES
               </span>
-              <h2 className="mt-2 text-[28px] sm:text-[36px] font-extrabold text-[#0f172a]">
-                See what our customers say
+              <h2 className="mt-2 text-[28px] sm:text-[36px] font-extrabold text-[#0f172a] tracking-tight">
+                See How Businesses Are Building Their Online Presence
               </h2>
             </div>
 
@@ -1245,7 +1318,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        {/* ── 11. FINAL CONVERSION BANNER (MATCHING IMAGE) ─────────── */}
+        {/* ── 11. FINAL CONVERSION BANNER (GET STARTED TODAY) ──────── */}
         <section className="px-6 py-16 lg:py-20 bg-white">
           <div className="mx-auto max-w-6xl rounded-2xl bg-[#0b192c] p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
             {/* Saffron & Green Decorative Waves */}
@@ -1258,23 +1331,24 @@ export function LandingPage() {
                 <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#ea580c] block mb-2">
                   GET STARTED TODAY
                 </span>
-                <h2 className="text-[32px] sm:text-[42px] font-extrabold leading-tight text-white">
-                  Your business is ready for a better website.
+                <h2 className="text-[32px] sm:text-[42px] font-extrabold leading-tight text-white tracking-tight">
+                  Your Business Is Ready for a Better Website
                 </h2>
-                <p className="mt-3 text-sm text-slate-300">
-                  Launch your professional website in minutes.
+                <p className="mt-3 text-sm text-slate-300 max-w-lg leading-relaxed">
+                  Choose a professional template, add your business information and create an online
+                  presence you&apos;re proud to share with your customers.
                 </p>
 
                 <div className="mt-7 flex flex-wrap items-center gap-3.5">
                   <Link
                     to={primaryRoute}
-                    className="inline-flex h-11 items-center justify-center rounded-lg bg-[#ea580c] px-6 text-xs font-bold text-white shadow-md hover:bg-[#c2410c] transition"
+                    className="inline-flex h-12 items-center justify-center rounded-xl bg-[#059669] px-6 text-xs font-bold text-white shadow-md hover:bg-[#047857] transition"
                   >
                     Create Your Website
                   </Link>
                   <a
                     href="#templates"
-                    className="inline-flex h-11 items-center justify-center rounded-lg border border-white/20 bg-white/5 px-5 text-xs font-semibold text-white hover:bg-white/10 transition"
+                    className="inline-flex h-12 items-center justify-center rounded-xl border border-white/20 bg-white/5 px-5 text-xs font-semibold text-white hover:bg-white/10 transition"
                   >
                     Explore Templates
                   </a>
@@ -1322,7 +1396,7 @@ export function LandingPage() {
         </section>
       </main>
 
-      {/* ── 12. FOOTER (5 DISTINCT BALANCED COLUMNS + SUB-FOOTER) ── */}
+      {/* ── 12. FOOTER (5 BALANCED COLUMNS + SEO LINKS + SUB-FOOTER) ── */}
       <footer className="border-t border-[#e2e8f0] bg-white pt-14 pb-10 text-[#475569]">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
@@ -1358,8 +1432,10 @@ export function LandingPage() {
                 </span>
               </a>
               <p className="text-xs leading-relaxed text-[#64748b] max-w-sm">
-                Empowering Indian business owners, doctors, consultants, and creators to launch
-                fast, beautiful websites without writing a single line of code.
+                Webmintra is a website builder for small businesses that makes it easy to create and
+                manage professional business websites. Choose ready-made website templates,
+                customize your business content, connect your domain and publish your website
+                without the complexity of traditional website development.
               </p>
 
               {/* Made in India badge */}
@@ -1540,8 +1616,39 @@ export function LandingPage() {
             </div>
           </div>
 
+          {/* Quick SEO Internal Links Strip */}
+          <div className="mt-10 pt-6 border-t border-[#e2e8f0] flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs font-semibold text-[#64748b]">
+            <a href="#top" className="hover:text-[#059669] transition">
+              Website Builder
+            </a>
+            <span>|</span>
+            <Link to="/templates" className="hover:text-[#059669] transition">
+              Templates
+            </Link>
+            <span>|</span>
+            <a href="#solutions" className="hover:text-[#059669] transition">
+              Solutions
+            </a>
+            <span>|</span>
+            <a href="#pricing" className="hover:text-[#059669] transition">
+              Pricing
+            </a>
+            <span>|</span>
+            <Link to="/blog" className="hover:text-[#059669] transition">
+              Blog
+            </Link>
+            <span>|</span>
+            <Link to="/help" className="hover:text-[#059669] transition">
+              Help Center
+            </Link>
+            <span>|</span>
+            <Link to="/contact" className="hover:text-[#059669] transition">
+              Contact
+            </Link>
+          </div>
+
           {/* Sub-Footer Bottom Bar */}
-          <div className="mt-12 pt-6 border-t border-[#e2e8f0] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11.5px] text-[#64748b]">
+          <div className="mt-6 pt-4 border-t border-[#f1f5f9] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11.5px] text-[#64748b]">
             <p>
               © {new Date().getFullYear()} {isMounted ? siteName : "Webmintra"}. All rights
               reserved.

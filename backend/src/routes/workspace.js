@@ -13,9 +13,10 @@ import { AnalyticsEvent } from "../models/AnalyticsEvent.js";
 import { resolveTenantSeoEntitlements } from "../lib/tenant-seo-entitlements.js";
 import { checkStorageLimit } from "../services/limits.js";
 import { sanitizeRichHtml } from "../lib/sanitizeRichHtml.js";
+import { compressUploadedImages } from "../middleware/imageCompressor.js";
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } }); // 2MB limit
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit (compressed before storage)
 
 router.use(requireAuthenticatedUser, requireRole("tenant"), establishTenantContext);
 
@@ -166,7 +167,7 @@ router.post("/support", async (req, res, next) => {
     }
 });
 
-router.post("/support/upload", upload.single("file"), async (req, res) => {
+router.post("/support/upload", upload.single("file"), compressUploadedImages("standard"), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 

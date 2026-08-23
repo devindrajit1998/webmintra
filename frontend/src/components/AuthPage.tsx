@@ -342,10 +342,7 @@ export function AuthPage({ mode }: { mode: AuthMode }) {
 
             {/* Google Sign-In — only on sign-in and create-account */}
             {mode !== "forgot-password" && (
-              <GoogleSignInButton
-                onCredential={handleGoogleCredential}
-                disabled={isSubmitting}
-              />
+              <GoogleSignInButton onCredential={handleGoogleCredential} disabled={isSubmitting} />
             )}
 
             <p className="mt-6 border-t border-[#f1f5f9] pt-5 text-center text-xs text-[#64748b]">
@@ -540,4 +537,3 @@ function GoogleSignInButton({
     </div>
   );
 }
-

@@ -26,6 +26,7 @@ import {
   X,
   BarChart3,
   Puzzle,
+  MessageSquare,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -56,8 +57,9 @@ export function useTenantContext() {
 const mainNavigation = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/tenant" },
   { label: "My websites", icon: Globe2, to: "/tenant/websites" },
-  { label: "Media library", icon: Image, to: "/tenant/media" },
+  { label: "WhatsApp & Leads", icon: MessageSquare, to: "/tenant/whatsapp" },
   { label: "Forms", icon: FileText, to: "/tenant/forms" },
+  { label: "Media library", icon: Image, to: "/tenant/media" },
   { label: "Blog", icon: BookOpen, to: "/tenant/blog" },
   { label: "Pages", icon: FileText, to: "/tenant/pages" },
   { label: "SEO manager", icon: Sparkles, to: "/tenant/seo" },
@@ -735,58 +737,69 @@ function GettingStartedChecklist({
 }) {
   const dismissKey = `webmintra:checklist-dismissed:${userEmail}`;
   const [dismissed, setDismissed] = useState(() => {
-    try { return localStorage.getItem(dismissKey) === "1"; } catch { return false; }
+    try {
+      return localStorage.getItem(dismissKey) === "1";
+    } catch {
+      return false;
+    }
   });
 
-  const steps = useMemo(() => [
-    {
-      id: "website",
-      label: "Create your first website",
-      description: "Pick a template and start building",
-      done: hasWebsite,
-      to: "/tenant/websites",
-      icon: "🌐",
-    },
-    {
-      id: "business",
-      label: "Fill in your business profile",
-      description: "Name, logo, contact info",
-      done: hasBusinessProfile,
-      to: "/tenant/business",
-      icon: "🏢",
-    },
-    {
-      id: "publish",
-      label: "Publish your website",
-      description: "Make it live for visitors",
-      done: hasPublished,
-      to: "/tenant/websites",
-      icon: "🚀",
-    },
-    {
-      id: "domain",
-      label: "Connect a custom domain",
-      description: "Use your own .in or .com domain",
-      done: false,
-      to: "/tenant/domains",
-      icon: "🔗",
-    },
-    {
-      id: "seo",
-      label: "Set up basic SEO",
-      description: "Help customers find you on Google",
-      done: false,
-      to: "/tenant/seo",
-      icon: "📈",
-    },
-  ], [hasWebsite, hasBusinessProfile, hasPublished]);
+  const steps = useMemo(
+    () => [
+      {
+        id: "website",
+        label: "Create your first website",
+        description: "Pick a template and start building",
+        done: hasWebsite,
+        to: "/tenant/websites",
+        icon: "🌐",
+      },
+      {
+        id: "business",
+        label: "Fill in your business profile",
+        description: "Name, logo, contact info",
+        done: hasBusinessProfile,
+        to: "/tenant/business",
+        icon: "🏢",
+      },
+      {
+        id: "publish",
+        label: "Publish your website",
+        description: "Make it live for visitors",
+        done: hasPublished,
+        to: "/tenant/websites",
+        icon: "🚀",
+      },
+      {
+        id: "domain",
+        label: "Connect a custom domain",
+        description: "Use your own .in or .com domain",
+        done: false,
+        to: "/tenant/domains",
+        icon: "🔗",
+      },
+      {
+        id: "seo",
+        label: "Set up basic SEO",
+        description: "Help customers find you on Google",
+        done: false,
+        to: "/tenant/seo",
+        icon: "📈",
+      },
+    ],
+    [hasWebsite, hasBusinessProfile, hasPublished],
+  );
 
   const completedCount = steps.filter((s) => s.done).length;
   const allDone = completedCount === steps.length;
   const progressPct = Math.round((completedCount / steps.length) * 100);
 
   function handleDismiss() {
-    try { localStorage.setItem(dismissKey, "1"); } catch { /* noop */ }
+    try {
+      localStorage.setItem(dismissKey, "1");
+    } catch {
+      /* noop */
+    }
     setDismissed(true);
   }
 
@@ -802,8 +815,12 @@ function GettingStartedChecklist({
             <svg className="h-10 w-10 -rotate-90" viewBox="0 0 36 36">
               <circle cx="18" cy="18" r="15" fill="none" stroke="#f1f5f9" strokeWidth="3" />
               <circle
-                cx="18" cy="18" r="15" fill="none"
-                stroke="#059669" strokeWidth="3"
+                cx="18"
+                cy="18"
+                r="15"
+                fill="none"
+                stroke="#059669"
+                strokeWidth="3"
                 strokeDasharray={`${progressPct * 0.942} 100`}
                 strokeLinecap="round"
               />
@@ -814,7 +831,9 @@ function GettingStartedChecklist({
           </div>
           <div>
             <h2 className="text-sm font-extrabold text-[#0b192c]">Getting Started</h2>
-            <p className="text-[10.5px] text-[#64748b]">{completedCount} of {steps.length} steps done</p>
+            <p className="text-[10.5px] text-[#64748b]">
+              {completedCount} of {steps.length} steps done
+            </p>
           </div>
         </div>
         <button
@@ -830,11 +849,7 @@ function GettingStartedChecklist({
       {/* Steps */}
       <div className="divide-y divide-[#f8fafc] px-4 py-2">
         {steps.map((step) => (
-          <Link
-            key={step.id}
-            to={step.to}
-            className="flex items-center gap-3 py-2.5 group"
-          >
+          <Link key={step.id} to={step.to} className="flex items-center gap-3 py-2.5 group">
             <span
               className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold transition ${
                 step.done
@@ -845,12 +860,12 @@ function GettingStartedChecklist({
               {step.done ? "✓" : step.icon}
             </span>
             <div className="min-w-0 flex-1">
-              <p className={`text-xs font-bold ${step.done ? "line-through text-[#94a3b8]" : "text-[#0f172a] group-hover:text-[#059669]"}`}>
+              <p
+                className={`text-xs font-bold ${step.done ? "line-through text-[#94a3b8]" : "text-[#0f172a] group-hover:text-[#059669]"}`}
+              >
                 {step.label}
               </p>
-              {!step.done && (
-                <p className="text-[10.5px] text-[#64748b]">{step.description}</p>
-              )}
+              {!step.done && <p className="text-[10.5px] text-[#64748b]">{step.description}</p>}
             </div>
             {!step.done && (
               <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#cbd5e1] group-hover:text-[#059669] transition" />

@@ -37,3 +37,5 @@ backend/.env
 # WhatsApp session auth
 .whatsapp-auth/
 backend/.whatsapp-auth/
+.whatsapp-sessions/
+backend/.whatsapp-sessions/

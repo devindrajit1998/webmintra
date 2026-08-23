@@ -22,6 +22,43 @@ const formSubmissionSchema = new mongoose.Schema(
       type: String,
       default: "public_site",
     },
+    // Normalized contact fields extracted from submission data
+    contactPhone: {
+      type: String,
+      trim: true,
+      index: true,
+      default: "",
+    },
+    contactName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    contactEmail: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    // WhatsApp consent & history
+    whatsappOptIn: {
+      type: Boolean,
+      default: true,
+    },
+    whatsappOptInAt: {
+      type: Date,
+      default: Date.now,
+    },
+    whatsappOptOut: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    whatsappOptOutAt: {
+      type: Date,
+    },
+    lastWhatsAppContactAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

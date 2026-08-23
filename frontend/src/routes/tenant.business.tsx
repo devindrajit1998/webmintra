@@ -13,8 +13,10 @@ import {
   Save,
   Upload,
   X,
+  Layers,
 } from "lucide-react";
 import { toast } from "sonner";
+import { MediaLibraryModal } from "@/components/ui/media-library-modal";
 import { useTenantContext } from "@/components/TenantDashboard";
 import {
   getBusinessInfo,
@@ -338,23 +340,7 @@ function AssetUploader({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-
-  async function upload(file?: File) {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) return toast.error("Select a supported image file.");
-    if (file.size > 2 * 1024 * 1024) return toast.error("Image must be 2 MB or smaller.");
-    setIsUploading(true);
-    try {
-      const result = await uploadBusinessBranding(file, assetType);
-      onChange(result.url);
-      toast.success(`${title} uploaded. Save changes to apply it.`);
-    } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : "Unable to upload image.");
-    } finally {
-      setIsUploading(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  }
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <div className="rounded-2xl border border-[#e2e8f0] bg-[#f8fafc] p-4">
@@ -364,13 +350,10 @@ function AssetUploader({
       </div>
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
-        disabled={isUploading}
+        onClick={() => setModalOpen(true)}
         className={`mt-3.5 flex w-full items-center justify-center overflow-hidden rounded-xl border border-dashed border-[#cbd5e1] bg-white transition hover:border-[#059669] hover:bg-[#ecfdf5]/30 cursor-pointer ${square ? "h-36" : "h-36"}`}
       >
-        {isUploading ? (
-          <Loader2 className="h-6 w-6 animate-spin text-[#059669]" />
-        ) : value ? (
+        {value ? (
           <img
             src={value}
             alt={`${title} preview`}
@@ -379,21 +362,24 @@ function AssetUploader({
         ) : (
           <span className="flex flex-col items-center gap-2 text-[#94a3b8]">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b]">
-              {square ? <Globe2 className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+              {square ? (
+                <Globe2 className="h-5 w-5 text-[#059669]" />
+              ) : (
+                <ImageIcon className="h-5 w-5 text-[#059669]" />
+              )}
             </span>
-            <span className="text-xs font-bold text-[#64748b]">Choose image</span>
+            <span className="text-xs font-bold text-[#64748b]">Choose from library</span>
           </span>
         )}
       </button>
       <div className="mt-3 flex gap-2">
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={isUploading}
+          onClick={() => setModalOpen(true)}
           className="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-xl bg-white border border-[#e2e8f0] text-xs font-bold text-[#0f172a] hover:bg-[#f8fafc] cursor-pointer transition shadow-2xs"
         >
-          <Upload className="h-3.5 w-3.5 text-[#059669]" />
-          {value ? "Replace" : "Upload"}
+          <Layers className="h-3.5 w-3.5 text-[#059669]" />
+          {value ? "Change Image" : "Browse Library"}
         </button>
         {value ? (
           <button
@@ -418,12 +404,17 @@ function AssetUploader({
           className="h-9 w-full rounded-xl border border-[#e2e8f0] bg-white px-3 text-[11px] font-semibold text-[#0f172a] outline-none placeholder:text-[#94a3b8] focus:border-[#059669]"
         />
       </label>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon,.ico"
-        className="hidden"
-        onChange={(event) => void upload(event.target.files?.[0])}
+
+      <MediaLibraryModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSelect={(url) => {
+          onChange(url);
+          toast.success(`${title} selected.`);
+        }}
+        title={`Select ${title}`}
+        initialSelectedUrl={value}
+        aspectRatioHint={square ? "Square format recommended" : "Horizontal logo"}
       />
     </div>
   );

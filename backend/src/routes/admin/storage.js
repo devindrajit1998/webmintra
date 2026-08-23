@@ -4,10 +4,15 @@
  */
 
 import { Router } from "express";
+import mongoose from "mongoose";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
 import { StorageItem, MEDIA_TYPES } from "../../models/StorageItem.js";
 import { parsePagination, parseSort, isMongoId, escapeRegex } from "../../lib/validate.js";
+import multer from "multer";
 import ImageKit from "imagekit";
+import { compressImageBuffer, getCompressionStats, COMPRESSION_PRESETS } from "../../services/imageCompressor.js";
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } }); // 25MB test limit
 
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
@@ -122,6 +127,73 @@ router.delete("/:itemId", async (req, res, next) => {
   }
 });
 
+// ── Live MongoDB Database Stats ─────────────────────────────────
+router.get("/mongodb", async (req, res, next) => {
+  try {
+    const db = mongoose.connection.db;
+    if (!db) {
+      return res.status(503).json({ message: "MongoDB connection is not active." });
+    }
+
+    // Run dbStats command
+    const dbStats = await db.command({ dbStats: 1, scale: 1024 * 1024 }); // in MB
+
+    // Fetch individual collection stats
+    const collections = await db.listCollections().toArray();
+    const collectionStats = [];
+
+    for (const col of collections) {
+      if (col.name.startsWith("system.")) continue;
+      try {
+        const count = await db.collection(col.name).estimatedDocumentCount();
+        const cStat = await db.command({ collStats: col.name, scale: 1024 }); // in KB
+        collectionStats.push({
+          name: col.name,
+          count: count || cStat.count || 0,
+          sizeKb: Math.round(cStat.size || 0),
+          storageSizeKb: Math.round(cStat.storageSize || 0),
+          avgObjSize: Math.round(cStat.avgObjSize || 0),
+          indexes: cStat.nindexes || 0,
+          totalIndexSizeKb: Math.round(cStat.totalIndexSize || 0),
+        });
+      } catch {
+        // Fallback for simple count
+        const count = await db.collection(col.name).countDocuments().catch(() => 0);
+        collectionStats.push({
+          name: col.name,
+          count,
+          sizeKb: 0,
+          storageSizeKb: 0,
+          avgObjSize: 0,
+          indexes: 0,
+          totalIndexSizeKb: 0,
+        });
+      }
+    }
+
+    // Sort largest collections first
+    collectionStats.sort((a, b) => b.storageSizeKb - a.storageSizeKb);
+
+    return res.json({
+      dbName: dbStats.db || mongoose.connection.name,
+      collectionsCount: dbStats.collections,
+      objectsCount: dbStats.objects,
+      avgObjSizeBytes: Math.round(dbStats.avgObjSize || 0),
+      dataSizeMb: Math.round((dbStats.dataSize || 0) * 100) / 100,
+      storageSizeMb: Math.round((dbStats.storageSize || 0) * 100) / 100,
+      indexesCount: dbStats.indexes,
+      indexSizeMb: Math.round((dbStats.indexSize || 0) * 100) / 100,
+      totalFreeStorageSizeMb: Math.round((dbStats.totalFreeStorageSize || 0) * 100) / 100,
+      connectionStatus: mongoose.connection.readyState === 1 ? "Connected" : "Connecting",
+      host: mongoose.connection.host,
+      collections: collectionStats,
+    });
+  } catch (error) {
+    console.error("MongoDB Stats Error:", error);
+    return res.status(500).json({ message: "Failed to fetch MongoDB stats: " + error.message });
+  }
+});
+
 // ── Live ImageKit Stats ───────────────────────────────────────
 router.get("/imagekit", async (req, res, next) => {
   try {
@@ -148,6 +220,46 @@ router.get("/imagekit", async (req, res, next) => {
   } catch (error) {
     console.error("ImageKit Stats Error:", error);
     return res.status(500).json({ message: "Failed to fetch ImageKit stats." });
+  }
+});
+
+// ── Image Compressor Live Stats & Test ─────────────────────────
+router.get("/compression-stats", async (_req, res) => {
+  return res.json(getCompressionStats());
+});
+
+router.post("/compress-test", upload.single("image"), async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No image file provided for compression testing." });
+    }
+
+    const preset = req.body?.preset || "standard";
+    const startTime = Date.now();
+    const result = await compressImageBuffer(req.file.buffer, preset);
+    const durationMs = Date.now() - startTime;
+
+    const base64Data = result.buffer.toString("base64");
+    const previewDataUri = `data:${result.mimetype};base64,${base64Data}`;
+
+    return res.json({
+      success: true,
+      originalName: req.file.originalname,
+      preset,
+      presetConfig: COMPRESSION_PRESETS[preset] || COMPRESSION_PRESETS.standard,
+      originalSizeKb: parseFloat((result.originalSize / 1024).toFixed(1)),
+      compressedSizeKb: parseFloat((result.compressedSize / 1024).toFixed(1)),
+      savedKb: parseFloat((result.savedBytes / 1024).toFixed(1)),
+      savedPercentage: result.savedPercentage,
+      width: result.width,
+      height: result.height,
+      mimetype: result.mimetype,
+      format: result.format,
+      durationMs,
+      previewDataUri,
+    });
+  } catch (error) {
+    return next(error);
   }
 });
 

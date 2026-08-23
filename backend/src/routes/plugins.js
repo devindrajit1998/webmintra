@@ -36,13 +36,18 @@ router.get("/:websiteId", async (req, res, next) => {
 });
 
 // ── POST /api/plugins/:websiteId/toggle ─────────────────────────
-router.post("/:websiteId/toggle", async (req, res, next) => {
+// Also accepts /api/plugins/:websiteId/toggle/:pluginSlug
+router.post(["/:websiteId/toggle", "/:websiteId/toggle/:pluginSlug", "/:websiteId/:pluginSlug/toggle"], async (req, res, next) => {
   try {
-    const { websiteId } = req.params;
-    const { pluginSlug, isEnabled } = req.body;
+    const websiteId = req.params.websiteId || req.body?.websiteId;
+    const pluginSlug = req.body?.pluginSlug || req.body?.slug || req.params.pluginSlug;
+    const isEnabled = req.body?.isEnabled !== undefined ? req.body.isEnabled : req.body?.enabled;
 
-    if (!mongoose.isObjectIdOrHexString(websiteId) || !pluginSlug) {
-      return res.status(400).json({ message: "websiteId and pluginSlug are required." });
+    if (!websiteId || !mongoose.isObjectIdOrHexString(websiteId)) {
+      return res.status(400).json({ message: "Valid websiteId is required." });
+    }
+    if (!pluginSlug) {
+      return res.status(400).json({ message: "pluginSlug is required." });
     }
 
     const website = await Website.findOne(ownedWebsiteScope(req.user, websiteId));
@@ -53,22 +58,24 @@ router.post("/:websiteId/toggle", async (req, res, next) => {
     const catalogItem = PLUGIN_CATALOG.find((p) => p.slug === pluginSlug);
     const defaultConfig = catalogItem?.defaultConfig || {};
 
-    const plugin = await WebsitePlugin.findOneAndUpdate(
-      { website: websiteId, pluginSlug },
-      {
-        $set: {
-          isEnabled: Boolean(isEnabled),
-          owner: req.user._id,
-        },
-        $setOnInsert: {
-          config: defaultConfig,
-          installedAt: new Date(),
-        },
-      },
-      { upsert: true, new: true }
-    );
+    let plugin = await WebsitePlugin.findOne({ website: websiteId, pluginSlug });
+    if (!plugin) {
+      plugin = new WebsitePlugin({
+        website: websiteId,
+        pluginSlug,
+        owner: req.user._id,
+        isEnabled: Boolean(isEnabled),
+        config: defaultConfig,
+        installedAt: new Date(),
+      });
+    } else {
+      plugin.owner = req.user._id;
+      plugin.isEnabled = Boolean(isEnabled);
+    }
 
-    return res.json({ message: "Plugin updated successfully", plugin });
+    await plugin.save();
+
+    return res.json({ message: "Plugin updated successfully", plugin: plugin.toObject() });
   } catch (error) {
     return next(error);
   }
@@ -77,11 +84,15 @@ router.post("/:websiteId/toggle", async (req, res, next) => {
 // ── PUT /api/plugins/:websiteId/:pluginSlug ─────────────────────
 router.put("/:websiteId/:pluginSlug", async (req, res, next) => {
   try {
-    const { websiteId, pluginSlug } = req.params;
-    const { config, isEnabled } = req.body;
+    const websiteId = req.params.websiteId || req.body?.websiteId;
+    const pluginSlug = req.params.pluginSlug || req.body?.pluginSlug;
+    const { config, isEnabled } = req.body || {};
 
-    if (!mongoose.isObjectIdOrHexString(websiteId) || !pluginSlug) {
-      return res.status(400).json({ message: "websiteId and pluginSlug are required." });
+    if (!websiteId || !mongoose.isObjectIdOrHexString(websiteId)) {
+      return res.status(400).json({ message: "Valid websiteId is required." });
+    }
+    if (!pluginSlug) {
+      return res.status(400).json({ message: "pluginSlug is required." });
     }
 
     const website = await Website.findOne(ownedWebsiteScope(req.user, websiteId));
@@ -89,23 +100,34 @@ router.put("/:websiteId/:pluginSlug", async (req, res, next) => {
       return res.status(404).json({ message: "Website not found" });
     }
 
-    const updateDoc = {};
-    if (config !== undefined) updateDoc.config = config;
-    if (isEnabled !== undefined) updateDoc.isEnabled = Boolean(isEnabled);
+    // Use fetch+save instead of findOneAndUpdate for Mixed-type config field.
+    // Mongoose requires markModified() to detect changes to Mixed fields.
+    let plugin = await WebsitePlugin.findOne({ website: websiteId, pluginSlug });
 
-    const plugin = await WebsitePlugin.findOneAndUpdate(
-      { website: websiteId, pluginSlug },
-      {
-        $set: updateDoc,
-        $setOnInsert: {
-          owner: req.user._id,
-          installedAt: new Date(),
-        },
-      },
-      { upsert: true, new: true }
-    );
+    if (!plugin) {
+      // Create a new plugin document
+      const catalogItem = PLUGIN_CATALOG.find((p) => p.slug === pluginSlug);
+      plugin = new WebsitePlugin({
+        website: websiteId,
+        pluginSlug,
+        owner: req.user._id,
+        isEnabled: isEnabled !== undefined ? Boolean(isEnabled) : true,
+        config: config !== undefined ? config : (catalogItem?.defaultConfig || {}),
+        installedAt: new Date(),
+      });
+    } else {
+      plugin.owner = req.user._id;
+      if (isEnabled !== undefined) plugin.isEnabled = Boolean(isEnabled);
+      if (config !== undefined) {
+        plugin.config = config;
+        plugin.markModified("config"); // Required for Schema.Types.Mixed fields
+      }
+    }
 
-    return res.json({ message: "Plugin settings saved successfully", plugin });
+    await plugin.save();
+
+    return res.json({ message: "Plugin settings saved successfully", plugin: plugin.toObject() });
+
   } catch (error) {
     return next(error);
   }

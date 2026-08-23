@@ -22,30 +22,31 @@ export function PrivacyPolicyPage() {
   const policyContent = settings["content.privacyPolicy"];
 
   return (
-    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+    <div className="landing-page min-h-screen flex flex-col justify-between tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
       <PublicHeader />
 
       {/* ── MAIN CONTENT ────────────────────────────────────────────── */}
-      <main className="mx-auto max-w-4xl px-5 sm:px-6 py-12 lg:py-16">
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 sm:p-12 shadow-sm space-y-8">
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11px] font-bold text-[#c2410c] shadow-2xs">
-              <Lock className="h-3.5 w-3.5" /> Legal Documentation
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#0f172a]">Privacy Policy</h1>
-            <p className="text-xs text-[#64748b] mt-2">
-              Last Updated: August 2026 • Compliant with Indian IT Act, 2000 & Digital Personal Data
-              Protection (DPDP) Act
-            </p>
-          </div>
+      <main className="flex-1 w-full mx-auto max-w-7xl px-5 sm:px-6 py-10 lg:py-14 space-y-8">
+        {/* Banner Header */}
+        <div className="content-page-header px-6 py-6 sm:px-8 sm:py-7">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#ea580c] tracking-tight">
+            Privacy Policy
+          </h1>
+          <p className="text-xs sm:text-sm font-bold text-[#0f172a] mt-1">{siteName}</p>
+          <p className="text-[11px] sm:text-xs text-[#64748b] mt-3">
+            Effective Date: 23 August 2026
+          </p>
+        </div>
 
+        {/* Content Body */}
+        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 sm:p-12 shadow-sm">
           {typeof policyContent === "string" && policyContent.trim() ? (
             <article
-              className="prose prose-slate max-w-none text-sm leading-relaxed text-[#475569] prose-headings:text-[#0f172a] prose-headings:font-bold prose-h2:text-base prose-a:font-bold prose-a:text-[#059669] prose-li:text-[#64748b]"
+              className="legal-content prose prose-slate max-w-none text-sm leading-relaxed text-[#475569]"
               dangerouslySetInnerHTML={{ __html: policyContent }}
             />
           ) : (
-            <div className="space-y-6 text-sm text-[#475569] leading-relaxed">
+            <div className="legal-content space-y-6 text-sm text-[#475569] leading-relaxed">
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-[#0f172a]">1. Overview</h2>
                 <p>

@@ -22,6 +22,13 @@ const planSchema = new mongoose.Schema(
       monthly: { type: Number, min: 0 },
       yearly: { type: Number, min: 0 },
     },
+    // Special offer / discount pricing (M.R.P. or strikethrough original price)
+    originalPricing: {
+      monthly: { type: Number, min: 0, default: null },
+      yearly: { type: Number, min: 0, default: null },
+    },
+    discountBadge: { type: String, trim: true, maxlength: 60, default: "" }, // e.g. "50% OFF", "Diwali Special", "Limited Time"
+    isOfferActive: { type: Boolean, default: false },
     status: { type: String, enum: PLAN_STATUSES, default: "active" },
     currency: { type: String, default: "INR", maxlength: 3, uppercase: true },
     trialDays: { type: Number, default: 0, min: 0, max: 365 },

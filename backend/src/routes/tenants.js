@@ -8,6 +8,7 @@ import { Notification } from "../models/Notification.js";
 import { imagekit } from "../lib/imagekit.js";
 import { requireAuthenticatedUser, requireRole } from "../middleware/auth.js";
 import { logActivity, buildLogContext } from "../services/activityLog.js";
+import { compressUploadedImages } from "../middleware/imageCompressor.js";
 
 const router = Router();
 const BRAND_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon"]);
@@ -188,7 +189,7 @@ router.put("/business", requireRole("tenant"), async (request, response, next) =
   }
 });
 
-router.post("/business/upload", requireRole("tenant"), upload.single("file"), async (request, response, next) => {
+router.post("/business/upload", requireRole("tenant"), upload.single("file"), compressUploadedImages("branding"), async (request, response, next) => {
   try {
     if (!request.file) {
       return response.status(400).json({ message: "No file uploaded." });

@@ -154,22 +154,36 @@ function formatWhatsAppJid(rawPhone) {
  * 1. Self-hosted Baileys client (primary free zero-cost engine)
  * 2. Fallback to WATI REST API if configured
  *
- * Fails gracefully and never breaks lead flow.
+ * @returns {Promise<{ success: boolean, message?: string }>}
  */
 export async function sendWhatsAppNotification({ phone, message }) {
-  if (!phone || !message) return;
+  if (!phone || !message) {
+    throw new Error("Phone number and message are required.");
+  }
 
-  // 1. Try free self-hosted Baileys client first
+  const jid = formatWhatsAppJid(phone);
+  if (!jid) {
+    throw new Error(`Invalid phone number format: "${phone}". Please enter a 10-digit mobile number or full country code format (e.g. +919876543210).`);
+  }
+
+  // 1. Try free self-hosted Baileys client
   if (sock && connectionStatus === "connected") {
     try {
-      const jid = formatWhatsAppJid(phone);
-      if (jid) {
-        await sock.sendMessage(jid, { text: message });
-        console.log(`[WhatsApp] Alert sent successfully via Baileys to ${jid}`);
-        return;
+      // Validate that the number exists on WhatsApp if supported
+      let targetJid = jid;
+      if (typeof sock.onWhatsApp === "function") {
+        const [result] = await sock.onWhatsApp(jid.replace("@s.whatsapp.net", "")).catch(() => []);
+        if (result?.jid) {
+          targetJid = result.jid;
+        }
       }
+
+      const response = await sock.sendMessage(targetJid, { text: message });
+      console.log(`[WhatsApp] Alert dispatched via Baileys to ${targetJid}, msgId: ${response?.key?.id || "ok"}`);
+      return { success: true, target: targetJid, messageId: response?.key?.id };
     } catch (err) {
-      console.warn("[WhatsApp] Baileys dispatch failed:", err?.message || err);
+      console.error("[WhatsApp] Baileys sendMessage error:", err);
+      throw new Error(`WhatsApp send error: ${err.message || "Failed to dispatch message"}`);
     }
   }
 
@@ -181,7 +195,7 @@ export async function sendWhatsAppNotification({ phone, message }) {
     try {
       const normalizedPhone = phone.replace(/[^\d+]/g, "").replace(/^\+/, "");
       const url = `${watiEndpoint.replace(/\/$/, "")}/api/v1/sendSessionMessage/${encodeURIComponent(normalizedPhone)}`;
-      await fetch(url, {
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -190,8 +204,17 @@ export async function sendWhatsAppNotification({ phone, message }) {
         body: JSON.stringify({ messageText: message }),
         signal: AbortSignal.timeout(8000),
       });
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`WATI API error (${res.status}): ${body.slice(0, 100)}`);
+      }
+      return { success: true, provider: "wati" };
     } catch (err) {
       console.warn("[WhatsApp] WATI fallback failed:", err?.message || err);
+      throw err;
     }
   }
+
+  throw new Error("WhatsApp device is not connected. Please scan the QR code first or reconnect.");
 }

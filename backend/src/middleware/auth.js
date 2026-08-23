@@ -43,11 +43,16 @@ export function establishTenantContext(request, response, next) {
     return response.status(403).json({ message: "You are not authorized to access this resource." });
   }
 
-  Object.defineProperty(request, "tenantId", {
-    value: request.user._id,
-    enumerable: true,
-    writable: false,
-    configurable: false,
-  });
+  if (request.tenantId === undefined) {
+    Object.defineProperty(request, "tenantId", {
+      value: request.user._id,
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+  } else {
+    request.tenantId = request.user._id;
+  }
   return next();
 }
+

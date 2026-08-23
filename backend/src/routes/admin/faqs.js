@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
-import { FAQ, DEFAULT_FAQS } from "../../models/Faq.js";
+import { FAQ } from "../../models/Faq.js";
 import { logActivity, buildLogContext } from "../../services/activityLog.js";
 import { isMongoId, isString } from "../../lib/validate.js";
 
@@ -10,10 +10,6 @@ router.use(requireAuthenticatedUser, requireRole("admin"));
 // GET all FAQs (admin)
 router.get("/", async (req, res, next) => {
   try {
-    const count = await FAQ.countDocuments();
-    if (count === 0) {
-      await FAQ.insertMany(DEFAULT_FAQS);
-    }
     const faqs = await FAQ.find().sort({ sortOrder: 1, createdAt: -1 }).lean();
     return res.json({ faqs });
   } catch (error) {
@@ -44,7 +40,7 @@ router.post("/", async (req, res, next) => {
       ...buildLogContext(req),
       action: "faq_created",
       description: `Created FAQ "${faq.question}".`,
-    }).catch(() => {});
+    }).catch(() => { });
 
     return res.status(201).json({ faq });
   } catch (error) {
@@ -74,7 +70,7 @@ router.patch("/:id", async (req, res, next) => {
       ...buildLogContext(req),
       action: "faq_updated",
       description: `Updated FAQ "${faq.question}".`,
-    }).catch(() => {});
+    }).catch(() => { });
 
     return res.json({ faq });
   } catch (error) {
@@ -96,7 +92,7 @@ router.delete("/:id", async (req, res, next) => {
       ...buildLogContext(req),
       action: "faq_deleted",
       description: `Deleted FAQ "${faq.question}".`,
-    }).catch(() => {});
+    }).catch(() => { });
 
     return res.json({ message: "FAQ deleted successfully." });
   } catch (error) {

@@ -22,11 +22,21 @@ function normalizedOrigin(value) {
 }
 
 export function allowedOrigins() {
-    const configured = (process.env.FRONTEND_ORIGIN ?? "http://localhost:3000")
+    const configured = (process.env.FRONTEND_ORIGIN ?? "http://localhost:8080")
         .split(",")
         .map(normalizedOrigin)
         .filter(Boolean);
-    return new Set(configured);
+    if (!isProduction()) {
+        configured.push(
+            "http://localhost:8080",
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://127.0.0.1:8080",
+            "http://127.0.0.1:3000",
+            "http://127.0.0.1:5173"
+        );
+    }
+    return new Set(configured.filter(Boolean));
 }
 
 export function validateProductionSecurityConfig() {
@@ -41,10 +51,11 @@ export function validateProductionSecurityConfig() {
 }
 
 export function corsOptions() {
-    const origins = allowedOrigins();
     return {
         origin(origin, callback) {
             if (!origin) return callback(null, true);
+            if (!isProduction()) return callback(null, true);
+            const origins = allowedOrigins();
             const normalized = normalizedOrigin(origin);
             if (origins.has(normalized)) return callback(null, true);
             
@@ -67,7 +78,7 @@ export function corsOptions() {
         },
         credentials: true,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-        allowedHeaders: ["Content-Type", CSRF_HEADER_NAME],
+        allowedHeaders: ["Content-Type", "Authorization", CSRF_HEADER_NAME, "x-csrf-token"],
         exposedHeaders: [],
         maxAge: isProduction() ? 600 : 0,
         optionsSuccessStatus: 204,
@@ -79,14 +90,14 @@ export function sessionCookieOptions() {
         httpOnly: true,
         secure: isProduction(),
         sameSite: "strict",
-        maxAge: CSRF_MAX_AGE_MS,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/",
     };
 }
 
 function csrfCookieOptions() {
     return {
-        httpOnly: true,
+        httpOnly: false,
         secure: isProduction(),
         sameSite: "strict",
         maxAge: CSRF_MAX_AGE_MS,
@@ -95,27 +106,26 @@ function csrfCookieOptions() {
 }
 
 function signCsrfNonce(nonce) {
-    return crypto.createHmac("sha256", process.env.JWT_SECRET).update(nonce).digest("base64url");
+    return crypto.createHmac("sha256", process.env.JWT_SECRET || "webmintra-dev-secret").update(nonce).digest("hex");
 }
 
 function createCsrfToken() {
-    const nonce = crypto.randomBytes(32).toString("base64url");
+    const nonce = crypto.randomBytes(16).toString("hex");
     return `${nonce}.${signCsrfNonce(nonce)}`;
 }
 
-function safelyEqual(left, right) {
-    if (typeof left !== "string" || typeof right !== "string") return false;
-    const leftBuffer = Buffer.from(left);
-    const rightBuffer = Buffer.from(right);
-    return leftBuffer.length === rightBuffer.length && crypto.timingSafeEqual(leftBuffer, rightBuffer);
+function safelyEqual(a, b) {
+    if (typeof a !== "string" || typeof b !== "string") return false;
+    const aBuf = Buffer.from(a);
+    const bBuf = Buffer.from(b);
+    if (aBuf.length !== bBuf.length) return false;
+    return crypto.timingSafeEqual(aBuf, bBuf);
 }
 
 function validCsrfSignature(token) {
-    if (typeof token !== "string") return false;
-    const separator = token.indexOf(".");
-    if (separator < 1) return false;
-    const nonce = token.slice(0, separator);
-    const signature = token.slice(separator + 1);
+    if (typeof token !== "string" || !token.includes(".")) return false;
+    const [nonce, signature] = token.split(".", 2);
+    if (!nonce || !signature) return false;
     return safelyEqual(signature, signCsrfNonce(nonce));
 }
 
@@ -133,7 +143,13 @@ export function clearSecurityCookies(response) {
 }
 
 function isPublicSiteEvent(request) {
-    return request.method === "POST" && /^\/api\/public\/site\/[^/]+\/(form|analytics)\/?$/.test(request.path);
+    const p = request.originalUrl || request.path || request.url || "";
+    return (
+        p.startsWith("/api/public/") ||
+        p.startsWith("/public/") ||
+        p.startsWith("/api/webhooks/") ||
+        p.startsWith("/webhooks/")
+    );
 }
 
 export function isOriginAllowed(rawOrigin) {
