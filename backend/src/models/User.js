@@ -44,6 +44,8 @@ const userSchema = new mongoose.Schema(
     onboardingCompletedAt: { type: Date },
     invitationId: { type: mongoose.Schema.Types.ObjectId, ref: "Invitation" },
     tenantStatus: { type: String, enum: ["invitation-sent", "active", "suspended", "archived"], default: "active" },
+    // Incremented on password change/reset to invalidate all previous sessions
+    tokenVersion: { type: Number, default: 0 },
   },
   { timestamps: true },
 );

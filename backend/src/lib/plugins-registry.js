@@ -61,6 +61,22 @@ export const PLUGIN_CATALOG = [
         helpText: "Text displayed next to the WhatsApp icon.",
       },
       {
+        name: "popupHeader",
+        label: "Chat Popup Header",
+        type: "text",
+        placeholder: "Chat with us on WhatsApp",
+        required: false,
+        helpText: "Title displayed at the top of the chat widget.",
+      },
+      {
+        name: "popupSubheader",
+        label: "Chat Popup Subheader / Reply Time",
+        type: "text",
+        placeholder: "Typically replies within a few minutes",
+        required: false,
+        helpText: "Status or sub-text below the title.",
+      },
+      {
         name: "buttonPosition",
         label: "Position on Screen",
         type: "select",

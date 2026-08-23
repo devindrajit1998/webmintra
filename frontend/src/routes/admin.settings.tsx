@@ -13,6 +13,9 @@ import {
   FilePenLine,
 } from "lucide-react";
 import { AdminSeoPage } from "@/components/AdminSeoPage";
+import { AdminWhatsAppCard } from "@/components/AdminWhatsAppCard";
+import { ImageUpload } from "@/components/ui/image-upload";
+import { MessageSquare } from "lucide-react";
 
 import { toast } from "sonner";
 export const Route = createFileRoute("/admin/settings")({
@@ -23,7 +26,8 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
-  const [activeView, setActiveView] = useState<"seo" | "platform" | "content">("seo");
+  const [activeView, setActiveView] = useState<"seo" | "whatsapp" | "platform" | "content">("seo");
+  const [activeContentTab, setActiveContentTab] = useState<string>("content.privacyPolicy");
 
   const { data, isLoading } = useQuery({
     queryKey: ["adminSettings"],
@@ -112,6 +116,17 @@ function SettingsPage() {
       </button>
       <button
         type="button"
+        onClick={() => setActiveView("whatsapp")}
+        className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
+          activeView === "whatsapp"
+            ? "border border-[#fed7aa] bg-[#fff7ed] text-[#c2410c] shadow-2xs"
+            : "text-[#64748b] hover:text-[#0b192c]"
+        }`}
+      >
+        <MessageSquare className="h-4 w-4" /> WhatsApp Gateway
+      </button>
+      <button
+        type="button"
         onClick={() => setActiveView("platform")}
         className={`inline-flex h-9 items-center gap-2 rounded-lg px-4 text-xs font-bold transition ${
           activeView === "platform"
@@ -143,61 +158,118 @@ function SettingsPage() {
       </div>
     );
 
+  if (activeView === "whatsapp")
+    return (
+      <div className="mx-auto w-full max-w-[1600px]">
+        {viewTabs}
+        <AdminWhatsAppCard />
+      </div>
+    );
+
   const contentSettings =
     data?.settings?.filter((setting: any) => setting.group === "content") || [];
+
+  const currentContentSetting =
+    contentSettings.find((s: any) => s.key === activeContentTab) || contentSettings[0];
 
   if (activeView === "content")
     return (
       <div className="mx-auto w-full max-w-[1600px]">
         {viewTabs}
-        <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
-            Public Content
-          </h1>
-          <p className="mt-1 text-xs font-medium text-[#64748b]">
-            Edit the legal content published on public policy pages. Changes become visible after
-            saving.
-          </p>
-        </div>
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl font-bold tracking-tight text-[#0b192c]">
+              Public Content
+            </h1>
+            <p className="mt-1 text-xs font-medium text-[#64748b]">
+              Edit the legal content published on public policy pages. Changes become visible after
+              saving.
+            </p>
+          </div>
 
-        <form onSubmit={handleSave} className="space-y-6 pb-20">
-          {contentSettings.map((setting: any) => (
-            <section
-              key={setting.key}
-              className="overflow-hidden rounded-xl border border-[#e2e8f0] bg-white shadow-xs"
-            >
-              <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-5 py-4">
-                <h2 className="text-sm font-bold text-[#0b192c]">{setting.label}</h2>
-                <p className="mt-1 text-xs text-[#64748b]">{setting.description}</p>
-              </div>
-              <div className="p-5">
-                <RichCKEditor
-                  value={formData[setting.key] || ""}
-                  onChange={(value) =>
-                    setFormData((previous) => ({ ...previous, [setting.key]: value }))
-                  }
-                  placeholder={`Write the ${setting.label.toLowerCase()} content...`}
-                  minHeight="360px"
-                />
-              </div>
-            </section>
-          ))}
-
-          <div className="sticky bottom-6 z-10 flex justify-end rounded-xl border border-[#e2e8f0] bg-white/95 p-4 shadow-lg backdrop-blur">
+          <div className="flex items-center gap-2">
             <button
-              type="submit"
+              type="button"
+              onClick={handleSave}
               disabled={updateMutation.isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#059669] px-6 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#059669]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#059669] px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#047857] disabled:opacity-50 cursor-pointer"
             >
               {updateMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {updateMutation.isPending ? "Saving content..." : "Save Public Content"}
+              {updateMutation.isPending ? "Saving..." : "Save Public Content"}
             </button>
           </div>
-        </form>
+        </div>
+
+        {/* Content Tabs */}
+        <div className="flex items-center gap-2 border-b border-[#e2e8f0] pb-3 mb-6 overflow-x-auto">
+          {contentSettings.map((setting: any) => {
+            const isTabActive = (activeContentTab || contentSettings[0]?.key) === setting.key;
+            return (
+              <button
+                key={setting.key}
+                type="button"
+                onClick={() => setActiveContentTab(setting.key)}
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-bold transition whitespace-nowrap cursor-pointer ${
+                  isTabActive
+                    ? "bg-[#059669] text-white shadow-xs"
+                    : "border border-[#e2e8f0] bg-white text-[#64748b] hover:text-[#0b192c] hover:bg-[#f8fafc]"
+                }`}
+              >
+                {setting.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {currentContentSetting && (
+          <div className="space-y-6 pb-20">
+            <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-xs">
+              <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <h2 className="text-sm font-extrabold text-[#0b192c]">
+                    {currentContentSetting.label}
+                  </h2>
+                  <p className="mt-0.5 text-xs text-[#64748b]">
+                    {currentContentSetting.description}
+                  </p>
+                </div>
+                <span className="inline-flex self-start sm:self-auto rounded-md bg-[#fff7ed] border border-[#fed7aa] px-2 py-0.5 text-[10px] font-extrabold text-[#c2410c]">
+                  Key: {currentContentSetting.key}
+                </span>
+              </div>
+              <div className="p-6">
+                <RichCKEditor
+                  value={formData[currentContentSetting.key] || ""}
+                  onChange={(value) =>
+                    setFormData((previous) => ({ ...previous, [currentContentSetting.key]: value }))
+                  }
+                  placeholder={`Write the ${currentContentSetting.label.toLowerCase()} content...`}
+                  minHeight="480px"
+                />
+              </div>
+            </section>
+
+            <div className="sticky bottom-6 z-10 flex justify-end rounded-2xl border border-[#e2e8f0] bg-white/95 p-4 shadow-lg backdrop-blur-md">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={updateMutation.isPending}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#059669] px-6 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#047857] disabled:opacity-50 cursor-pointer"
+              >
+                {updateMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+                {updateMutation.isPending ? "Saving content..." : "Save Public Content"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
 
@@ -260,45 +332,18 @@ function SettingsPage() {
                     </div>
                     <div className="w-72 shrink-0">
                       {setting.type === "image" ? (
-                        <div className="flex flex-col gap-3">
-                          {formData[setting.key] ? (
-                            <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-[#cbd5e1] bg-[#f8fafc]">
-                              <img
-                                src={formData[setting.key]}
-                                alt=""
-                                className="h-full w-full object-contain p-1"
-                              />
-                            </div>
-                          ) : (
-                            <div className="flex h-16 w-16 items-center justify-center rounded-xl border border-dashed border-[#cbd5e1] bg-[#f8fafc]">
-                              <ImageIcon className="h-6 w-6 text-[#94a3b8]" />
-                            </div>
-                          )}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              if (e.target.files?.[0])
-                                handleImageUpload(setting.key, e.target.files[0]);
-                            }}
-                            className="block w-full text-xs text-[#64748b] file:mr-3 file:rounded-lg file:border-0 file:bg-[#fff7ed] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#c2410c] hover:file:bg-[#ffedd5] cursor-pointer"
-                          />
-                          {uploading[setting.key] && (
-                            <span className="text-xs font-semibold text-[#ea580c] flex items-center gap-1">
-                              <Loader2 className="h-3.5 w-3.5 animate-spin" /> Uploading...
-                            </span>
-                          )}
-                          <input
-                            id={setting.key}
-                            type="text"
-                            placeholder="Or enter image URL"
-                            value={formData[setting.key] || ""}
-                            onChange={(e) =>
-                              setFormData({ ...formData, [setting.key]: e.target.value })
-                            }
-                            className="mt-1 w-full rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs font-medium text-[#0b192c] outline-none shadow-2xs focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/15"
-                          />
-                        </div>
+                        <ImageUpload
+                          value={formData[setting.key] || ""}
+                          onChange={(url) =>
+                            setFormData((prev) => ({ ...prev, [setting.key]: url }))
+                          }
+                          placeholder="Select image from library"
+                          title={`Select ${setting.key.split(".").pop() || "Image"}`}
+                          square={
+                            setting.key.toLowerCase().includes("favicon") ||
+                            setting.key.toLowerCase().includes("logo")
+                          }
+                        />
                       ) : setting.type === "boolean" ? (
                         <select
                           id={setting.key}

@@ -22,11 +22,13 @@ import {
 import { toast } from "sonner";
 import { useTenantContext } from "@/components/TenantDashboard";
 import {
-  deleteWebsiteAsset,
-  getWebsiteAssets,
-  uploadWebsiteImage,
-  type MediaAsset,
-} from "@/lib/auth-api";
+  fetchMediaLibrary,
+  uploadMediaItem,
+  deleteMediaItem,
+  type MediaLibraryItem,
+} from "@/lib/media-api";
+
+export type MediaAsset = MediaLibraryItem;
 
 export const Route = createFileRoute("/tenant/media")({
   component: MediaPage,
@@ -50,23 +52,23 @@ function MediaPage() {
 
   const assetsQuery = useQuery({
     queryKey: ["website-assets", activeWebsiteId],
-    queryFn: () => getWebsiteAssets(activeWebsiteId),
+    queryFn: () => fetchMediaLibrary({ websiteId: activeWebsiteId, limit: 100 }),
     enabled: Boolean(activeWebsiteId),
   });
 
   const uploadMutation = useMutation({
     mutationFn: async (files: File[]) => {
-      for (const file of files) await uploadWebsiteImage(activeWebsiteId, file);
+      for (const file of files) await uploadMediaItem(file, { websiteId: activeWebsiteId });
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["website-assets", activeWebsiteId] });
-      toast.success("Media uploaded successfully.");
+      toast.success("Media uploaded and optimized successfully.");
     },
     onError: (error: Error) => toast.error(error.message),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (asset: MediaAsset) => deleteWebsiteAsset(activeWebsiteId, asset._id),
+    mutationFn: (asset: MediaAsset) => deleteMediaItem(asset.id),
     onSuccess: async () => {
       setPendingDelete(null);
       await queryClient.invalidateQueries({ queryKey: ["website-assets", activeWebsiteId] });
@@ -75,7 +77,7 @@ function MediaPage() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const assets = useMemo(() => assetsQuery.data?.assets ?? [], [assetsQuery.data?.assets]);
+  const assets = useMemo(() => assetsQuery.data?.items ?? [], [assetsQuery.data?.items]);
   const visibleAssets = useMemo(() => {
     const term = search.trim().toLowerCase();
     return assets.filter((asset) => {

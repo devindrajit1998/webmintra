@@ -45,6 +45,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { RichCKEditor } from "@/components/RichCKEditor";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 export const Route = createFileRoute("/admin/blog")({
   component: BlogPage,
@@ -576,69 +577,16 @@ function BlogPage() {
                       </div>
 
                       <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="block text-[11px] font-bold text-[#475569]">
-                            Cover Image
-                          </label>
-                          <label className="cursor-pointer text-[10px] font-bold text-[#ea580c] hover:underline flex items-center gap-1">
-                            <Upload className="h-3 w-3" />
-                            <span>Upload File</span>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                if (!file.type.startsWith("image/")) {
-                                  toast.error("Please upload a valid image file");
-                                  return;
-                                }
-                                try {
-                                  const formData = new FormData();
-                                  formData.append("file", file);
-                                  toast.loading("Uploading cover image...", { id: "upload-cover" });
-                                  const res = await uploadImage(formData);
-                                  if (res?.url) {
-                                    setForm((prev) => ({ ...prev, coverImage: res.url }));
-                                    toast.success("Cover image uploaded successfully!", {
-                                      id: "upload-cover",
-                                    });
-                                  }
-                                } catch (err: any) {
-                                  toast.error(err.message || "Failed to upload image", {
-                                    id: "upload-cover",
-                                  });
-                                }
-                              }}
-                            />
-                          </label>
-                        </div>
-                        <div className="flex gap-2">
-                          <input
-                            value={form.coverImage}
-                            onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-                            className="w-full h-9 rounded-lg border border-[#cbd5e1] bg-white px-3 text-xs font-medium text-[#0b192c] outline-none transition focus:border-[#ea580c] focus:ring-2 focus:ring-[#ea580c]/10"
-                            placeholder="https://... or click Upload File"
-                          />
-                        </div>
-                        {form.coverImage && (
-                          <div className="mt-2 relative rounded-lg border border-[#e2e8f0] overflow-hidden bg-slate-100 h-24 flex items-center justify-center group">
-                            <img
-                              src={form.coverImage}
-                              alt="Cover preview"
-                              className="w-full h-full object-cover"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setForm({ ...form, coverImage: "" })}
-                              className="absolute top-1.5 right-1.5 rounded-md bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 transition hover:bg-black/80"
-                              title="Remove image"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        )}
+                        <label className="block text-[11px] font-bold text-[#475569] mb-1.5">
+                          Cover Image
+                        </label>
+                        <ImageUpload
+                          value={form.coverImage}
+                          onChange={(url) => setForm((prev) => ({ ...prev, coverImage: url }))}
+                          placeholder="Select cover from library or upload"
+                          title="Select Blog Post Cover"
+                          aspectRatioHint="16:9 widescreen recommended"
+                        />
                       </div>
                     </div>
 

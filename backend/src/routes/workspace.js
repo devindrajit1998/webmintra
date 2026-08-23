@@ -12,9 +12,11 @@ import { Website } from "../models/Website.js";
 import { AnalyticsEvent } from "../models/AnalyticsEvent.js";
 import { resolveTenantSeoEntitlements } from "../lib/tenant-seo-entitlements.js";
 import { checkStorageLimit } from "../services/limits.js";
+import { sanitizeRichHtml } from "../lib/sanitizeRichHtml.js";
+import { compressUploadedImages } from "../middleware/imageCompressor.js";
 
 const router = Router();
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 2 * 1024 * 1024 } }); // 2MB limit
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit (compressed before storage)
 
 router.use(requireAuthenticatedUser, requireRole("tenant"), establishTenantContext);
 
@@ -165,7 +167,7 @@ router.post("/support", async (req, res, next) => {
     }
 });
 
-router.post("/support/upload", upload.single("file"), async (req, res) => {
+router.post("/support/upload", upload.single("file"), compressUploadedImages("standard"), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
@@ -530,7 +532,7 @@ router.post("/websites/:websiteId/blog", requireWebsiteOwnership, async (req, re
             title: body.title,
             slug,
             excerpt: body.excerpt || "",
-            content: body.content || "",
+            content: sanitizeRichHtml(body.content || ""),
             status: TENANT_POST_STATUSES.includes(body.status) ? body.status : "draft",
             seo: body.seo || {},
         });
@@ -548,7 +550,7 @@ router.patch("/websites/:websiteId/blog/:postId", requireWebsiteOwnership, async
         const updates = stripUndefined({
             title: isString(req.body.title) ? req.body.title : undefined,
             slug: isString(req.body.slug) ? req.body.slug : undefined,
-            content: isString(req.body.content) ? req.body.content : undefined,
+            content: isString(req.body.content) ? sanitizeRichHtml(req.body.content) : undefined,
             excerpt: isString(req.body.excerpt) ? req.body.excerpt : undefined,
             status: TENANT_POST_STATUSES.includes(req.body.status) ? req.body.status : undefined,
             seo: req.body.seo,

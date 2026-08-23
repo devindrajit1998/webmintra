@@ -8,6 +8,7 @@ import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js"
 import { KBArticle, KBCategory, ARTICLE_STATUSES } from "../../models/KnowledgeBase.js";
 import { logActivity, buildLogContext } from "../../services/activityLog.js";
 import { parsePagination, parseSort, isMongoId, isString, stripUndefined } from "../../lib/validate.js";
+import { sanitizeRichHtml } from "../../lib/sanitizeRichHtml.js";
 
 const router = Router();
 router.use(requireAuthenticatedUser, requireRole("admin"));
@@ -124,7 +125,7 @@ router.post("/articles", async (req, res, next) => {
     const status = ARTICLE_STATUSES.includes(b.status) ? b.status : "draft";
     const article = await KBArticle.create({
       title: b.title.trim(), slug: b.slug.toLowerCase().trim(),
-      content: b.content, excerpt: b.excerpt?.trim() || "",
+      content: sanitizeRichHtml(b.content), excerpt: b.excerpt?.trim() || "",
       category: b.category && isMongoId(b.category) ? b.category : undefined,
       author: req.user._id, status,
       publishedAt: status === "published" ? new Date() : undefined,
@@ -153,7 +154,8 @@ router.patch("/articles/:articleId", async (req, res, next) => {
     const b = req.body ?? {};
     const status = ARTICLE_STATUSES.includes(b.status) ? b.status : undefined;
     const update = stripUndefined({
-      title: b.title?.trim(), excerpt: b.excerpt?.trim(), content: b.content,
+      title: b.title?.trim(), excerpt: b.excerpt?.trim(),
+      content: b.content !== undefined ? sanitizeRichHtml(b.content) : undefined,
       category: b.category && isMongoId(b.category) ? b.category : undefined,
       tags: Array.isArray(b.tags) ? b.tags.map((t) => t.toLowerCase().trim()) : undefined,
       status, isFaq: b.isFaq, seo: b.seo, sortOrder: b.sortOrder,

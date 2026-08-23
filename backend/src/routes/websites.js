@@ -10,6 +10,7 @@ import { resolveTenantSeoEntitlements, sanitizeDraftSeo } from "../lib/tenant-se
 import multer from "multer";
 import { imagekit } from "../lib/imagekit.js";
 import { checkStorageLimit } from "../services/limits.js";
+import { compressUploadedImages } from "../middleware/imageCompressor.js";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -312,7 +313,7 @@ router.delete("/:websiteId/assets/:assetId", async (req, res, next) => {
   }
 });
 
-router.post("/:websiteId/upload", upload.single("file"), async (req, res, next) => {
+router.post("/:websiteId/upload", upload.single("file"), compressUploadedImages("standard"), async (req, res, next) => {
   try {
     if (!validWebsiteId(req.params.websiteId))
       return res.status(404).json({ message: "Website not found." });

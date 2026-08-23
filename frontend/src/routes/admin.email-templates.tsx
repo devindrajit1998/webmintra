@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   getEmailTemplates,
   getEmailTemplateVariables,
@@ -111,7 +111,7 @@ function EmailTemplatesPage() {
     onError: (err: any) => toast.error(err.message || "Failed to send test email"),
   });
 
-  const templates = templatesData?.templates || [];
+  const templates = useMemo(() => templatesData?.templates || [], [templatesData?.templates]);
   const types = templatesData?.types || [];
   const activeTemplate =
     activeTemplateId === "new"

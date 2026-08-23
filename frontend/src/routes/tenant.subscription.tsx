@@ -358,16 +358,35 @@ function PlanCard({
           : "border-[#e2e8f0] bg-white hover:border-[#a7f3d0] hover:shadow-md"
       }`}
     >
-      {isCurrent && (
-        <span className="absolute right-5 top-5 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#065f46]">
-          Current plan
-        </span>
-      )}
-      <h3 className="font-display text-xl font-extrabold text-[#0f172a]">{plan.name}</h3>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h3 className="font-display text-xl font-extrabold text-[#0f172a]">{plan.name}</h3>
+          {plan.isOfferActive && plan.discountBadge && (
+            <span className="mt-1 inline-flex items-center gap-1 rounded-md bg-[#fff7ed] border border-[#fed7aa] px-2 py-0.5 text-[10px] font-extrabold text-[#c2410c]">
+              🔥 {plan.discountBadge}
+            </span>
+          )}
+        </div>
+        {isCurrent && (
+          <span className="shrink-0 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[#065f46]">
+            Current plan
+          </span>
+        )}
+      </div>
       <p className="mt-2 min-h-10 text-xs leading-relaxed text-[#64748b]">
         {plan.description || "A flexible WebMintra workspace plan."}
       </p>
       <div className="mt-5 border-y border-[#f1f5f9] py-4">
+        {plan.isOfferActive && plan.originalPricing?.[interval] && (
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-semibold text-[#94a3b8] line-through">
+              {formatMoney(plan.originalPricing[interval]!, plan.currency)}
+            </span>
+            <span className="text-[10px] font-black text-[#ea580c] bg-[#fff7ed] px-1.5 py-0.2 rounded border border-[#fed7aa]">
+              SPECIAL OFFER
+            </span>
+          </div>
+        )}
         <p className="text-3xl font-black text-[#0f172a]">
           {formatMoney(price, plan.currency)}
           <span className="ml-1.5 text-xs font-bold text-[#64748b]">

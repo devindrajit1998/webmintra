@@ -96,12 +96,12 @@ export function PublicTemplatesCatalogPage() {
   const allCategories = ["All", ...categories];
 
   return (
-    <div className="landing-page min-h-screen tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
+    <div className="landing-page min-h-screen flex flex-col justify-between tiranga-hero-bg indian-jali-pattern text-[#0f172a] font-sans">
       {/* ── GLOBAL HEADER NAVIGATION ─────────────────────────────────── */}
       <PublicHeader />
 
       {/* ── MAIN CATALOG CONTENT ────────────────────────────────────── */}
-      <main className="mx-auto max-w-7xl px-5 sm:px-6 py-12 lg:py-16">
+      <main className="flex-1 w-full mx-auto max-w-7xl px-5 sm:px-6 py-12 lg:py-16">
         {/* Title Banner */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-[#fed7aa] bg-[#fff7ed] px-3.5 py-1 text-[11.5px] font-bold text-[#c2410c] shadow-2xs">

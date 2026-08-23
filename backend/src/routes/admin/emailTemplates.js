@@ -11,6 +11,7 @@ import { isMongoId, isString, isEnum, stripUndefined } from "../../lib/validate.
 import { sendRawEmail } from "../../services/mail.js";
 import multer from "multer";
 import { imagekit } from "../../lib/imagekit.js";
+import { compressUploadedImages } from "../../middleware/imageCompressor.js";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -165,7 +166,7 @@ router.get("/:templateId/variables", async (req, res, next) => {
 });
 
 // ── Image Upload ──────────────────────────────────────────────
-router.post("/upload-image", upload.single("image"), async (req, res, next) => {
+router.post("/upload-image", upload.single("image"), compressUploadedImages("email"), async (req, res, next) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No image file provided." });
     

@@ -9,6 +9,10 @@ import { AnalyticsEvent, ANALYTICS_EVENT_TYPES } from "../models/AnalyticsEvent.
 import { Domain } from "../models/Domain.js";
 import { WebsitePlugin } from "../models/WebsitePlugin.js";
 import { generatePluginInjections } from "../lib/plugin-injectors.js";
+import { extractContactFromFormData } from "../lib/phone.js";
+import { whatsAppQueueService } from "../services/WhatsAppQueueService.js";
+import { renderTemplate } from "../services/WhatsAppTemplateService.js";
+import { TenantWhatsAppSettings } from "../models/TenantWhatsAppSettings.js";
 import {
   buildPublicPages,
   buildSitemapXml,
@@ -48,7 +52,7 @@ router.get("/templates", async (req, res) => {
     const query = Template.find(filter)
       .sort({ createdAt: -1 })
       .select("title description category thumbnailUrl pageCount assets pages");
-    
+
     if (limit) {
       query.limit(Math.min(100, Number(limit) || 10));
     }
@@ -90,7 +94,7 @@ router.get("/plans", async (req, res) => {
   try {
     const plans = await Plan.find({ status: "active", isPublic: true })
       .sort({ sortOrder: 1, createdAt: 1 })
-      .select("name slug description pricing currency trialDays limits features highlights isPopular sortOrder")
+      .select("name slug description pricing originalPricing discountBadge isOfferActive currency trialDays limits features highlights isPopular sortOrder")
       .lean();
     return res.json({ plans });
   } catch (error) {
@@ -228,16 +232,71 @@ router.post("/contact", async (req, res) => {
       return res.status(400).json({ message: recapResult.error || "Security verification failed." });
     }
 
-    const { SupportTicket } = await import("../models/Support.js").catch(() => ({}));
+    const enquirySubject = String(subject || `Website Pre-Sales Enquiry from ${name}`).slice(0, 200);
+    const enquiryDetails = `Name: ${String(name).slice(0, 100)}\nEmail: ${String(email).slice(0, 100)}\nPhone: ${String(phone || "N/A").slice(0, 30)}\n\nMessage:\n${String(message).slice(0, 5000)}`;
+
+    const { SupportTicket } = await import("../models/SupportTicket.js");
     if (SupportTicket) {
       await SupportTicket.create({
-        subject: String(subject || `Website Pre-Sales Enquiry from ${name}`).slice(0, 200),
-        description: `Name: ${String(name).slice(0, 100)}\nEmail: ${String(email).slice(0, 100)}\nPhone: ${String(phone || "N/A").slice(0, 30)}\n\nMessage:\n${String(message).slice(0, 5000)}`,
-        category: "general",
+        subject: enquirySubject,
+        description: enquiryDetails,
+        contactName: String(name).slice(0, 100),
+        contactEmail: String(email).slice(0, 100),
+        contactPhone: String(phone || "").slice(0, 30),
+        category: "Pre-Sales",
         priority: "medium",
         status: "open",
       });
     }
+
+    // Also register as a Lead for CRM tracking
+    try {
+      const { Lead } = await import("../models/Lead.js");
+      if (Lead) {
+        await Lead.create({
+          name: String(name).slice(0, 100),
+          email: String(email).slice(0, 100),
+          phone: String(phone || "").slice(0, 30),
+          source: "landing_page",
+          category: String(subject || "General").slice(0, 50),
+          status: "new",
+          notes: [
+            {
+              note: `[Website Contact Enquiry]\nSubject: ${enquirySubject}\n\n${message}`,
+              authorName: "Website Visitor",
+            },
+          ],
+        });
+      }
+    } catch (leadErr) {
+      console.warn("Could not create lead from contact submission:", leadErr?.message);
+    }
+
+    // Attempt to notify admin via email
+    try {
+      const { Setting } = await import("../models/Setting.js");
+      const supportEmailSetting = await Setting.findOne({ key: "site.supportEmail" }).lean();
+      const adminNotifyEmail = supportEmailSetting?.value || process.env.ADMIN_EMAIL || process.env.SMTP_USER || "support@webmintra.in";
+      
+      const { sendRawEmail } = await import("../services/mail.js");
+      await sendRawEmail({
+        to: adminNotifyEmail,
+        replyTo: email,
+        subject: `[WebMintra Enquiry] ${enquirySubject}`,
+        text: `New Website Contact Form Enquiry:\n\n${enquiryDetails}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; rounded: 8px;">
+            <h2 style="color: #0f172a; margin-bottom: 16px;">New Contact Form Enquiry</h2>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+            <p><strong>Phone:</strong> ${phone || "N/A"}</p>
+            <p><strong>Subject:</strong> ${enquirySubject}</p>
+            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
+            <p style="white-space: pre-wrap; color: #334155; line-height: 1.6;">${message}</p>
+          </div>
+        `,
+      }).catch((mailErr) => console.warn("Could not dispatch contact email alert:", mailErr?.message));
+    } catch {}
 
     return res.status(201).json({ message: "Enquiry submitted successfully! Our team will contact you shortly." });
   } catch (error) {
@@ -249,11 +308,7 @@ router.post("/contact", async (req, res) => {
 // ── Public FAQs ────────────────────────────────────────────────
 router.get("/faqs", async (req, res) => {
   try {
-    const { FAQ, DEFAULT_FAQS } = await import("../models/Faq.js");
-    const count = await FAQ.countDocuments();
-    if (count === 0) {
-      await FAQ.insertMany(DEFAULT_FAQS);
-    }
+    const { FAQ } = await import("../models/Faq.js");
     const faqs = await FAQ.find({ isPublished: true })
       .sort({ sortOrder: 1, createdAt: 1 })
       .lean();
@@ -352,12 +407,12 @@ async function resolvePublishedWebsite(domainOrId) {
   // Check if a tenant's business name matches the subdomain slug
   const normalizedSlug = domainOrId.toLowerCase().replace(/[^a-z0-9]/g, "");
   const tenants = await User.find({ role: "tenant" }).select("_id name business").lean();
-  
+
   const matchedTenant = tenants.find((t) => {
     const bizName = t.business?.name ? t.business.name.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
     const userName = t.name ? t.name.toLowerCase().replace(/[^a-z0-9]/g, "") : "";
     return (bizName && (bizName === normalizedSlug || bizName.includes(normalizedSlug) || normalizedSlug.includes(bizName))) ||
-           (userName && (userName === normalizedSlug || userName.includes(normalizedSlug)));
+      (userName && (userName === normalizedSlug || userName.includes(normalizedSlug)));
   });
 
   if (matchedTenant) {
@@ -468,8 +523,97 @@ export function analyticsScript(websiteId) {
 }
 
 export function formScript(websiteId) {
-  return `<script>document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('form').forEach(form=>{const status=document.createElement('p');status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.style.marginTop='0.75rem';form.appendChild(status);form.addEventListener('submit',async event=>{event.preventDefault();const button=form.querySelector('button[type="submit"]')||form.querySelector('button');const original=button?.textContent||'';status.textContent='';if(button){button.disabled=true;button.textContent='Submitting...';}try{const response=await fetch('/api/public/site/${websiteId}/form',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});if(!response.ok)throw new Error();form.reset();status.textContent='Thank you! Your submission has been received.';}catch{status.textContent='There was a problem submitting your form. Please try again.';}finally{if(button){button.disabled=false;button.textContent=original;}}});});});</script>`;
+  return `<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('form').forEach(form => {
+    const status = document.createElement('p');
+    status.setAttribute('role', 'status');
+    status.setAttribute('aria-live', 'polite');
+    status.style.marginTop = '0.75rem';
+    form.appendChild(status);
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = form.querySelector('button[type="submit"]') || form.querySelector('button');
+      const original = button?.textContent || '';
+      status.textContent = '';
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Submitting...';
+      }
+
+      try {
+        const payload = {};
+        const inputs = Array.from(form.querySelectorAll('input, select, textarea'));
+        
+        inputs.forEach((el, idx) => {
+          if (!el || ['button', 'submit', 'reset', 'hidden'].includes(el.type?.toLowerCase())) return;
+
+          // Universal Field Name Detection:
+          // 1. Explicit name attribute (if not generic)
+          let label = el.getAttribute('name');
+
+          // 2. <label for="id"> associated label
+          if (!label && el.id) {
+            const lbl = form.querySelector('label[for="' + el.id + '"]') || document.querySelector('label[for="' + el.id + '"]');
+            if (lbl) label = lbl.textContent;
+          }
+
+          // 3. Preceding sibling or parent container label/heading
+          if (!label) {
+            const parent = el.closest('div, section, p, fieldset');
+            const parentLbl = parent ? parent.querySelector('label, h4, h5, h6, .form-label, span') : null;
+            if (parentLbl && !parentLbl.contains(el)) {
+              label = parentLbl.textContent;
+            }
+          }
+
+          // 4. aria-label or placeholder
+          if (!label) label = el.getAttribute('aria-label') || el.getAttribute('placeholder') || el.id;
+
+          // 5. Fallback based on input type
+          if (!label || label.trim() === '') {
+            const type = el.getAttribute('type')?.toLowerCase();
+            if (type === 'email') label = 'Email';
+            else if (type === 'tel') label = 'Phone';
+            else if (type === 'date') label = 'Date';
+            else if (type === 'time') label = 'Time';
+            else label = el.tagName === 'SELECT' ? 'Selection' : ('Field ' + (idx + 1));
+          }
+
+          // Clean label text: strip asterisks, colons, extra whitespace
+          const cleanKey = label.replace(/[*:]/g, '').replace(/\\s+/g, ' ').trim();
+          const val = el.type === 'checkbox' ? (el.checked ? 'Yes' : 'No') : el.value?.trim();
+
+          if (cleanKey && val !== undefined && val !== '') {
+            payload[cleanKey] = val;
+          }
+        });
+
+        const response = await fetch('/api/public/site/${websiteId}/form', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error();
+        form.reset();
+        status.textContent = 'Thank you! Your submission has been received.';
+      } catch (err) {
+        status.textContent = 'There was a problem submitting your form. Please try again.';
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = original;
+        }
+      }
+    });
+  });
+});
+</script>`;
 }
+
+
 
 async function renderPage(req, res, next) {
   try {
@@ -587,7 +731,76 @@ router.post("/site/:domainOrId/form", async (req, res, next) => {
     const website = await resolvePublishedWebsite(req.params.domainOrId);
     if (!website) return res.status(404).json({ message: "Website not found." });
     const cleanData = sanitizeFormData(req.body);
-    const submission = await FormSubmission.create({ websiteId: website._id, tenantId: website.owner, data: cleanData });
+
+    // Extract normalized contact phone, name and email from submitted form fields
+    const { phone: contactPhone, name: contactName, email: contactEmail } = extractContactFromFormData(cleanData);
+
+    const submission = await FormSubmission.create({
+      websiteId: website._id,
+      tenantId: website.owner,
+      data: cleanData,
+      contactPhone: contactPhone || "",
+      contactName: contactName || "",
+      contactEmail: contactEmail || "",
+      whatsappOptIn: true,
+      whatsappOptInAt: new Date(),
+    });
+
+    // ── Asynchronous WhatsApp Automation (Non-blocking) ─────────
+    (async () => {
+      try {
+        const owner = await User.findById(website.owner).select("business name").lean();
+        const settings = await TenantWhatsAppSettings.findOne({ tenant: website.owner }).lean();
+        const siteName = owner?.business?.name || website.name || "our business";
+        const businessName = owner?.business?.name || owner?.name || "our team";
+
+        // 1. Send Auto-Reply to customer if valid phone number & auto-reply enabled
+        if (contactPhone && settings?.autoReplyEnabled) {
+          const autoReplyText = renderTemplate(
+            settings.autoReplyTemplate || "Hi {{name}}, thank you for contacting {{businessName}}! We received your enquiry and will get back to you shortly.",
+            {
+              name: contactName || "there",
+              businessName,
+              phone: contactPhone,
+              email: contactEmail || "",
+              siteName,
+            }
+          );
+
+          await whatsAppQueueService.enqueueMessage({
+            tenantId: website.owner,
+            leadId: submission._id,
+            dedupKey: `autoreply_${submission._id}`,
+            recipient: contactPhone,
+            message: autoReplyText,
+            messageType: "auto_reply",
+          });
+        }
+
+        // 2. Send Lead Alert to tenant phone
+        const alertPhone = settings?.leadAlertPhone || owner?.business?.phone || "";
+        if (alertPhone && (settings?.leadAlertEnabled !== false)) {
+          const fieldSummary = Object.entries(cleanData)
+            .slice(0, 5)
+            .map(([k, v]) => `${k}: ${String(v).slice(0, 80)}`)
+            .join("\n");
+
+          const alertText = `🔔 *New Lead from ${siteName}*!\n\n${fieldSummary}\n\n_WebMintra Leads Engine_`;
+
+          await whatsAppQueueService.enqueueMessage({
+            tenantId: website.owner,
+            leadId: submission._id,
+            dedupKey: `alert_${submission._id}`,
+            recipient: alertPhone,
+            message: alertText,
+            messageType: "lead_alert",
+          });
+        }
+      } catch (err) {
+        console.warn("[Form Automation] WhatsApp enqueue error (non-critical):", err.message);
+      }
+    })();
+
     return res.status(201).json({ message: "Form submitted successfully", id: submission._id });
   } catch (error) {
     return next(error);

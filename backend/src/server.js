@@ -5,6 +5,7 @@ import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 import {
   corsOptions,
   issueCsrfToken,
@@ -15,6 +16,7 @@ import {
 
 // ── Existing routes (Template Engine ecosystem — DO NOT MODIFY) ──
 import authRouter from "./routes/auth.js";
+import googleAuthRouter from "./routes/google-auth.js";
 import dashboardRouter from "./routes/dashboard.js";
 import websitesRouter from "./routes/websites.js";
 import templatesRouter from "./routes/templates.js";
@@ -26,6 +28,9 @@ import onboardingRouter from "./routes/onboarding.js";
 import billingRouter from "./routes/billing.js";
 import workspaceRouter from "./routes/workspace.js";
 import pluginsRouter from "./routes/plugins.js";
+import tenantWhatsAppRouter from "./routes/tenantWhatsApp.js";
+import { tenantWhatsAppManager } from "./services/TenantWhatsAppManager.js";
+import { whatsAppQueueService } from "./services/WhatsAppQueueService.js";
 
 // ── Admin Platform Routes ──
 import adminDashboardRouter from "./routes/admin/dashboard.js";
@@ -53,7 +58,15 @@ import adminTemplateCategoriesRouter from "./routes/admin/templateCategories.js"
 import adminTestimonialsRouter from "./routes/admin/testimonials.js";
 import adminFaqsRouter from "./routes/admin/faqs.js";
 import adminUploadRouter from "./routes/admin/upload.js";
+import adminWhatsAppRouter from "./routes/admin/whatsapp.js";
+import adminLeadsRouter from "./routes/admin/leads.js";
+import adminMailboxRouter from "./routes/admin/mailbox.js";
+import adminBackupRouter from "./routes/admin/backup.js";
+import mediaRouter from "./routes/media.js";
+import inboundEmailWebhookRouter from "./routes/webhooks/inboundEmail.js";
+import razorpayWebhookRouter from "./routes/webhooks/razorpay.js";
 import { initCronJobs } from "./services/cron.js";
+import { initWhatsAppClient } from "./services/whatsapp.js";
 
 // ── Environment Validation ──────────────────────────────────────
 const required = ["MONGODB_URI", "JWT_SECRET", "OTP_SECRET"];
@@ -87,6 +100,16 @@ app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 app.use(requireTrustedOrigin);
 app.use(requireCsrfToken);
+// Strip MongoDB operators from incoming request data to prevent NoSQL injection (Express 5 compatible)
+app.use((req, res, next) => {
+  if (req.body && typeof req.body === "object") {
+    mongoSanitize.sanitize(req.body);
+  }
+  if (req.params && typeof req.params === "object") {
+    mongoSanitize.sanitize(req.params);
+  }
+  next();
+});
 
 // ── Rate Limiters ───────────────────────────────────────────────
 const authLimiter = rateLimit({
@@ -127,6 +150,7 @@ app.get("/api/csrf-token", (request, response) => {
   response.json({ csrfToken: issueCsrfToken(request, response) });
 });
 app.use("/api/auth", authLimiter, authRouter);
+app.use("/api/auth", authLimiter, googleAuthRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/websites", websitesRouter);
 app.use("/api/templates", templatesRouter);
@@ -136,6 +160,8 @@ app.use("/api/domains", domainsRouter);
 app.use("/api/onboarding", onboardingLimiter, onboardingRouter);
 app.use("/api/billing", billingRouter);
 app.use("/api/workspace", workspaceRouter);
+app.use("/api/media", mediaRouter);
+app.use("/api/workspace/whatsapp", tenantWhatsAppRouter);
 app.use("/api/plugins", pluginsRouter);
 
 // ── Public Settings Endpoint (no auth) ─────────────────────────
@@ -168,6 +194,14 @@ app.use("/api/admin/template-categories", adminTemplateCategoriesRouter);
 app.use("/api/admin/testimonials", adminTestimonialsRouter);
 app.use("/api/admin/faqs", adminFaqsRouter);
 app.use("/api/admin/upload", adminUploadRouter);
+app.use("/api/admin/whatsapp", adminWhatsAppRouter);
+app.use("/api/admin/leads", adminLeadsRouter);
+app.use("/api/admin/mailbox", adminMailboxRouter);
+app.use("/api/admin/backup", adminBackupRouter);
+
+// ── Inbound Webhooks (Resend / Cloudflare / Postmark / Brevo & Razorpay) ──
+app.use("/api/webhooks/inbound-email", inboundEmailWebhookRouter);
+app.use("/api/webhooks/razorpay", razorpayWebhookRouter);
 
 // ── Public APIs ──────────────────────────────────────────────────
 app.use("/api/public", publicSubmissionsLimiter, publicRouter);
@@ -342,7 +376,15 @@ const port = Number(process.env.PORT ?? 5000);
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(port, () => console.log(`API listening on ${port}`));
+    app.listen(port, () => {
+      console.log(`Backend server listening on port ${port}`);
+      // 1. Recover active multi-tenant WhatsApp sessions
+      tenantWhatsAppManager.restoreAllSessions().catch((err) =>
+        console.error("[Tenant WhatsApp] Session recovery error:", err.message)
+      );
+      // 2. Start background message queue worker
+      whatsAppQueueService.startWorker();
+    });
     initCronJobs();
   })
   .catch((error) => {

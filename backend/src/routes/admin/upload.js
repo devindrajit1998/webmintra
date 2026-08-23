@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import { imagekit } from "../../lib/imagekit.js";
 import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js";
+import { compressUploadedImages } from "../../middleware/imageCompressor.js";
 
 const router = Router();
 
@@ -31,7 +32,7 @@ const upload = multer({
 router.use(requireAuthenticatedUser, requireRole("admin"));
 
 // Generic upload endpoint
-router.post("/", upload.single("file"), async (req, res) => {
+router.post("/", upload.single("file"), compressUploadedImages("standard"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });

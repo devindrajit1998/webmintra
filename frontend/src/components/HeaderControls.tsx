@@ -178,14 +178,14 @@ export function AdminHeaderControls() {
     <div className="ml-auto flex min-w-0 items-center gap-1 sm:gap-2">
       <form action="/admin/search" method="get" className="hidden min-w-0 max-w-md flex-1 md:block">
         <label className="relative block">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94a3b8]" />
           <input
             name="q"
             minLength={2}
             required
             aria-label="Search platform"
-            placeholder="Search tenants, websites, payments..."
-            className="h-9 w-full rounded-lg border border-slate-700 bg-slate-900/60 pl-9 pr-3 text-xs text-slate-100 outline-none transition focus:border-cyan-400"
+            placeholder="Search tenants, websites, leads, payments..."
+            className="h-9 w-64 lg:w-80 rounded-xl border border-[#cbd5e1] bg-[#f8fafc] pl-9 pr-3 text-xs font-semibold text-[#0f172a] placeholder-[#94a3b8] outline-none transition focus:border-[#059669] focus:bg-white focus:ring-2 focus:ring-[#059669]/10"
           />
         </label>
       </form>
@@ -201,7 +201,7 @@ export function AdminHeaderControls() {
       <Link
         to="/admin/kb"
         aria-label="Help"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-800 hover:text-slate-100"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#e2e8f0] text-[#64748b] transition hover:bg-[#f1f5f9] hover:text-[#0f172a]"
       >
         <CircleHelp className="h-4 w-4" />
       </Link>

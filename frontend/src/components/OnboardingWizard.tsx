@@ -639,9 +639,26 @@ function PlanStep({
                     <Check className="h-3.5 w-3.5 stroke-[3]" />
                   </div>
                 )}
-                <h3 className="font-display text-lg font-bold text-[#0f172a]">{plan.name}</h3>
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-display text-lg font-bold text-[#0f172a]">{plan.name}</h3>
+                  {plan.isOfferActive && plan.discountBadge && (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-[#fff7ed] border border-[#fed7aa] px-2 py-0.5 text-[10px] font-extrabold text-[#c2410c]">
+                      🔥 {plan.discountBadge}
+                    </span>
+                  )}
+                </div>
                 <p className="mt-1 text-xs text-[#64748b] line-clamp-2">{plan.description}</p>
                 <div className="mt-4">
+                  {plan.isOfferActive && plan.originalPricing?.[interval] && (
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs font-semibold text-[#94a3b8] line-through">
+                        ₹{Number(plan.originalPricing[interval]).toLocaleString("en-IN")}
+                      </span>
+                      <span className="text-[9px] font-extrabold text-[#ea580c] bg-[#fff7ed] px-1 py-0.2 rounded border border-[#fed7aa]">
+                        OFFER
+                      </span>
+                    </div>
+                  )}
                   <span className="text-3xl font-black text-[#0f172a]">
                     ₹{price.toLocaleString("en-IN")}
                   </span>

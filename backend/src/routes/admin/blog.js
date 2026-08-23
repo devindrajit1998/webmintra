@@ -8,6 +8,7 @@ import { requireAuthenticatedUser, requireRole } from "../../middleware/auth.js"
 import { BlogPost, BlogCategory, POST_STATUSES } from "../../models/Blog.js";
 import { logActivity, buildLogContext } from "../../services/activityLog.js";
 import { parsePagination, parseSort, isMongoId, isString, stripUndefined } from "../../lib/validate.js";
+import { sanitizeRichHtml } from "../../lib/sanitizeRichHtml.js";
 
 const router = Router();
 router.use(requireAuthenticatedUser, requireRole("admin"));
@@ -164,7 +165,7 @@ router.post("/posts", async (req, res, next) => {
       title: b.title.trim(),
       slug: b.slug.toLowerCase().trim(),
       excerpt: b.excerpt?.trim() || "",
-      content: b.content,
+      content: sanitizeRichHtml(b.content),
       coverImage: b.coverImage?.trim() || "",
       author: req.user._id,
       category: b.category && isMongoId(b.category) ? b.category : undefined,
@@ -208,7 +209,7 @@ router.patch("/posts/:postId", async (req, res, next) => {
       title: b.title?.trim(),
       slug: b.slug?.toLowerCase()?.trim(),
       excerpt: b.excerpt?.trim(),
-      content: b.content,
+      content: b.content !== undefined ? sanitizeRichHtml(b.content) : undefined,
       coverImage: b.coverImage?.trim(),
       category: b.category && isMongoId(b.category) ? b.category : undefined,
       tags: Array.isArray(b.tags) ? b.tags.map((t) => t.toLowerCase().trim()) : undefined,

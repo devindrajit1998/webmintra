@@ -138,15 +138,51 @@ router.post("/:ticketId/reply", async (req, res, next) => {
 
     await ticket.save();
 
-    // Notify tenant (if not internal note)
+    // Notify tenant or visitor via in-app notification and email (if not an internal note)
     if (!isInternal) {
-      await Notification.create({
-        recipient: ticket.tenant,
-        type: "ticket",
-        title: "New reply on your support ticket",
-        message: `An admin has replied to your ticket #${ticket.ticketNumber}.`,
-        link: `/tickets/${ticket._id}`,
-      });
+      if (ticket.tenant) {
+        await Notification.create({
+          recipient: ticket.tenant,
+          type: "ticket",
+          title: "New reply on your support ticket",
+          message: `An admin has replied to your ticket #${ticket.ticketNumber}.`,
+          link: `/tickets/${ticket._id}`,
+        }).catch(() => {});
+      }
+
+      // Send email to customer / lead
+      try {
+        const recipientEmail = ticket.contactEmail || ticket.tenant?.email;
+        const recipientName = ticket.contactName || ticket.tenant?.name || "Customer";
+        
+        if (recipientEmail) {
+          const { sendRawEmail } = await import("../../services/mail.js");
+          await sendRawEmail({
+            to: recipientEmail,
+            subject: `Re: [${ticket.ticketNumber}] ${ticket.subject}`,
+            text: `Hello ${recipientName},\n\nOur support team has replied to your enquiry (Ticket #${ticket.ticketNumber}):\n\n${content.trim()}\n\nBest regards,\nWebMintra Support Team`,
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background-color: #ffffff;">
+                <div style="margin-bottom: 20px;">
+                  <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; color: #059669; letter-spacing: 0.5px;">WebMintra Support</span>
+                  <h2 style="font-size: 18px; color: #0f172a; margin: 6px 0 0 0;">Update on Ticket #${ticket.ticketNumber}</h2>
+                  <p style="font-size: 13px; color: #64748b; margin: 4px 0 0 0;">${ticket.subject}</p>
+                </div>
+                <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 16px; border-radius: 4px; margin: 20px 0;">
+                  <p style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #1e293b; margin: 0;">${content.trim()}</p>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
+                <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+                  You can reply directly to this email or visit our help center if you have any further questions.<br />
+                  © ${new Date().getFullYear()} WebMintra. All rights reserved.
+                </p>
+              </div>
+            `,
+          }).catch((mailErr) => console.warn("Failed to dispatch ticket reply email:", mailErr?.message));
+        }
+      } catch (e) {
+        console.warn("Could not send email on ticket reply:", e?.message);
+      }
     }
 
     await logActivity({
@@ -213,7 +249,7 @@ function formatTicket(t) {
     satisfactionRating: t.satisfactionRating,
     tenant: t.tenant
       ? { id: t.tenant._id || t.tenant, name: t.tenant.name, email: t.tenant.email, businessName: t.tenant.business?.name }
-      : { id: t.tenant },
+      : { id: "lead", name: t.contactName || "Website Lead", email: t.contactEmail || "Public Visitor", businessName: t.contactPhone ? `Phone: ${t.contactPhone}` : "Website Enquiry" },
     assignedTo: t.assignedTo
       ? { id: t.assignedTo._id || t.assignedTo, name: t.assignedTo.name, email: t.assignedTo.email }
       : null,

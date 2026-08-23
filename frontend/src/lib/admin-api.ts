@@ -149,12 +149,25 @@ export const getDomains = (params?: {
   search?: string;
 }) => adminRequest<any>(`/domains${buildQuery(params)}`);
 
+export const getStorageStats = () => adminRequest<any>("/storage/stats");
+export const getMongoStorageStats = () => adminRequest<any>("/storage/mongodb");
 export const getStorageItems = (params?: {
+  type?: string;
   page?: number;
   limit?: number;
   search?: string;
-  tenantId?: string;
 }) => adminRequest<any>(`/storage${buildQuery(params)}`);
+export const uploadStorageItem = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  const response = await apiFetch(`${API_URL}/admin/storage/upload`, {
+    method: "POST",
+    body: formData,
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Upload failed");
+  return response.json();
+};
 export const deleteStorageItem = (id: string) =>
   adminRequest<any>(`/storage/${id}`, { method: "DELETE" });
 export const getImageKitStats = () => adminRequest<any>(`/storage/imagekit`);
@@ -163,6 +176,14 @@ export const uploadAdminFile = (file: File) => {
   formData.append("file", file);
   return adminRequest<any>("/upload", { method: "POST", body: formData });
 };
+
+// ── WhatsApp ───────────────────────────────────────────────────
+export const getAdminWhatsAppStatus = () => adminRequest<any>("/whatsapp/status");
+export const reconnectAdminWhatsApp = () =>
+  adminRequest<any>("/whatsapp/reconnect", { method: "POST" });
+export const logoutAdminWhatsApp = () => adminRequest<any>("/whatsapp/logout", { method: "POST" });
+export const testAdminWhatsAppMessage = (phone: string) =>
+  adminRequest<any>("/whatsapp/test", { method: "POST", body: JSON.stringify({ phone }) });
 
 // ── Content (Blog, KB, Announcements) ─────────────────────────
 export type BlogPostInput = {
@@ -446,3 +467,186 @@ export const deleteAdminFaq = (id: string) =>
   adminRequest<{ message: string }>(`/faqs/${id}`, {
     method: "DELETE",
   });
+
+// ── Leads CRM ─────────────────────────────────────────────────
+export const getAdminLeads = (params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+  priority?: string;
+  category?: string;
+  source?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}) => adminRequest<any>(`/leads${buildQuery(params)}`);
+
+export const getAdminLeadStats = () => adminRequest<any>("/leads/stats");
+
+export const createAdminLead = (data: any) =>
+  adminRequest<any>("/leads", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const importAdminLeadsBulk = (data: { leads: any[]; skipDuplicates?: boolean }) =>
+  adminRequest<any>("/leads/bulk-import", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateAdminLead = (leadId: string, data: any) =>
+  adminRequest<any>(`/leads/${leadId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const addAdminLeadNote = (leadId: string, note: string) =>
+  adminRequest<any>(`/leads/${leadId}/notes`, {
+    method: "POST",
+    body: JSON.stringify({ note }),
+  });
+
+export const convertAdminLeadToTenant = (leadId: string) =>
+  adminRequest<any>(`/leads/${leadId}/convert`, {
+    method: "POST",
+  });
+
+export const deleteAdminLead = (leadId: string) =>
+  adminRequest<any>(`/leads/${leadId}`, {
+    method: "DELETE",
+  });
+
+export const updateAdminLeadsBulkStatus = (leadIds: string[], status: string) =>
+  adminRequest<any>("/leads/bulk-status", {
+    method: "POST",
+    body: JSON.stringify({ leadIds, status }),
+  });
+
+export const deleteAdminLeadsBulk = (leadIds: string[]) =>
+  adminRequest<any>("/leads/bulk-delete", {
+    method: "POST",
+    body: JSON.stringify({ leadIds }),
+  });
+
+// ── Mailbox & Inbound Email ──────────────────────────────────
+export const getAdminMailbox = (params?: {
+  page?: number;
+  limit?: number;
+  folder?: string;
+  status?: string;
+  category?: string;
+  search?: string;
+}) =>
+  adminRequest<{ messages: any[]; unreadCount: number; starredCount: number; pagination: any }>(
+    `/mailbox${buildQuery(params)}`,
+  );
+
+export const getAdminMailboxMessage = (id: string) =>
+  adminRequest<{ message: any }>(`/mailbox/${id}`);
+
+export const replyAdminMailboxMessage = (
+  id: string,
+  data: { htmlBody: string; textBody?: string },
+) =>
+  adminRequest<{ success: boolean; message: string; reply: any }>(`/mailbox/${id}/reply`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateAdminMailboxMessageStatus = (
+  id: string,
+  data: { status?: string; isStarred?: boolean; category?: string },
+) =>
+  adminRequest<{ message: any }>(`/mailbox/${id}/status`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+
+export const convertAdminMailboxLead = (id: string) =>
+  adminRequest<{ success: boolean; message: string; lead: any }>(`/mailbox/${id}/convert-lead`, {
+    method: "POST",
+  });
+
+export const deleteAdminMailboxMessage = (id: string) =>
+  adminRequest<{ message: string }>(`/mailbox/${id}`, {
+    method: "DELETE",
+  });
+
+// ── Database Backups (Cloudflare R2) ─────────────────────────────
+export const getAdminBackupStatus = () =>
+  adminRequest<{
+    configured: boolean;
+    message?: string;
+    bucket?: string;
+    totalBackups: number;
+    lastBackup: any;
+    nextScheduled: string;
+    retentionPolicy: string;
+    backups: any[];
+  }>("/backup/status");
+
+export const runAdminBackupNow = () =>
+  adminRequest<{
+    message: string;
+    key: string;
+    totalDocuments: number;
+    compressedSizeKb: number;
+    durationMs: number;
+  }>("/backup/run", {
+    method: "POST",
+  });
+
+export const listAdminBackups = () =>
+  adminRequest<{ backups: any[]; total: number }>("/backup/list");
+
+export const getAdminBackupDownloadUrl = (key: string) =>
+  adminRequest<{ url: string; expiresIn: number }>(
+    `/backup/download?key=${encodeURIComponent(key)}`,
+  );
+
+export const deleteAdminBackup = (key: string) =>
+  adminRequest<{ message: string }>(`/backup?key=${encodeURIComponent(key)}`, {
+    method: "DELETE",
+  });
+
+// ── Image Compression Engine ─────────────────────────────────────
+export const getImageCompressionStats = () =>
+  adminRequest<{
+    totalProcessed: number;
+    totalOriginalBytes: number;
+    totalCompressedBytes: number;
+    totalSavedBytes: number;
+    totalOriginalMb: number;
+    totalCompressedMb: number;
+    totalSavedMb: number;
+    overallSavedPercent: number;
+    presets: Record<string, any>;
+    engine: string;
+  }>("/storage/compression-stats");
+
+export const testImageCompression = async (file: File, preset = "standard") => {
+  const formData = new FormData();
+  formData.append("image", file);
+  formData.append("preset", preset);
+
+  return adminRequest<{
+    success: boolean;
+    originalName: string;
+    preset: string;
+    presetConfig: any;
+    originalSizeKb: number;
+    compressedSizeKb: number;
+    savedKb: number;
+    savedPercentage: number;
+    width: number;
+    height: number;
+    mimetype: string;
+    format: string;
+    durationMs: number;
+    previewDataUri: string;
+  }>("/storage/compress-test", {
+    method: "POST",
+    body: formData,
+  });
+};

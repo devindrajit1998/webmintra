@@ -724,45 +724,72 @@ function AdminTemplatesPage() {
         })()}
 
       {editTemplate && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-slate-950 animate-in fade-in duration-200">
-          <div className="flex justify-between items-center px-4 py-3 border-b border-slate-800 bg-[#0b1826]">
-            <div className="flex items-center gap-3">
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#0f172a] text-[#0f172a] animate-in fade-in duration-200">
+          {/* Indian Tricolor Accent Strip */}
+          <div className="flex h-1.5 w-full shrink-0 shadow-sm" aria-hidden="true">
+            <span className="flex-1 bg-[#ea580c]" />
+            <span className="flex-1 bg-white" />
+            <span className="flex-1 bg-[#059669]" />
+          </div>
+
+          {/* Top Studio Bar */}
+          <div className="flex justify-between items-center px-6 py-3.5 border-b border-[#e2e8f0] bg-white shadow-xs">
+            <div className="flex items-center gap-3.5">
               <button
+                type="button"
                 onClick={() => setEditTemplate(null)}
-                className="text-slate-400 hover:text-white transition bg-slate-800/50 hover:bg-slate-700 p-1.5 rounded-md"
+                className="text-[#64748b] hover:text-[#0f172a] transition bg-[#f8fafc] hover:bg-[#f1f5f9] p-2 rounded-xl border border-[#e2e8f0] cursor-pointer"
+                title="Close Editor"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
-              <div>
-                <h2 className="text-white font-bold text-sm flex items-center gap-2">
-                  <Pencil className="h-3.5 w-3.5 text-cyan-400" /> Editing: {editData.title}
-                </h2>
+              <div className="flex items-center gap-3">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#fff7ed] text-[#ea580c] border border-[#fed7aa] shadow-2xs">
+                  <FileCode2 className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-[#0f172a] font-display font-extrabold text-sm tracking-tight">
+                      {editData.title}
+                    </h2>
+                    <span className="rounded-full bg-[#ecfdf5] border border-[#a7f3d0] px-2.5 py-0.5 text-[9px] font-extrabold text-[#065f46]">
+                      {editData.category || "Template"}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#64748b] font-semibold flex items-center gap-1.5 mt-0.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#ea580c]" />
+                    <span>HTML Template Code Studio</span>
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <button
+                type="button"
                 onClick={() => setIsPreviewModalOpen(true)}
-                className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-cyan-500/30 bg-cyan-500/10 text-sm font-semibold text-cyan-400 transition hover:bg-cyan-500 hover:text-cyan-950"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#fed7aa] bg-[#fff7ed] text-xs font-extrabold text-[#c2410c] transition hover:bg-[#ea580c] hover:text-white cursor-pointer shadow-2xs"
               >
-                <Eye className="h-4 w-4" /> Preview
+                <Eye className="h-3.5 w-3.5" /> Preview
               </button>
               <button
+                type="button"
                 onClick={() => setIsSettingsOpen(true)}
-                className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 text-sm font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] text-xs font-extrabold text-[#334155] transition hover:bg-[#f1f5f9] hover:text-[#0f172a] cursor-pointer shadow-2xs"
               >
-                <Settings className="h-4 w-4" /> Metadata
+                <Settings className="h-3.5 w-3.5 text-[#64748b]" /> Metadata
               </button>
               <button
+                type="button"
                 onClick={() => updateMutation.mutate({ id: editTemplate._id, data: editData })}
                 disabled={updateMutation.isPending}
-                className="flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg bg-cyan-500 text-sm font-semibold text-cyan-950 transition hover:bg-cyan-400 disabled:opacity-50 min-w-[120px]"
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#059669] text-xs font-extrabold text-white shadow-xs transition hover:bg-[#047857] disabled:opacity-50 min-w-[130px] cursor-pointer"
               >
                 {updateMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
                   <>
-                    <Save className="h-4 w-4" /> Save Changes
+                    <Save className="h-3.5 w-3.5" /> Save Changes
                   </>
                 )}
               </button>
@@ -771,14 +798,14 @@ function AdminTemplatesPage() {
 
           <div className="flex-1 flex overflow-hidden">
             {/* File Sidebar */}
-            <div className="w-56 bg-slate-900 border-r border-slate-800 flex flex-col">
-              <div className="p-3 border-b border-slate-800 flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Pages
+            <div className="w-64 bg-[#f8fafc] border-r border-[#e2e8f0] flex flex-col">
+              <div className="p-3.5 border-b border-[#e2e8f0] flex justify-between items-center bg-white">
+                <span className="text-[11px] font-extrabold text-[#475569] uppercase tracking-wider">
+                  Pages & Files
                 </span>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                   <label
-                    className="cursor-pointer text-slate-400 hover:text-cyan-400 p-1 rounded hover:bg-slate-800 transition"
+                    className="cursor-pointer text-[#64748b] hover:text-[#059669] p-1.5 rounded-lg hover:bg-[#f1f5f9] transition"
                     title="Import HTML File"
                   >
                     <Upload className="h-3.5 w-3.5" />
@@ -823,47 +850,60 @@ function AdminTemplatesPage() {
                     />
                   </label>
                   <button
+                    type="button"
                     onClick={handleAddPage}
-                    className="text-slate-400 hover:text-cyan-400 p-1 rounded hover:bg-slate-800 transition"
+                    className="text-[#64748b] hover:text-[#059669] p-1.5 rounded-lg hover:bg-[#f1f5f9] transition cursor-pointer"
                     title="Add Blank Page"
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-2 space-y-1">
+              <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
                 <div
                   onClick={() => setActivePage("index.html")}
-                  className={`flex items-center gap-2 px-2 py-1.5 rounded text-sm cursor-pointer transition ${activePage === "index.html" ? "bg-cyan-500/10 text-cyan-400" : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"}`}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition ${
+                    activePage === "index.html"
+                      ? "bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0] shadow-2xs"
+                      : "text-[#64748b] hover:bg-white hover:text-[#0f172a] border border-transparent"
+                  }`}
                 >
-                  <FileCode2 className="h-4 w-4" /> index.html
+                  <FileCode2 className="h-4 w-4 shrink-0 text-[#059669]" />
+                  <span className="truncate">index.html</span>
+                  <span className="ml-auto text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-[#059669] text-white">
+                    Home
+                  </span>
                 </div>
                 {editData.pages.map((page) => (
                   <div
                     key={page.name}
                     onClick={() => setActivePage(page.name)}
-                    className={`flex items-center justify-between gap-1 px-2.5 py-1.5 rounded-lg text-xs cursor-pointer transition ${activePage === page.name ? "bg-cyan-500/15 text-cyan-300 font-medium border border-cyan-500/30" : "text-slate-400 hover:bg-slate-800/80 hover:text-slate-200 border border-transparent"}`}
+                    className={`flex items-center justify-between gap-1 px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition ${
+                      activePage === page.name
+                        ? "bg-[#ecfdf5] text-[#065f46] border border-[#a7f3d0] shadow-2xs"
+                        : "text-[#64748b] hover:bg-white hover:text-[#0f172a] border border-transparent"
+                    }`}
                   >
-                    <div className="flex items-center gap-2 overflow-hidden min-w-0 flex-1">
-                      <FileCode2 className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    <div className="flex items-center gap-2.5 overflow-hidden min-w-0 flex-1">
+                      <FileCode2 className="h-4 w-4 shrink-0 text-[#64748b]" />
                       <span className="truncate">{page.name}</span>
                     </div>
-                    <div className="flex items-center gap-0.5 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       <button
                         type="button"
                         onClick={(e) => handleRenameClick(page.name, e)}
-                        className="text-slate-400 hover:text-cyan-300 p-1 rounded hover:bg-slate-700 transition"
+                        className="text-[#64748b] hover:text-[#059669] p-1 rounded-md hover:bg-white transition"
                         title="Rename Page"
                       >
-                        <Pencil className="h-3.5 w-3.5" />
+                        <Pencil className="h-3 w-3" />
                       </button>
                       <button
                         type="button"
                         onClick={(e) => handleDeletePage(page.name, e)}
-                        className="text-slate-400 hover:text-rose-400 p-1 rounded hover:bg-slate-700 transition"
+                        className="text-[#64748b] hover:text-rose-600 p-1 rounded-md hover:bg-white transition"
                         title="Delete Page"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
+                        <Trash2 className="h-3 w-3" />
                       </button>
                     </div>
                   </div>
@@ -871,11 +911,18 @@ function AdminTemplatesPage() {
               </div>
             </div>
 
-            <div className="flex-1 bg-[#1e1e1e] flex flex-col">
-              <div className="px-4 py-2 bg-[#1e1e1e] border-b border-slate-800 text-xs font-mono text-slate-400 flex justify-between">
-                <span>{activePage}</span>
-                <span className="text-cyan-500">Monaco Editor</span>
+            <div className="flex-1 bg-[#1e1e1e] flex flex-col min-w-0">
+              <div className="px-5 py-2.5 bg-[#121824] border-b border-[#1e293b] text-xs font-mono text-slate-200 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-[#ea580c] animate-pulse" />
+                  <span className="font-bold text-white font-mono">{activePage}</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#059669]/15 border border-[#059669]/40 text-[#10b981] text-[11px] font-sans font-extrabold shadow-xs">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#10b981]" />
+                  <span>Monaco Code Editor</span>
+                </div>
               </div>
+
               <div className="flex-1">
                 <Editor
                   height="100%"
@@ -1015,95 +1062,118 @@ function AdminTemplatesPage() {
           )}
 
           {isSettingsOpen && (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-              <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-[#0b1826] p-6 shadow-2xl animate-in zoom-in-95">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-cyan-400" /> Template Metadata
-                  </h2>
-                  <button
-                    onClick={() => setIsSettingsOpen(false)}
-                    className="text-slate-400 hover:text-white transition"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200 p-4">
+              <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-2xl animate-in zoom-in-95">
+                {/* Indian Tricolor Accent Strip */}
+                <div className="flex h-1.5 w-full shrink-0" aria-hidden="true">
+                  <span className="flex-1 bg-[#ea580c]" />
+                  <span className="flex-1 bg-white" />
+                  <span className="flex-1 bg-[#059669]" />
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-medium text-slate-300 block mb-1.5">Title</label>
-                    <input
-                      value={editData.title}
-                      onChange={(e) => setEditData({ ...editData, title: e.target.value })}
-                      className="w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none"
-                      placeholder="Template Title"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-slate-300 block mb-1.5">
-                      Category
-                    </label>
-                    <Select
-                      value={editData.category}
-                      onValueChange={(value) => setEditData({ ...editData, category: value })}
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-5 pb-3 border-b border-[#f1f5f9]">
+                    <div className="flex items-center gap-2.5">
+                      <div className="grid h-8 w-8 place-items-center rounded-xl bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]">
+                        <Settings className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h2 className="text-base font-display font-extrabold text-[#0f172a]">
+                          Template Metadata
+                        </h2>
+                        <p className="text-[11px] text-[#64748b] font-medium">
+                          Update title, category, and preview image
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsSettingsOpen(false)}
+                      className="rounded-xl p-1.5 text-[#64748b] hover:bg-[#f1f5f9] hover:text-[#0f172a] transition cursor-pointer"
                     >
-                      <SelectTrigger className="w-full rounded-lg border-slate-700 bg-slate-900/50 text-slate-200 focus:ring-cyan-500">
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0b1826] border-slate-700 text-slate-200">
-                        {categoriesData?.categories?.map((cat: any) => (
-                          <SelectItem
-                            key={cat._id}
-                            value={cat.name}
-                            className="focus:bg-slate-800 focus:text-white"
-                          >
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                        {editData.category &&
-                          !categoriesData?.categories?.some(
-                            (c: any) => c.name === editData.category,
-                          ) && (
-                            <SelectItem
-                              value={editData.category}
-                              className="focus:bg-slate-800 focus:text-white"
-                            >
-                              {editData.category}
-                            </SelectItem>
-                          )}
-                      </SelectContent>
-                    </Select>
+                      <X className="h-4 w-4" />
+                    </button>
                   </div>
-                  <div>
-                    <label className="text-xs font-medium text-slate-300 block mb-1.5">
-                      Thumbnail URL (optional)
-                    </label>
-                    <ImageUpload
-                      value={editData.thumbnailUrl}
-                      onChange={(url) => setEditData({ ...editData, thumbnailUrl: url })}
-                      placeholder="Upload thumbnail"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-slate-300 block mb-1.5">
-                      Description
-                    </label>
-                    <textarea
-                      value={editData.description}
-                      onChange={(e) => setEditData({ ...editData, description: e.target.value })}
-                      className="w-full rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-cyan-500 focus:outline-none min-h-[80px] resize-none"
-                      placeholder="Short description..."
-                    />
-                  </div>
-                </div>
 
-                <div className="mt-6 flex justify-end gap-3">
-                  <button
-                    onClick={() => setIsSettingsOpen(false)}
-                    className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-300 hover:bg-slate-800 transition bg-slate-800"
-                  >
-                    Done
-                  </button>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-extrabold text-[#0f172a] block mb-1.5">
+                        Template Title
+                      </label>
+                      <input
+                        value={editData.title}
+                        onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+                        className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-3.5 py-2.5 text-xs font-semibold text-[#0f172a] placeholder-[#94a3b8] outline-none focus:border-[#059669] focus:bg-white transition"
+                        placeholder="e.g. StreetCraft — Sizzling Kitchen"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-extrabold text-[#0f172a] block mb-1.5">
+                        Category
+                      </label>
+                      <Select
+                        value={editData.category}
+                        onValueChange={(value) => setEditData({ ...editData, category: value })}
+                      >
+                        <SelectTrigger className="w-full rounded-xl border-[#e2e8f0] bg-[#f8fafc] text-xs font-bold text-[#0f172a] focus:ring-[#059669] h-10">
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white border-[#e2e8f0] text-[#0f172a] shadow-xl">
+                          {categoriesData?.categories?.map((cat: any) => (
+                            <SelectItem
+                              key={cat._id}
+                              value={cat.name}
+                              className="text-xs font-medium focus:bg-[#ecfdf5] focus:text-[#065f46]"
+                            >
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                          {editData.category &&
+                            !categoriesData?.categories?.some(
+                              (c: any) => c.name === editData.category,
+                            ) && (
+                              <SelectItem
+                                value={editData.category}
+                                className="text-xs font-medium focus:bg-[#ecfdf5] focus:text-[#065f46]"
+                              >
+                                {editData.category}
+                              </SelectItem>
+                            )}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-extrabold text-[#0f172a] block mb-1.5">
+                        Thumbnail Preview
+                      </label>
+                      <ImageUpload
+                        value={editData.thumbnailUrl}
+                        onChange={(url) => setEditData({ ...editData, thumbnailUrl: url })}
+                        placeholder="Upload or paste image URL"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-extrabold text-[#0f172a] block mb-1.5">
+                        Description
+                      </label>
+                      <textarea
+                        value={editData.description}
+                        onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+                        className="w-full rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3 text-xs font-semibold text-[#0f172a] placeholder-[#94a3b8] outline-none focus:border-[#059669] focus:bg-white min-h-[75px] resize-none transition"
+                        placeholder="Short description..."
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex justify-end gap-2.5 pt-3 border-t border-[#f1f5f9]">
+                    <button
+                      type="button"
+                      onClick={() => setIsSettingsOpen(false)}
+                      className="px-5 py-2 rounded-xl bg-[#059669] text-xs font-extrabold text-white shadow-xs hover:bg-[#047857] transition cursor-pointer"
+                    >
+                      Done
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

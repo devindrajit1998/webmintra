@@ -1,4 +1,4 @@
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useMemo } from "react";
 import { Link, Outlet } from "@tanstack/react-router";
 import {
   Activity,
@@ -26,6 +26,7 @@ import {
   X,
   BarChart3,
   Puzzle,
+  MessageSquare,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -56,8 +57,9 @@ export function useTenantContext() {
 const mainNavigation = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/tenant" },
   { label: "My websites", icon: Globe2, to: "/tenant/websites" },
-  { label: "Media library", icon: Image, to: "/tenant/media" },
+  { label: "WhatsApp & Leads", icon: MessageSquare, to: "/tenant/whatsapp" },
   { label: "Forms", icon: FileText, to: "/tenant/forms" },
+  { label: "Media library", icon: Image, to: "/tenant/media" },
   { label: "Blog", icon: BookOpen, to: "/tenant/blog" },
   { label: "Pages", icon: FileText, to: "/tenant/pages" },
   { label: "SEO manager", icon: Sparkles, to: "/tenant/seo" },
@@ -372,7 +374,12 @@ export function TenantDashboardIndex() {
           )}
         </div>
         <aside className="space-y-4 xl:col-span-4">
-          <WorkspaceHealth done={{ create: websites.length > 0, publish: published > 0 }} />
+          <GettingStartedChecklist
+            userEmail={user.email}
+            hasWebsite={websites.length > 0}
+            hasPublished={published > 0}
+            hasBusinessProfile={Boolean(dashboard?.account?.businessName)}
+          />
           <QuickActions />
         </aside>
       </section>
@@ -717,34 +724,163 @@ function ActivityCard({ websites }: { websites: Website[] }) {
   );
 }
 
-function WorkspaceHealth({ done }: { done: { create: boolean; publish: boolean } }) {
+function GettingStartedChecklist({
+  userEmail,
+  hasWebsite,
+  hasPublished,
+  hasBusinessProfile,
+}: {
+  userEmail: string;
+  hasWebsite: boolean;
+  hasPublished: boolean;
+  hasBusinessProfile: boolean;
+}) {
+  const dismissKey = `webmintra:checklist-dismissed:${userEmail}`;
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      return localStorage.getItem(dismissKey) === "1";
+    } catch {
+      return false;
+    }
+  });
+
+  const steps = useMemo(
+    () => [
+      {
+        id: "website",
+        label: "Create your first website",
+        description: "Pick a template and start building",
+        done: hasWebsite,
+        to: "/tenant/websites",
+        icon: "🌐",
+      },
+      {
+        id: "business",
+        label: "Fill in your business profile",
+        description: "Name, logo, contact info",
+        done: hasBusinessProfile,
+        to: "/tenant/business",
+        icon: "🏢",
+      },
+      {
+        id: "publish",
+        label: "Publish your website",
+        description: "Make it live for visitors",
+        done: hasPublished,
+        to: "/tenant/websites",
+        icon: "🚀",
+      },
+      {
+        id: "domain",
+        label: "Connect a custom domain",
+        description: "Use your own .in or .com domain",
+        done: false,
+        to: "/tenant/domains",
+        icon: "🔗",
+      },
+      {
+        id: "seo",
+        label: "Set up basic SEO",
+        description: "Help customers find you on Google",
+        done: false,
+        to: "/tenant/seo",
+        icon: "📈",
+      },
+    ],
+    [hasWebsite, hasBusinessProfile, hasPublished],
+  );
+
+  const completedCount = steps.filter((s) => s.done).length;
+  const allDone = completedCount === steps.length;
+  const progressPct = Math.round((completedCount / steps.length) * 100);
+
+  function handleDismiss() {
+    try {
+      localStorage.setItem(dismissKey, "1");
+    } catch {
+      /* noop */
+    }
+    setDismissed(true);
+  }
+
+  if (dismissed || allDone) return null;
+
   return (
-    <section className="rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-extrabold text-[#0b192c]">Launch Checklist</h2>
-      <p className="mt-0.5 text-xs text-[#64748b]">Complete these steps to go live.</p>
-      <div className="mt-4 space-y-2.5">
-        <Readiness label="Select Indian Business Template" done={done.create} />
-        <Readiness label="Connect .in Custom Domain" />
-        <Readiness label="Add WhatsApp Contact Button" />
-        <Readiness label="Publish Website to Edge" done={done.publish} />
+    <section className="overflow-hidden rounded-2xl border border-[#e2e8f0] bg-white shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-[#f1f5f9] px-5 py-4">
+        <div className="flex items-center gap-3">
+          {/* Progress ring */}
+          <div className="relative h-10 w-10 shrink-0">
+            <svg className="h-10 w-10 -rotate-90" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15" fill="none" stroke="#f1f5f9" strokeWidth="3" />
+              <circle
+                cx="18"
+                cy="18"
+                r="15"
+                fill="none"
+                stroke="#059669"
+                strokeWidth="3"
+                strokeDasharray={`${progressPct * 0.942} 100`}
+                strokeLinecap="round"
+              />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-extrabold text-[#047857]">
+              {completedCount}/{steps.length}
+            </span>
+          </div>
+          <div>
+            <h2 className="text-sm font-extrabold text-[#0b192c]">Getting Started</h2>
+            <p className="text-[10.5px] text-[#64748b]">
+              {completedCount} of {steps.length} steps done
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={handleDismiss}
+          title="Dismiss checklist"
+          className="rounded-lg p-1.5 text-[#94a3b8] hover:bg-[#f8fafc] hover:text-[#475569] transition"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Steps */}
+      <div className="divide-y divide-[#f8fafc] px-4 py-2">
+        {steps.map((step) => (
+          <Link key={step.id} to={step.to} className="flex items-center gap-3 py-2.5 group">
+            <span
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold transition ${
+                step.done
+                  ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
+                  : "border-[#cbd5e1] bg-[#f8fafc] text-[#94a3b8] group-hover:border-[#059669] group-hover:text-[#059669]"
+              }`}
+            >
+              {step.done ? "✓" : step.icon}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p
+                className={`text-xs font-bold ${step.done ? "line-through text-[#94a3b8]" : "text-[#0f172a] group-hover:text-[#059669]"}`}
+              >
+                {step.label}
+              </p>
+              {!step.done && <p className="text-[10.5px] text-[#64748b]">{step.description}</p>}
+            </div>
+            {!step.done && (
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#cbd5e1] group-hover:text-[#059669] transition" />
+            )}
+          </Link>
+        ))}
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-1.5 bg-[#f1f5f9]">
+        <div
+          className="h-full bg-gradient-to-r from-[#ea580c] to-[#059669] transition-all duration-500"
+          style={{ width: `${progressPct}%` }}
+        />
       </div>
     </section>
-  );
-}
-
-function Readiness({ label, done }: { label: string; done?: boolean }) {
-  return (
-    <div className="flex items-center gap-2.5 text-xs font-semibold">
-      <span
-        className={`flex h-5 w-5 items-center justify-center rounded-md border text-[10px] font-bold ${
-          done
-            ? "border-[#a7f3d0] bg-[#ecfdf5] text-[#047857]"
-            : "border-[#cbd5e1] bg-[#f8fafc] text-transparent"
-        }`}
-      >
-        ✓
-      </span>
-      <span className={done ? "text-[#0f172a]" : "text-[#64748b]"}>{label}</span>
-    </div>
   );
 }

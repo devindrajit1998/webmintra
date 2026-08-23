@@ -145,6 +145,9 @@ type PlanForm = {
   slug: string;
   description: string;
   pricing: { monthly: number | null; yearly: number | null };
+  originalPricing: { monthly: number | null; yearly: number | null };
+  discountBadge: string;
+  isOfferActive: boolean;
   trialDays: number;
   isPublic: boolean;
   sortOrder: number;
@@ -258,6 +261,9 @@ const EMPTY_FORM: PlanForm = {
   slug: "",
   description: "",
   pricing: { monthly: 499, yearly: 4990 },
+  originalPricing: { monthly: null, yearly: null },
+  discountBadge: "",
+  isOfferActive: false,
   trialDays: 0,
   isPublic: true,
   sortOrder: 0,
@@ -387,27 +393,48 @@ function PlanCard({ plan, onEdit }: { plan: any; onEdit: (p: any) => void }) {
         <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
           {plan.pricing?.monthly !== null && (
             <div>
-              <p className="font-display text-2xl font-bold text-slate-950">
-                ₹{Number(plan.pricing?.monthly ?? 0).toLocaleString("en-IN")}
-                <span className="ml-1 text-xs font-normal text-slate-500">/mo</span>
-              </p>
+              <div className="flex items-center gap-1.5">
+                {plan.isOfferActive && plan.originalPricing?.monthly && (
+                  <span className="text-xs font-semibold text-slate-400 line-through">
+                    ₹{Number(plan.originalPricing.monthly).toLocaleString("en-IN")}
+                  </span>
+                )}
+                <p className="font-display text-2xl font-bold text-slate-950">
+                  ₹{Number(plan.pricing?.monthly ?? 0).toLocaleString("en-IN")}
+                  <span className="ml-1 text-xs font-normal text-slate-500">/mo</span>
+                </p>
+              </div>
             </div>
           )}
           {plan.pricing?.yearly !== null && (
             <div>
-              <p className="font-display text-2xl font-bold text-slate-950">
-                ₹{Number(plan.pricing?.yearly ?? 0).toLocaleString("en-IN")}
-                <span className="ml-1 text-xs font-normal text-slate-500">/yr</span>
-              </p>
+              <div className="flex items-center gap-1.5">
+                {plan.isOfferActive && plan.originalPricing?.yearly && (
+                  <span className="text-xs font-semibold text-slate-400 line-through">
+                    ₹{Number(plan.originalPricing.yearly).toLocaleString("en-IN")}
+                  </span>
+                )}
+                <p className="font-display text-2xl font-bold text-slate-950">
+                  ₹{Number(plan.pricing?.yearly ?? 0).toLocaleString("en-IN")}
+                  <span className="ml-1 text-xs font-normal text-slate-500">/yr</span>
+                </p>
+              </div>
             </div>
           )}
           {plan.pricing?.monthly === null && plan.pricing?.yearly === null && (
             <p className="font-display text-2xl font-bold text-slate-400">Free</p>
           )}
         </div>
-        {plan.trialDays > 0 && (
-          <p className="mt-1 text-xs text-cyan-400">{plan.trialDays}-day free trial</p>
-        )}
+        <div className="mt-1 flex items-center gap-2">
+          {plan.isOfferActive && plan.discountBadge && (
+            <span className="rounded-md bg-[#fff7ed] border border-[#fed7aa] px-1.5 py-0.5 text-[10px] font-extrabold text-[#c2410c]">
+              🔥 {plan.discountBadge}
+            </span>
+          )}
+          {plan.trialDays > 0 && (
+            <p className="text-xs text-cyan-600 font-semibold">{plan.trialDays}-day free trial</p>
+          )}
+        </div>
       </div>
 
       {/* Limits */}
@@ -494,6 +521,12 @@ function PlanFormDrawer({
             monthly: initial.pricing?.monthly ?? 499,
             yearly: initial.pricing?.yearly ?? 4990,
           },
+          originalPricing: {
+            monthly: initial.originalPricing?.monthly ?? null,
+            yearly: initial.originalPricing?.yearly ?? null,
+          },
+          discountBadge: initial.discountBadge ?? "",
+          isOfferActive: initial.isOfferActive ?? false,
           trialDays: initial.trialDays ?? 0,
           isPublic: initial.isPublic ?? true,
           sortOrder: initial.sortOrder ?? 0,
@@ -634,7 +667,7 @@ function PlanFormDrawer({
             </span>
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="text-xs font-bold text-[#0f172a]">Monthly Price (₹)</label>
+                <label className="text-xs font-bold text-[#0f172a]">Monthly Offer Price (₹)</label>
                 <input
                   type="number"
                   min="0"
@@ -653,7 +686,7 @@ function PlanFormDrawer({
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-[#0f172a]">Yearly Price (₹)</label>
+                <label className="text-xs font-bold text-[#0f172a]">Yearly Offer Price (₹)</label>
                 <input
                   type="number"
                   min="0"
@@ -686,6 +719,103 @@ function PlanFormDrawer({
                 </select>
               </div>
             </div>
+
+            {/* Special Discount & Offer System */}
+            <div className="mt-4 rounded-2xl border border-[#fed7aa] bg-[#fffaf5] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#ffedd5] text-[#ea580c] font-bold text-xs">
+                    🏷️
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-extrabold text-[#0f172a]">
+                      Special Discount & Offer Pricing
+                    </h4>
+                    <p className="text-[11px] text-[#64748b]">
+                      Show strikethrough original price & save badge on pricing cards
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, isOfferActive: !f.isOfferActive }))}
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    form.isOfferActive ? "bg-[#ea580c]" : "bg-[#cbd5e1]"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      form.isOfferActive ? "translate-x-4" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {form.isOfferActive && (
+                <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#fed7aa]/60">
+                  <div>
+                    <label className="text-[11px] font-bold text-[#0f172a]">
+                      Original Monthly (M.R.P. ₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={
+                        form.originalPricing.monthly === null ? "" : form.originalPricing.monthly
+                      }
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          originalPricing: {
+                            ...f.originalPricing,
+                            monthly: e.target.value === "" ? null : Number(e.target.value),
+                          },
+                        }))
+                      }
+                      placeholder="e.g. 999"
+                      className="mt-1 h-9 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#0f172a] shadow-2xs outline-none focus:border-[#ea580c]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-[#0f172a]">
+                      Original Yearly (M.R.P. ₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={
+                        form.originalPricing.yearly === null ? "" : form.originalPricing.yearly
+                      }
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          originalPricing: {
+                            ...f.originalPricing,
+                            yearly: e.target.value === "" ? null : Number(e.target.value),
+                          },
+                        }))
+                      }
+                      placeholder="e.g. 9990"
+                      className="mt-1 h-9 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#0f172a] shadow-2xs outline-none focus:border-[#ea580c]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-[#0f172a]">
+                      Custom Offer Badge
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={30}
+                      value={form.discountBadge}
+                      onChange={(e) => setForm((f) => ({ ...f, discountBadge: e.target.value }))}
+                      placeholder="e.g. 50% OFF / Festive Sale"
+                      className="mt-1 h-9 w-full rounded-xl border border-[#cbd5e1] bg-white px-3 text-xs font-semibold text-[#0f172a] shadow-2xs outline-none focus:border-[#ea580c]"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div
               className="mt-3.5 flex items-center justify-between rounded-xl border border-[#e2e8f0] bg-[#f8fafc] px-4 py-3 cursor-pointer hover:border-[#cbd5e1] transition"
               onClick={() => setForm((f) => ({ ...f, isPublic: !f.isPublic }))}
