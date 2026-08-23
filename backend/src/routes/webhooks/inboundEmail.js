@@ -87,6 +87,23 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Sender email is missing from payload." });
     }
 
+    // ── LOOP BREAK GUARD ──────────────────────────────────────────────────────
+    // Prevent infinite email loops: skip if this is a notification we already sent
+    const LOOP_MARKERS = ["[webmintra inbox]", "x-webmintra-internal"];
+    const isLoopback =
+      LOOP_MARKERS.some((m) => subject.toLowerCase().includes(m)) ||
+      (raw.headers && raw.headers["x-webmintra-internal"] === "true") ||
+      toEmail.toLowerCase().includes("webmintraofficial") ||
+      fromEmail.toLowerCase().includes("webmintraofficial") ||
+      fromEmail.toLowerCase().includes("noreply@webmintra") ||
+      fromEmail.toLowerCase().includes("no-reply@webmintra");
+
+    if (isLoopback) {
+      console.log(`[Inbound Webhook] Loop detected — skipping: FROM=${fromEmail} SUBJECT="${subject}"`);
+      return res.status(200).json({ success: true, message: "Loop email detected and skipped." });
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     // Auto-detect Tenant / User match
     const existingUser = await User.findOne({ email: fromEmail }).select("_id role business").lean();
     
@@ -156,6 +173,11 @@ router.post("/", async (req, res) => {
             html: forwardHtml,
             text: textBody,
             replyTo: fromEmail,
+            headers: {
+              "X-WebMintra-Internal": "true",
+              "X-Auto-Response-Suppress": "All",
+              "Precedence": "bulk",
+            },
           });
         })
         .catch((err) => console.warn("[Inbound Email Forward Error]:", err.message));
