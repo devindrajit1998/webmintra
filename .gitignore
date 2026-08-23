@@ -19,6 +19,8 @@ dist-ssr
 *.local
 .env
 backend/.env
+.whatsapp-auth
+backend/.whatsapp-auth/
 
 # Wrangler / Cloudflare
 .wrangler/
