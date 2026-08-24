@@ -27,12 +27,23 @@ import {
   BarChart3,
   Puzzle,
   MessageSquare,
+  Megaphone,
+  Bell,
+  Info,
+  AlertTriangle,
+  CheckCircle2,
+  Wrench,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPublicSettings } from "@/lib/public-api";
 import { TenantHeaderControls } from "@/components/HeaderControls";
-import type { SessionUser, TenantDashboard as TenantDashboardData, Website } from "@/lib/auth-api";
+import {
+  type SessionUser,
+  type TenantDashboard as TenantDashboardData,
+  type Website,
+  getTenantAnnouncements,
+} from "@/lib/auth-api";
 
 export type TenantLayoutProps = {
   user: SessionUser;
@@ -262,8 +273,84 @@ export function TenantDashboardIndex() {
   const isTrialing = dashboard?.account?.isTrialing;
   const trialDaysLeft = dashboard?.account?.trialDaysLeft ?? 0;
 
+  const announcementsQuery = useQuery({
+    queryKey: ["tenant-announcements"],
+    queryFn: getTenantAnnouncements,
+    staleTime: 60_000,
+  });
+
+  const announcements = announcementsQuery.data?.announcements ?? [];
+
   return (
     <div className="space-y-6">
+      {/* ── Active Broadcast Announcements ───────────────────────── */}
+      {announcements.length > 0 && (
+        <div className="space-y-3">
+          {announcements.map((a) => {
+            const isWarn = a.type === "warning";
+            const isMaintenance = a.type === "maintenance";
+            const isSuccess = a.type === "success";
+            const isFeature = a.type === "feature";
+
+            const bgClasses = isWarn
+              ? "border-amber-200 bg-amber-50/90 text-amber-900"
+              : isMaintenance
+                ? "border-rose-200 bg-rose-50/90 text-rose-900"
+                : isSuccess
+                  ? "border-emerald-200 bg-emerald-50/90 text-emerald-900"
+                  : isFeature
+                    ? "border-indigo-200 bg-indigo-50/90 text-indigo-900"
+                    : "border-blue-200 bg-blue-50/90 text-blue-900";
+
+            const iconBg = isWarn
+              ? "bg-amber-100 text-amber-700"
+              : isMaintenance
+                ? "bg-rose-100 text-rose-700"
+                : isSuccess
+                  ? "bg-emerald-100 text-emerald-700"
+                  : isFeature
+                    ? "bg-indigo-100 text-indigo-700"
+                    : "bg-blue-100 text-blue-700";
+
+            return (
+              <div
+                key={a.id}
+                className={`flex items-start gap-3.5 rounded-2xl border p-4 shadow-2xs transition-all ${bgClasses}`}
+              >
+                <div
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl font-bold shadow-2xs ${iconBg}`}
+                >
+                  {isWarn ? (
+                    <AlertTriangle className="h-4 w-4" />
+                  ) : isMaintenance ? (
+                    <Wrench className="h-4 w-4" />
+                  ) : isSuccess ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : isFeature ? (
+                    <Sparkles className="h-4 w-4" />
+                  ) : (
+                    <Megaphone className="h-4 w-4" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h4 className="text-sm font-extrabold">{a.title}</h4>
+                    {a.isPinned && (
+                      <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider shadow-2xs">
+                        Pinned
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed opacity-90 whitespace-pre-line">
+                    {a.content}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Free Trial Banner */}
       {isTrialing && (
         <div className="tiranga-border-top flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-[#fed7aa] bg-gradient-to-r from-[#fff7ed] via-white to-[#ecfdf5] p-5 shadow-sm">

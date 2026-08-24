@@ -7,6 +7,7 @@ import { Router } from "express";
 import { InboxMessage } from "../../models/InboxMessage.js";
 import { User } from "../../models/User.js";
 import { Lead } from "../../models/Lead.js";
+import { Notification } from "../../models/Notification.js";
 
 const router = Router();
 
@@ -140,48 +141,32 @@ router.post("/", async (req, res) => {
       receivedAt: new Date(),
     });
 
-    // ── Dual Delivery: Automatically send a copy to Admin Gmail (Non-blocking) ──
-    const adminNotificationEmail = process.env.ADMIN_INBOX_FORWARD_EMAIL || "indrajitghosh449@gmail.com";
-    if (adminNotificationEmail && fromEmail !== adminNotificationEmail) {
-      import("../../services/mail.js")
-        .then(({ sendRawEmail }) => {
-          const forwardHtml = `
-            <div style="font-family:sans-serif;background:#f8fafc;padding:24px;color:#0f172a;">
-              <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;border:1px solid #e2e8f0;padding:24px;">
-                <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
-                  <span style="font-size:12px;font-weight:bold;color:#059669;">📬 New Inbound Message on WebMintra Admin Mailbox</span>
-                </div>
-                <h3 style="margin:0 0 8px 0;color:#0f172a;">${subject}</h3>
-                <p style="font-size:13px;color:#64748b;margin:0 0 16px 0;">
-                  From: <strong>${fromName || fromEmail}</strong> &lt;${fromEmail}&gt; &bull; Sent to: <strong>${toEmail}</strong>
-                </p>
-                <hr style="border:none;border-top:1px solid #f1f5f9;margin:16px 0;"/>
-                <div style="font-size:14px;line-height:1.6;color:#334155;">
-                  ${htmlBody || `<p>${textBody.replace(/\n/g, "<br/>")}</p>`}
-                </div>
-                <hr style="border:none;border-top:1px solid #f1f5f9;margin:24px 0 16px 0;"/>
-                <div style="font-size:12px;color:#64748b;">
-                  You can reply directly in your <a href="https://webmintra.in/admin/mailbox" style="color:#059669;font-weight:bold;text-decoration:none;">Admin Mailbox Dashboard</a>.
-                </div>
-              </div>
-            </div>
-          `;
-
-          return sendRawEmail({
-            to: adminNotificationEmail,
-            subject: `[WebMintra Inbox] ${subject} (from ${fromName || fromEmail})`,
-            html: forwardHtml,
-            text: textBody,
-            replyTo: fromEmail,
-            headers: {
-              "X-WebMintra-Internal": "true",
-              "X-Auto-Response-Suppress": "All",
-              "Precedence": "bulk",
+    // ── In-App Notification: Notify all active admins ──────────────────────────
+    try {
+      const admins = await User.find({ role: "admin", isEmailVerified: true }).select("_id").lean();
+      if (admins.length) {
+        await Notification.insertMany(
+          admins.map((admin) => ({
+            recipient: admin._id,
+            type: "system",
+            title: `New Email from ${fromName || fromEmail}`,
+            message: subject ? String(subject).slice(0, 300) : "No subject",
+            link: "/admin/mailbox",
+            metadata: {
+              inboxMessageId: String(message._id),
+              fromEmail,
+              category,
             },
-          });
-        })
-        .catch((err) => console.warn("[Inbound Email Forward Error]:", err.message));
+          })),
+          { ordered: false }
+        );
+      }
+    } catch (notifErr) {
+      console.warn("[Inbound Email Notification Error]:", notifErr?.message);
     }
+
+    // Note: Cloudflare Email Routing already forwards a pristine copy to your Gmail inbox.
+    // In-app notifications in Admin Mailbox are recorded above.
 
     return res.status(201).json({
       success: true,

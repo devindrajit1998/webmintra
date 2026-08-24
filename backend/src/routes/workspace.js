@@ -14,11 +14,55 @@ import { resolveTenantSeoEntitlements } from "../lib/tenant-seo-entitlements.js"
 import { checkStorageLimit } from "../services/limits.js";
 import { sanitizeRichHtml } from "../lib/sanitizeRichHtml.js";
 import { compressUploadedImages } from "../middleware/imageCompressor.js";
+import { Announcement } from "../models/Announcement.js";
 
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } }); // 10MB limit (compressed before storage)
 
 router.use(requireAuthenticatedUser, requireRole("tenant"), establishTenantContext);
+
+router.get("/announcements", async (req, res, next) => {
+    try {
+        const now = new Date();
+        const userPlan = req.user.plan || "starter";
+
+        const filter = {
+            status: "published",
+            $and: [
+                {
+                    $or: [
+                        { audience: "all" },
+                        { audience: "tenants" },
+                        { audience: "active", $expr: { $eq: [req.user.tenantStatus, "active"] } },
+                        { audience: "specific_plans", targetPlans: userPlan },
+                    ],
+                },
+                {
+                    $or: [
+                        { expiresAt: { $exists: false } },
+                        { expiresAt: null },
+                        { expiresAt: { $gt: now } },
+                    ],
+                },
+            ],
+        };
+
+        const announcements = await Announcement.find(filter)
+            .sort({ isPinned: -1, publishedAt: -1, createdAt: -1 })
+            .limit(10)
+            .select("title content excerpt type isPinned publishedAt createdAt")
+            .lean();
+
+        return res.json({
+            announcements: announcements.map((a) => ({
+                ...a,
+                id: a._id,
+            })),
+        });
+    } catch (error) {
+        return next(error);
+    }
+});
 
 router.get("/notifications", async (req, res, next) => {
     try {
@@ -160,6 +204,23 @@ router.post("/support", async (req, res, next) => {
             description: `Support ticket ${ticket.ticketNumber} created.`,
             resource: { type: "support_ticket", id: String(ticket._id), name: ticket.ticketNumber },
         });
+
+        // Notify admins about the new support ticket
+        try {
+            const admins = await req.user.constructor.find({ role: "admin", isEmailVerified: true }).select("_id email name").lean();
+            if (admins.length) {
+                await Notification.insertMany(admins.map((admin) => ({
+                    recipient: admin._id,
+                    type: "ticket",
+                    title: `New Ticket #${ticket.ticketNumber} from ${req.user.name || "Tenant"}`,
+                    message: ticket.subject,
+                    link: `/admin/support`,
+                    metadata: { ticketId: String(ticket._id), ticketNumber: ticket.ticketNumber },
+                })), { ordered: false });
+            }
+        } catch (notifErr) {
+            console.warn("[Support Ticket Notification Error]:", notifErr?.message);
+        }
 
         return res.status(201).json({ ticket: formatTenantTicket(ticket.toObject()) });
     } catch (error) {

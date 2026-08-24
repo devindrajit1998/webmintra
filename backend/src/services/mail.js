@@ -53,31 +53,26 @@ export async function sendRawEmail({ to, subject, text, html, fromAddress, fromN
 
   const resend = getResendClient();
 
-  // 1. If Resend is configured, use Resend HTTP API (highest reliability & HTML rendering)
+  // 1. Primary & Exclusive Delivery via Resend API
   if (resend) {
-    try {
-      const response = await resend.emails.send({
-        from: formattedFrom,
-        to: Array.isArray(to) ? to : [to],
-        reply_to: defaultReplyTo,
-        subject,
-        html: html || undefined,
-        text: text || undefined,
-      });
+    const response = await resend.emails.send({
+      from: formattedFrom,
+      to: Array.isArray(to) ? to : [to],
+      reply_to: defaultReplyTo,
+      subject,
+      html: html || undefined,
+      text: text || undefined,
+    });
 
-      if (response.error) {
-        console.error("[EmailService:Resend Error]:", response.error);
-        throw new Error(response.error.message || "Resend email delivery failed.");
-      }
-
-      return { provider: "resend", id: response.data?.id };
-    } catch (err) {
-      console.warn("[EmailService:Resend Failed, falling back to SMTP]:", err.message);
-      // fallback to SMTP if Resend fails
+    if (response.error) {
+      console.error("[EmailService:Resend Error]:", response.error);
+      throw new Error(response.error.message || "Resend email delivery failed.");
     }
+
+    return { provider: "resend", id: response.data?.id };
   }
 
-  // 2. SMTP Transport Fallback
+  // 2. SMTP Transport (only used if RESEND_API_KEY is not set)
   const transport = getSmtpTransport();
   if (transport) {
     const info = await transport.sendMail({
@@ -91,7 +86,7 @@ export async function sendRawEmail({ to, subject, text, html, fromAddress, fromN
     return { provider: "smtp", messageId: info.messageId };
   }
 
-  throw new Error("No active email transport available. Please set RESEND_API_KEY or SMTP credentials.");
+  throw new Error("No active email transport available. Please configure RESEND_API_KEY.");
 }
 
 /**

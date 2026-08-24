@@ -236,8 +236,9 @@ router.post("/contact", async (req, res) => {
     const enquiryDetails = `Name: ${String(name).slice(0, 100)}\nEmail: ${String(email).slice(0, 100)}\nPhone: ${String(phone || "N/A").slice(0, 30)}\n\nMessage:\n${String(message).slice(0, 5000)}`;
 
     const { SupportTicket } = await import("../models/SupportTicket.js");
+    let createdTicket = null;
     if (SupportTicket) {
-      await SupportTicket.create({
+      createdTicket = await SupportTicket.create({
         subject: enquirySubject,
         description: enquiryDetails,
         contactName: String(name).slice(0, 100),
@@ -247,6 +248,30 @@ router.post("/contact", async (req, res) => {
         priority: "medium",
         status: "open",
       });
+    }
+
+    // In-App Notification for all admins
+    try {
+      const { Notification } = await import("../models/Notification.js");
+      const admins = await User.find({ role: "admin", isEmailVerified: true }).select("_id").lean();
+      if (admins.length && Notification) {
+        await Notification.insertMany(
+          admins.map((admin) => ({
+            recipient: admin._id,
+            type: "ticket",
+            title: `New Enquiry from ${name}`,
+            message: enquirySubject,
+            link: "/admin/support",
+            metadata: {
+              contactEmail: email,
+              ticketId: createdTicket ? String(createdTicket._id) : undefined,
+            },
+          })),
+          { ordered: false }
+        );
+      }
+    } catch (notifErr) {
+      console.warn("[Contact Enquiry Notification Error]:", notifErr?.message);
     }
 
     // Also register as a Lead for CRM tracking

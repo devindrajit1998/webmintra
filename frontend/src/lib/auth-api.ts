@@ -827,6 +827,21 @@ export function markAllTenantNotificationsRead() {
   return workspaceRequest<{ message: string }>("/notifications/read-all", { method: "PATCH" });
 }
 
+export type TenantAnnouncement = {
+  id: string;
+  title: string;
+  content: string;
+  excerpt?: string;
+  type: "info" | "warning" | "success" | "maintenance" | "feature";
+  isPinned?: boolean;
+  publishedAt?: string;
+  createdAt: string;
+};
+
+export function getTenantAnnouncements() {
+  return workspaceRequest<{ announcements: TenantAnnouncement[] }>("/announcements");
+}
+
 export type TenantAnalytics = {
   period: { days: number; from: string; to: string };
   summary: { uniqueVisitors: number; pageViews: number; conversions: number };
