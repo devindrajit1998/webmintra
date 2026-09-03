@@ -40,7 +40,7 @@ export const Route = createFileRoute("/admin/storage")({
   head: () => ({ meta: [{ title: "Storage & Image Compression | WebMintra Admin" }] }),
 });
 
-export function StoragePage() {
+function StoragePage() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<"mongodb" | "files" | "compressor">("compressor");
   const [page, setPage] = useState(1);

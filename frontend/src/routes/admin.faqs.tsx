@@ -36,7 +36,7 @@ const EMPTY_FORM: FaqForm = {
   sortOrder: 0,
 };
 
-export function AdminFaqsPage() {
+function AdminFaqsPage() {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

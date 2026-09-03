@@ -9,6 +9,7 @@ import {
   Upload,
   Layers,
   X,
+  Share2,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";

@@ -49,7 +49,7 @@ const CATEGORY_BADGES: Record<string, { label: string; color: string }> = {
   general: { label: "General", color: "bg-slate-100 text-slate-700 border-slate-200" },
 };
 
-export function MailboxPage() {
+function MailboxPage() {
   const queryClient = useQueryClient();
   const [folder, setFolder] = useState<"inbox" | "starred" | "archived" | "spam">("inbox");
   const [categoryFilter, setCategoryFilter] = useState("");

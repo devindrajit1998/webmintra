@@ -181,7 +181,7 @@ const EMPTY_LEAD_FORM: LeadFormState = {
   initialNote: "",
 };
 
-export function AdminLeadsPage() {
+function AdminLeadsPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
 

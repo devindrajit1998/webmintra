@@ -10,7 +10,7 @@ export const Route = createFileRoute("/terms-and-conditions")({
   head: () => ({ meta: [{ title: "Terms and Conditions | WebMintra" }] }),
 });
 
-export function TermsAndConditionsPage() {
+function TermsAndConditionsPage() {
   const { data: settings = {} } = useQuery({
     queryKey: ["publicSettings"],
     queryFn: getPublicSettings,

@@ -53,7 +53,7 @@ const EMPTY_FORM: TestimonialForm = {
   sortOrder: 0,
 };
 
-export function AdminTestimonialsPage() {
+function AdminTestimonialsPage() {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);

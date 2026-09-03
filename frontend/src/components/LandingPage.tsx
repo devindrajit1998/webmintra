@@ -373,8 +373,12 @@ export function LandingPage() {
                         {/* Canvas Right Image */}
                         <div className="rounded-xl overflow-hidden border border-[#e2e8f0] bg-white aspect-[4/3] shadow-sm">
                           <img
-                            src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=80&w=800"
+                            src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&q=75&w=640"
                             alt="Dental Clinic Delhi"
+                            width={640}
+                            height={480}
+                            fetchPriority="high"
+                            decoding="async"
                             className="h-full w-full object-cover"
                           />
                         </div>
@@ -675,8 +679,12 @@ export function LandingPage() {
                     <div className="rounded-lg border border-[#e2e8f0] bg-white p-1.5 shadow-2xs">
                       <div className="h-10 w-full rounded bg-[#fff7ed] overflow-hidden border border-[#fed7aa] relative mb-1">
                         <img
-                          src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=200"
+                          src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=75&w=200"
                           alt="Dental"
+                          width={200}
+                          height={100}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover"
                         />
                         <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#c2410c]">
@@ -688,8 +696,12 @@ export function LandingPage() {
                     <div className="rounded-lg border border-[#e2e8f0] bg-white p-1.5 shadow-2xs">
                       <div className="h-10 w-full rounded bg-[#ecfdf5] overflow-hidden border border-[#a7f3d0] relative mb-1">
                         <img
-                          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=200"
+                          src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=75&w=200"
                           alt="Gym"
+                          width={200}
+                          height={100}
+                          loading="lazy"
+                          decoding="async"
                           className="h-full w-full object-cover"
                         />
                         <span className="absolute bottom-0.5 left-0.5 text-[7px] font-extrabold bg-white/90 px-1 rounded text-[#047857]">
@@ -828,9 +840,13 @@ export function LandingPage() {
                       <img
                         src={
                           t.thumbnailUrl ||
-                          "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=600"
+                          "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=75&w=400"
                         }
                         alt={t.title}
+                        width={300}
+                        height={225}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover group-hover:scale-108 transition-transform duration-300"
                       />
 
@@ -1206,6 +1222,10 @@ export function LandingPage() {
                       <img
                         src={t.avatarUrl}
                         alt={t.authorName}
+                        width={36}
+                        height={36}
+                        loading="lazy"
+                        decoding="async"
                         className="h-9 w-9 rounded-full object-cover border border-[#e2e8f0]"
                       />
                       <div>
@@ -1365,8 +1385,12 @@ export function LandingPage() {
                     <div className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   </div>
                   <img
-                    src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600"
+                    src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=75&w=600"
                     alt="Laptop screen"
+                    width={600}
+                    height={375}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -1374,8 +1398,12 @@ export function LandingPage() {
                 {/* Overlapping Mobile Mockup */}
                 <div className="absolute -bottom-3 right-2 sm:right-8 w-26 rounded-xl bg-slate-950 border-2 border-slate-700 shadow-2xl overflow-hidden aspect-[9/16] hidden sm:block">
                   <img
-                    src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=400"
+                    src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=75&w=260"
                     alt="Mobile screen"
+                    width={260}
+                    height={462}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover"
                   />
                 </div>
@@ -1411,6 +1439,9 @@ export function LandingPage() {
                   <img
                     src={logoUrl}
                     alt={isMounted ? siteName : "Webmintra"}
+                    width={180}
+                    height={32}
+                    decoding="async"
                     className="h-8 max-w-[180px] object-contain"
                   />
                 ) : (
@@ -1703,6 +1734,10 @@ export function LandingPage() {
               <img
                 src={previewTemplate.thumbnailUrl}
                 alt={previewTemplate.title}
+                width={768}
+                height={480}
+                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover object-top"
               />
             </div>

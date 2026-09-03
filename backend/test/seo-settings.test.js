@@ -19,7 +19,7 @@ test("normalizes only provided keys in canonical key order", () => {
         { key: "seo.defaultDescription", value: "A website builder for small businesses." },
         { key: "seo.allowIndexing", value: true },
     ]);
-    assert.equal(SEO_SETTING_KEYS.length, 10);
+    assert.equal(SEO_SETTING_KEYS.length, 12);
 });
 
 test("rejects invalid or unsafe SEO values", () => {

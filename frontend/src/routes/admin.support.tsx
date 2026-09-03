@@ -73,7 +73,7 @@ interface TicketDetail extends TicketSummary {
 }
 
 // ── Main Page Component ───────────────────────────────────────
-export function SupportPage() {
+function SupportPage() {
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("");

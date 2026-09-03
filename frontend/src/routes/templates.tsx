@@ -35,7 +35,7 @@ export const Route = createFileRoute("/templates")({
   head: () => ({ meta: [{ title: "Website Templates Catalog | WebMintra" }] }),
 });
 
-export function PublicTemplatesCatalogPage() {
+function PublicTemplatesCatalogPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");

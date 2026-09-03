@@ -35,7 +35,7 @@ const STATUS_BADGE: Record<string, string> = {
   contacted: "bg-purple-50 text-purple-700 border-purple-200",
 };
 
-export function SearchPage() {
+function SearchPage() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
 

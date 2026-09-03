@@ -78,7 +78,7 @@ export const Route = createFileRoute("/contact")({
   component: PublicContactPage,
 });
 
-export function PublicContactPage() {
+function PublicContactPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",

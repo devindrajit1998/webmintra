@@ -10,7 +10,7 @@ export const Route = createFileRoute("/refund-cancellation-policy")({
   head: () => ({ meta: [{ title: "Refund & Cancellation Policy | WebMintra" }] }),
 });
 
-export function RefundCancellationPolicyPage() {
+function RefundCancellationPolicyPage() {
   const { data: settings = {} } = useQuery({
     queryKey: ["publicSettings"],
     queryFn: getPublicSettings,

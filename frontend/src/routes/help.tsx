@@ -113,7 +113,7 @@ export const Route = createFileRoute("/help")({
   component: PublicHelpCenterPage,
 });
 
-export function PublicHelpCenterPage() {
+function PublicHelpCenterPage() {
   const [selectedTutorial, setSelectedTutorial] = useState<any | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");

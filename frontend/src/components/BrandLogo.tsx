@@ -46,6 +46,9 @@ export function BrandLogo({
         <img
           src={logoUrl}
           alt={siteName}
+          width={180}
+          height={size === "sm" ? 24 : size === "lg" ? 36 : 32}
+          decoding="async"
           className={`${imgHeight} max-w-[180px] object-contain shrink-0`}
         />
       ) : (

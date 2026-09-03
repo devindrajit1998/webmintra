@@ -47,7 +47,7 @@ function timeAgo(date: string | Date): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-export function BackupPage() {
+function BackupPage() {
   const queryClient = useQueryClient();
   const [downloadingKey, setDownloadingKey] = useState<string | null>(null);
 

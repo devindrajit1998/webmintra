@@ -1,9 +1,14 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from '@tanstack/react-router'
+import { lazy, Suspense, useState } from "react";
 import { LandingPage } from "@/components/LandingPage";
-import { ImportWizard } from "@/components/engine/ImportWizard";
-import { Editor } from "@/components/engine/Editor";
 import type { TemplateAnalysis } from "@/lib/template-engine/types";
+
+const ImportWizard = lazy(() =>
+  import("@/components/engine/ImportWizard").then((mod) => ({ default: mod.ImportWizard })),
+);
+const Editor = lazy(() =>
+  import("@/components/engine/Editor").then((mod) => ({ default: mod.Editor })),
+);
 import { getSessionUser, routeForRole } from "@/lib/auth-api";
 import { getPublicSettings } from "@/lib/public-api";
 
@@ -110,12 +115,33 @@ function Index() {
     return <PublicSiteViewer subdomain={previewSite} />;
   }
 
-  if (analysis) return <Editor analysis={analysis} onExit={() => setAnalysis(null)} />;
+  if (analysis) {
+    return (
+      <Suspense
+        fallback={
+          <div className="flex h-screen items-center justify-center bg-[#f8fafc]">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#059669] border-t-transparent" />
+          </div>
+        }
+      >
+        <Editor analysis={analysis} onExit={() => setAnalysis(null)} />
+      </Suspense>
+    );
+  }
+
   if (!started) return <LandingPage />;
 
   return (
     <div className="min-h-screen">
-      <ImportWizard onComplete={setAnalysis} />
+      <Suspense
+        fallback={
+          <div className="flex h-screen items-center justify-center bg-[#f8fafc]">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#059669] border-t-transparent" />
+          </div>
+        }
+      >
+        <ImportWizard onComplete={setAnalysis} />
+      </Suspense>
     </div>
   );
 }

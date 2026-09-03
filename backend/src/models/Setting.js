@@ -51,6 +51,8 @@ export const DEFAULT_SETTINGS = [
   { key: "seo.organizationName", value: "WebMintra", group: "seo", label: "Organization name", description: "Business name included in structured search data.", type: "string", isPublic: true },
   { key: "seo.organizationLogoUrl", value: "", group: "seo", label: "Organization logo", description: "Absolute logo URL included in structured search data.", type: "image", isPublic: true },
   { key: "seo.allowIndexing", value: true, group: "seo", label: "Allow search indexing", description: "Allow search engines to index and follow the landing page.", type: "boolean", isPublic: true },
+  { key: "seo.googleSiteVerification", value: "", group: "seo", label: "Google Site Verification", description: "Google Search Console verification meta tag token.", type: "string", isPublic: true },
+  { key: "seo.bingVerification", value: "", group: "seo", label: "Bing Webmaster Verification", description: "Bing Webmaster verification meta tag token.", type: "string", isPublic: true },
   // Public legal content
   {
     key: "content.privacyPolicy",

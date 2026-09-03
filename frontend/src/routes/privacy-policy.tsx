@@ -10,7 +10,7 @@ export const Route = createFileRoute("/privacy-policy")({
   head: () => ({ meta: [{ title: "Privacy Policy | WebMintra" }] }),
 });
 
-export function PrivacyPolicyPage() {
+function PrivacyPolicyPage() {
   const { data: settings = {} } = useQuery({
     queryKey: ["publicSettings"],
     queryFn: getPublicSettings,

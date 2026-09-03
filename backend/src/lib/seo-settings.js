@@ -9,6 +9,8 @@ const SEO_RULES = Object.freeze({
     "seo.organizationName": { type: "string", maxLength: 120, required: true },
     "seo.organizationLogoUrl": { type: "url", maxLength: 1000 },
     "seo.allowIndexing": { type: "boolean" },
+    "seo.googleSiteVerification": { type: "string", maxLength: 200 },
+    "seo.bingVerification": { type: "string", maxLength: 200 },
 });
 
 export const SEO_SETTING_KEYS = Object.freeze(Object.keys(SEO_RULES));
