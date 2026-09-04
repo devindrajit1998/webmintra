@@ -31,9 +31,67 @@ import { PublicHeader } from "@/components/PublicHeader";
 import { PublicFooter } from "@/components/PublicFooter";
 
 export const Route = createFileRoute("/templates")({
+  loader: async () => {
+    try {
+      const settings = await getPublicSettings().catch(() => ({}));
+      return { settings };
+    } catch {
+      return { settings: {} };
+    }
+  },
+  head: ({ loaderData }) => {
+    const settings = loaderData?.settings || {};
+    const siteName = String(settings["site.name"] || "WebMintra");
+    const canonicalBase = String(settings["seo.canonicalUrl"] || "https://webmintra.in").replace(
+      /\/$/,
+      "",
+    );
+    const pageUrl = `${canonicalBase}/templates`;
+    const title = `Ready-to-Use Website Templates Catalog | ${siteName}`;
+    const description = `Explore responsive, high-converting website templates for clinics, restaurants, shops, events, and modern startups on ${siteName}.`;
+    const ogImage = settings["seo.socialImageUrl"] || settings["brand.logoUrl"] || "";
+
+    const jsonLdCatalog = {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: title,
+      url: pageUrl,
+      description,
+      publisher: {
+        "@type": "Organization",
+        name: siteName,
+        url: canonicalBase,
+      },
+    };
+
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow, max-image-preview:large" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: pageUrl },
+        { property: "og:site_name", content: siteName },
+        ...(ogImage ? [{ property: "og:image", content: ogImage }] : []),
+        { name: "twitter:card", content: ogImage ? "summary_large_image" : "summary" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        ...(ogImage ? [{ name: "twitter:image", content: ogImage }] : []),
+      ],
+      links: [{ rel: "canonical", href: pageUrl }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify(jsonLdCatalog),
+        },
+      ],
+    };
+  },
   component: PublicTemplatesCatalogPage,
-  head: () => ({ meta: [{ title: "Website Templates Catalog | WebMintra" }] }),
 });
+
 
 function PublicTemplatesCatalogPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
